@@ -1,2 +1,3 @@
-# trinitylake
-Open LakeHouse Format for Big Data Analytics, ML &amp; AI
+# TrinityLake&trade;
+
+**An Open LakeHouse Format for Big Data Analytics, ML & AI**
