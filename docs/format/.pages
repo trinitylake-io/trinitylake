@@ -1,0 +1,12 @@
+nav:
+    - overview.md
+    - versioning.md
+    - storage.md
+    - commit.md
+    - object-definition-file.md
+    - key-encoding.md
+    - location.md
+    - lakehouse.md
+    - namespace.md
+    - table
+    - tree

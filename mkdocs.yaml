@@ -3,29 +3,23 @@ site_url: https://trinitylake.io
 repo_url: https://github.com/trinitylake-io/trinitylake
 repo_name: trinitylake-io/trinitylake
 theme:
-  name: material
   font:
-    code: Red Hat Mono
+    text: Roboto
+    code: Roboto Mono
+  name: material
+  logo: logo/blue.png
+  favicon: logo/favicon.ico
   icon:
-    logo: material/sail-boat
     repo: material/github
   palette:
-    # Dark Mode
-    - scheme: slate
-      toggle:
-        icon: material/weather-sunny
-        name: Dark mode
-      primary: deep blue
-      accent: deep purple
-
-    # Light Mode
-    - scheme: default
-      toggle:
-        icon: material/weather-night
-        name: Light mode
-      primary: blue
-      accent: deep orange
-
+    scheme: default
+    primary: white
+    accent: blue
+  features:
+    - search.suggest
+plugins:
+  - awesome-pages
+  - search
 markdown_extensions:
   - attr_list
   - pymdownx.emoji:
@@ -46,3 +40,4 @@ markdown_extensions:
       alternate_style: true
   - admonition
   - pymdownx.details
+  - md_in_html
