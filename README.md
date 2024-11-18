@@ -2,7 +2,7 @@
 
 ***An Open LakeHouse Format for Big Data Analytics, ML & AI***
 
-![TrinityLake Logo](https://github.com/jackye1995/trinitylake/blob/initial/docs/logo/blue-text-horizontal.png?raw=true)
+![TrinityLake Logo](https://github.com/trinitylake-io/trinitylake/blob/main/docs/logo/blue-text-horizontal.png?raw=true)
 
 ## Introduction
 
@@ -26,7 +26,8 @@ The project website is built using the [mkdocs-material](https://pypi.org/projec
 ```bash
 python3 -m venv env
 source env/bin/activate
-pip install -r mkdocs-requirements.txt
+pip install mkdocs-material
+pip install mkdocs-awesome-pages-plugin
 ```
 
 ### Serve website
