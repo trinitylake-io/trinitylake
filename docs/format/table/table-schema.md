@@ -1,3 +1,2 @@
 # Table Schema
 
-TODO
