@@ -1,46 +1,51 @@
 # Key Encoding
 
-## First Byte
-
-The first byte of a key in a TrinityLake tree is used as an indicator to differentiate user-facing objects in LakeHouse vs
-any other system-reserved objects such as [LakeHouse](./lakehouse.md).
-User-facing object keys must start with a `[space]`,
-and system-reserved object keys must not start with a `[space]`.
-
 !!! note
 
     we use the literal `[space]` to represent the space character (hex value 20) in this document for clarity
 
-## LakeHouse Definition Key
+## First Byte
 
-The LakeHouse definition file pointer is stored with key `lakehouse`.
-This key is special that it does not participate in the TrinityLake tree sorting algorithm,
-and always stay in the root node and is read first by any reader.
+The first byte of a key in a TrinityLake tree is used to differentiate user-facing objects in LakeHouse vs
+any other system-internal object definitions such as [LakeHouse](#lakehouse-key).
+User-facing object keys must start with a `[space]`,
+and system-internal object keys must not start with a `[space]`.
 
-## Object Name Key Encoding
+## LakeHouse Key
 
-The object name key is a UTF-8 string that contains multiple parts.
+The [LakeHouse definition file](./lakehouse.md) pointer is stored with key `lakehouse`.
+This key is special that it does not participate in the TrinityLake tree key sorting algorithm,
+and always stay in the root node so that it is read as the first entry to bootstrap a TrinityLake reader or writer.
+
+## Object ID Key
+
+The object ID key is a UTF-8 string that uniquely identifies the object and also allows sorting it in a 
+lexicographical order that resembles the object hierarchy in a LakeHouse.
 
 ### Object Name
 
-Any object name must have maximum size in bytes defined in Lakehouse definition.
-The value must only contain UTF-8 characters that are not any control characters or the space character (hex value 00 to 20).
+The object name has maximum size in bytes defined in [Lakehouse definition file](./lakehouse.md), 
+with one configuration for each type of object.
+
+The following UTF-8 characters are not permitted in an object name:
+- any control characters (hex value 00 to 1F)
+- the space character (hex value 20)
+- the DEL character (hex value 7F)
 
 ### Encoded Object Name
 
-When encoded in an object key, the object name is right-padded with space up to the maximum size.
-For example, a namespace `default` under LakeHouse definition `object_name_size_bytes_max=16` will have an encoded object name
-`[space]default[space][space][space][space][space][space][space][space][space]`.
+When used in an object ID key, the object name is right-padded with space up to the maximum size 
+(excluding the initial byte). For example, a namespace `default` under LakeHouse definition 
+`namespace_name_max_size_bytes=8` will have an encoded object name`[space]default[space]`.
+
+### Encoded Object Definition Schema ID
+
+The schema of the [object definition](./object-definition-file.md) has a numeric ID, 
+and is encoded to a base64 value of size 4 with padding.
 
 ### Encoded Object ID
 
-The full key name of an object 
+The encoded object ID that is used as the object ID key is defined as the following:
 
-
-
-The name of an object must have maximum size in bytes defined by global configuration `<object>.name_size_bytes_max`,
-default to 128. The value must only contain UTF-8 string that is not any control characters or the space character (hex value 00 to 20).
-
-When presented in an object key, the value is left-padded with space up to the maximum size of the namespace name.
-For example, a namespace `default` under configuration `namespace.name_size_bytes_max=16` will have an object name key
-`[space][space][space][space][space][space][space][space][space][space]default` (1 space for first byte, 9 spaces for padding, 7 bytes for `default`).
+- Namespace: encoded namespace name + encoded schema ID
+- Table: encoded namespace name + encoded table name + encoded schema ID

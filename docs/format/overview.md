@@ -17,7 +17,7 @@ The TrinityLake format defines a LakeHouse-specific [key-value map](tree/search-
 implemented using a [B-epsilon tree](tree/b-epsilon-tree.md).
 
 - The keys of this map are IDs of objects in a LakeHouse
-- The values of this map are location pointers to the definitions of the objects 
+- The values of this map are location pointers to the **Object Definitions** 
 
 We denote such tree as the **TrinityLake Tree**, 
 and denote a LakeHouse implemented using the TrinityLake format as a **Trinity LakeHouse**.
@@ -25,7 +25,7 @@ and denote a LakeHouse implemented using the TrinityLake format as a **Trinity L
 The TrinityLake format contains the following specifications:
 
 - The TrinityLake tree is persisted in storage and follows [Storage Specification](./storage.md).
-- The TrinityLake tree is assessed following the [Commit Specification](./commit.md) for ACID enforcement.
+- The TrinityLake tree is assessed and updated following the [Transaction Specification](./transaction.md).
 - The object definitions are persisted in storage and follows the [Object Definition File Specification](./object-definition-file.md)
 - The key names in a TrinityLake tree follow the [Key Encoding Specification](./key-encoding.md).
 - The locations used in a TrinityLake tree follow the [Location Specification](./location.md).
@@ -55,5 +55,3 @@ There are also a set of write operations that are performed against the objects 
 - Update the definition of existing table `table1` in `ns1`
 - Create a new materialized view `mv2` in namespace `ns2`
 - Delete existing table `table1` in namespace `ns3`
-
-

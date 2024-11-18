@@ -1,17 +1,19 @@
 # Search Tree
 
-A search tree is a tree data structure used for locating specific **Key**s from within a set.
-A search tree consists of a set of **Node**s, and each node has a set of keys.
+A search tree is a tree data structure used for locating specific **Key**s from within a collection of keys,
+and used as an implementation of a **Set**.
+
+A search tree consists of a collection of **Node**s, and each node contains an ordered collection of keys.
 For example, consider a search tree with integer keys:
 
 ![search-tree-example](search-tree-example.png)
 
-To search for key `64`:
+To search if the key `64` is contained within the set:
 
-1. start from the top node `(1, 31)`, `64` is greater than `31` so go right
-2. in `(58, 101)`, `64` is greater than `58` but smaller than `101`, so go down the pointer between `58` and `101`
-3. in `(60, 64, 77)`, we find exact value for `64`
-4. conclusion: key `64` is contained within the set
+1. Start from the top node `(1, 31)`, `64` is greater than `31` so go right
+2. In `(58, 101)`, `64` is greater than `58` but smaller than `101`, so go down the pointer between `58` and `101`
+3. In `(60, 64, 77)`, we find exact value for `64`
+4. Conclusion reached that key `64` is contained within the set
 
 ## N-Way Search Tree
 

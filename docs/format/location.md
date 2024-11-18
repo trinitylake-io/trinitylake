@@ -31,7 +31,7 @@ All files stored in TrinityLake format must have a maximum file name size define
 ## Optimized File Name
 
 A file name in the TrinityLake format is designed for optimized performance in storage.
-Given an **Original File Name**, the **Optimized File Name** in storage is calculated as the following:
+Given an **Original File Name**, the **Optimized File Name** in storage can be calculated as the following:
 
 1. Calculate the MurMur3 hash of the file name in bytes.
 2. Get the first 20 bytes and convert it to binary string representation and use it as the prefix. This maximizes the throughput in object storages like S3.
@@ -39,3 +39,6 @@ Given an **Original File Name**, the **Optimized File Name** in storage is calcu
 4. Concatenate the prefix before the original file name using the `-` character.
 
 For example, an original file name `my-table-definition.binpb` will be transformed to `0101/0101/0101/10101100-my-table-definition.binpb`.
+
+Note that not all the file names will be optimized in this way.
+A few system-internal files such as the [root node file](./storage.md#root-node-file-name) will not be stored using this scheme.
