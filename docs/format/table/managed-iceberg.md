@@ -1,1 +1,0 @@
-# Managed Iceberg Table

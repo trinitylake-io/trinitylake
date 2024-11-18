@@ -1,5 +1,5 @@
 nav:
     - overview.md
-    - external-iceberg.md
-    - federated-iceberg.md
-    - managed-iceberg.md
+    - table-schema.md
+    - table-type.md
+    - iceberg.md

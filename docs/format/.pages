@@ -2,7 +2,7 @@ nav:
     - overview.md
     - versioning.md
     - storage.md
-    - commit.md
+    - transaction.md
     - object-definition-file.md
     - key-encoding.md
     - location.md

@@ -12,29 +12,22 @@ but a system can also choose to implement a reader and writer that are of differ
 
 ### Backward Compatible
 
-A format version is backward compatible if the format that is written by a lower version writer
+A format version is backward compatible if the format that is produced by a lower version writer
 can be correctly read by a higher version reader.
 
 ### Forward Compatible
 
-A format version is forward compatible if the format that is written by a higher version writer
+A format version is forward compatible if the format that is produced by a higher version writer
 can be correctly read by a lower version reader.
 
 ## Versioning Semantics
 
 The TrinityLake format uses traditional major, minor and patch versioning semantics, forming a version string like `1.2.3`.
+We expect to bump up:
 
-### Major Version Bump
-
-We expect to bump up the major version when the format introduces forward incompatible changes.
-
-### Minor Version Bump
-
-We expect to bump up the minor version for any new feature release in the format that is still forward compatible.
-
-### Patch Version Bump
-
-We expect to bump up the patch version if there are bugs, typos, etc. that should be corrected in the minor version.
+- Major version when the format introduces forward incompatible changes.
+- Minor version for any new feature release in the format that is still forward compatible.
+- Patch version if there are bugs, typos, etc. that should be corrected in the minor version.
 
 ## Format Implementation Expectations
 
