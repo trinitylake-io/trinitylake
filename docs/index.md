@@ -4,6 +4,8 @@ title: Welcome
 
 # Welcome to TrinityLake
 
+![logo](./logo/blue-text-horizontal.png)
+
 TrinityLake is an **Open LakeHouse Format** for Big Data Analytics, ML & AI. 
 It defines the objects in a LakeHouse and provides a consistent and efficient way for accessing and manipulating these objects.
 The TrinityLake format offers the following key features:
