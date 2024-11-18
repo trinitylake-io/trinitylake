@@ -11,7 +11,7 @@ Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs
 | 2  | pvalue | String     | File location pointer to the value of the key, following [Location Specification](./location.md)  | no        |         |
 | 3  | pnode  | String     | File location pointer to the value of the node, following [Location Specification](./location.md) | no        |         |
 
-## System-Reserved Rows for Root Node
+## System-Internal Rows for Root Node
 
 System-internal keys such as `lakehouse` will appear as the top rows in the file.
 Such keys do not exist in non-root node, and do not participate in the tree storage algorithm.
