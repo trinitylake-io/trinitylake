@@ -17,6 +17,6 @@ import org.junit.jupiter.api.Test;
 
 public class TestTrinityLakeCatalog {
 
-    @Test
-    public void test() {}
+  @Test
+  public void test() {}
 }
