@@ -1,4 +1,4 @@
-# Table
+# Table Overview
 
 A table is a collection of related data organized in tabular format; consisting of columns and rows.
 

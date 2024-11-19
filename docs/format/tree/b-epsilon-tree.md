@@ -27,9 +27,11 @@ and also applies the existing messages in the buffer to the nodes along the way 
 When reading, the reader starts from the root node and go down just like in B-tree.
 However, in addition to walking the tree, it needs to apply any messages in the write buffers at runtime
 to derive the latest value of a given key.
+This is technically a **Merge-on-Read** for people that are familiar with that terminology. 
 
 ## Compaction
 
 Because of the delayed write mechanism using write buffer, a compaction is possible against the tree,
 where the process can force flush all the messages in the buffers to the corresponding keys to clear up the buffer space.
-
+The process is not necessary because eventually the writes would bring down all the write buffers 
+to the right nodes to be applied, but doing compaction wisely would improve the write performance further.

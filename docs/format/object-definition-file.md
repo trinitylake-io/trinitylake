@@ -5,9 +5,9 @@
 Each type of object definition has a different schema, which is defined using [protobuf](https://protobuf.dev/).
 The schema should evolve in a way that is backward and froward compatible following the [versioning semantics](./versioning.md#versioning-semantics).
 
-Each schema has a schem ID, and is used as a part of the TrinityLake tree [key encoding](./key-encoding.md).
+Each schema has a schema ID, and is used as a part of the TrinityLake tree [key encoding](./key-encoding.md#encoded-object-definition-schema-id).
 
-The TrinityLake format currently provides the following object definitions with their corresponding object definition schemas:
+The TrinityLake format currently provides the following object definitions with their corresponding schemas:
 
 - [LakeHouse](./lakehouse.md)
 - [Namespace](./namespace.md)
