@@ -1,0 +1,97 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+String sparkMajorVersion = '3.5'
+String scalaVersion = System.getProperty("scalaVersion") != null ? System.getProperty("scalaVersion") : System.getProperty("defaultScalaVersion")
+
+project(":trinitylake-spark:trinitylake-spark-${sparkMajorVersion}_${scalaVersion}") {
+    apply plugin: 'scala'
+
+    sourceSets {
+        main {
+            scala.srcDirs = ['src/main/scala', 'src/main/java']
+            java.srcDirs = []
+        }
+    }
+
+    dependencies {
+        implementation project(':trinitylake-core')
+
+        compileOnly("org.apache.spark:spark-hive_${scalaVersion}:${libs.versions.spark.hive35.get()}")
+
+        testImplementation libs.junit.jupiter
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+project(":trinitylake-spark:trinitylake-spark-extensions-${sparkMajorVersion}_${scalaVersion}") {
+    apply plugin: 'java-library'
+    apply plugin: 'scala'
+
+    dependencies {
+        implementation project(':trinitylake-core')
+
+        compileOnly "org.scala-lang:scala-library"
+        compileOnly project(":trinitylake-spark:trinitylake-spark-${sparkMajorVersion}_${scalaVersion}")
+        compileOnly("org.apache.spark:spark-hive_${scalaVersion}:${libs.versions.spark.hive35.get()}")
+
+        testImplementation project(path: ":trinitylake-spark:trinitylake-spark-${sparkMajorVersion}_${scalaVersion}")
+        testImplementation libs.junit.jupiter
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+project(":trinitylake-spark:trinitylake-spark-runtime-${sparkMajorVersion}_${scalaVersion}") {
+    apply plugin: 'scala'
+
+    sourceSets {
+        integration {
+            java.srcDir "$projectDir/src/integration/java"
+        }
+    }
+
+    dependencies {
+        implementation project(":trinitylake-spark:trinitylake-spark-${sparkMajorVersion}_${scalaVersion}")
+        implementation project(":trinitylake-spark:trinitylake-spark-extensions-${sparkMajorVersion}_${scalaVersion}")
+
+        integrationImplementation "org.apache.spark:spark-hive_${scalaVersion}:${libs.versions.spark.hive35.get()}"
+        integrationImplementation libs.junit.jupiter
+        integrationImplementation project(path: ":trinitylake-spark:trinitylake-spark-${sparkMajorVersion}_${scalaVersion}")
+        integrationImplementation project(path: ":trinitylake-spark:trinitylake-spark-extensions-${sparkMajorVersion}_${scalaVersion}")
+
+        integrationCompileOnly project(":trinitylake-spark:trinitylake-spark-extensions-${sparkMajorVersion}_${scalaVersion}")
+        integrationCompileOnly project(":trinitylake-spark:trinitylake-spark-${sparkMajorVersion}_${scalaVersion}")
+    }
+
+    task integrationTest(type: Test) {
+        useJUnitPlatform()
+        description = "Test Spark3 Runtime Jar against Spark ${sparkMajorVersion}"
+        group = "verification"
+        jvmArgs += project.property('extraJvmArgs')
+        testClassesDirs = sourceSets.integration.output.classesDirs
+        classpath = sourceSets.integration.runtimeClasspath
+    }
+
+    check.dependsOn integrationTest
+
+    jar {
+        enabled = false
+    }
+}
