@@ -1,6 +1,6 @@
 # Search Tree Map
 
-A search tree can not only be used as the implementation of a set, but also a key-value **Map**.
+A [search tree](./search-tree.md) can not only be used as the implementation of a set, but also a key-value **Map**.
 For database system applications of search trees like TrinityLake,
 the pointer is typically stored as the value in map, which points to a much larger payload in memory.
 

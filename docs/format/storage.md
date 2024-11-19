@@ -7,7 +7,7 @@ Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs
 
 | ID | Name   | Arrow Type | Description                                                                                       | Required? | Default |
 |----|--------|------------|---------------------------------------------------------------------------------------------------|-----------|---------|
-| 1  | key    | String     | Name of the key, following [Key Specification](./key.md)                                          | no        |         |
+| 1  | key    | String     | Name of the key, following [Key Specification](./key-encoding.md)                                 | no        |         |
 | 2  | pvalue | String     | File location pointer to the value of the key, following [Location Specification](./location.md)  | no        |         |
 | 3  | pnode  | String     | File location pointer to the value of the node, following [Location Specification](./location.md) | no        |         |
 

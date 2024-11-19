@@ -1,8 +1,8 @@
 # B-Tree
 
-A N-way search tree only enforces the general requirements for the number of children per tree node.
-The tree could become imbalanced over time. A B-tree of order N is a self-balancing N-way search tree
-that enforces a set of rules when updating the tree:
+An [N-way search tree](./search-tree.md#n-way-search-tree) only enforces the general requirements for the number of 
+children per tree node. The tree could become imbalanced over time. A B-tree of order N is a self-balancing 
+N-way search tree that enforces a set of rules when updating the tree:
 
 1. All leaf nodes must appear at the same level
 2. The root node must have at least 2 children, unless it is also a leaf
