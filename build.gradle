@@ -67,7 +67,7 @@ subprojects {
     pluginManager.withPlugin('com.diffplug.spotless') {
         spotless {
             java {
-                target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+                target 'src/main/java/**/*.java', 'src/test/java/**/*.java', 'src/integration/java/**/*.java'
                 googleJavaFormat("1.24.0")
                 removeUnusedImports()
                 licenseHeaderFile "$rootDir/.baseline/copyright/copyright-header-java.txt"
