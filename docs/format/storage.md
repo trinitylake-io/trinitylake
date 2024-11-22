@@ -5,11 +5,11 @@ Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs
 
 ## Node File Schema
 
-| ID | Name   | Arrow Type | Description                                                                                       | Required? | Default |
-|----|--------|------------|---------------------------------------------------------------------------------------------------|-----------|---------|
-| 1  | key    | String     | Name of the key, following [Key Specification](./key-encoding.md)                                 | no        |         |
-| 2  | pvalue | String     | File location pointer to the value of the key, following [Location Specification](./location.md)  | no        |         |
-| 3  | pnode  | String     | File location pointer to the value of the node, following [Location Specification](./location.md) | no        |         |
+| ID | Name  | Arrow Type | Description                                    | Required? | Default |
+|----|-------|------------|------------------------------------------------|-----------|---------|
+| 1  | key   | String     | Name of the key                                | no        |         |
+| 2  | value | String     | The value of the key                           | no        |         |
+| 3  | pnode | String     | File location pointer to the value of the node | no        |         |
 
 ## System-Internal Rows for Root Node
 
@@ -21,7 +21,7 @@ Such keys do not exist in non-root node, and do not participate in the tree stor
 To read the node pointers, the reader for the tree should skip the keys until it reaches the ones starting with `[space]`.
 There are exactly `N` rows of the file are reserved for the `N` pointers of each node for a tree of order `N`.
 
-The fist row in these `N` rows must have `key` and `pvalue` as `NULL` because the first pointer points to all
+The fist row in these `N` rows must have `key` and `value` as `NULL` because the first pointer points to all
 keys that are smaller than the key of the second row.
 
 A node might not have all `N` child nodes yet. If there are `k <= N` child nodes,

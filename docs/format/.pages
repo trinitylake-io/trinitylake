@@ -3,6 +3,7 @@ nav:
     - versioning.md
     - storage.md
     - transaction.md
+    - streaming.md
     - object-definition-file.md
     - key-encoding.md
     - location.md

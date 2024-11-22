@@ -2,4 +2,5 @@ nav:
     - overview.md
     - table-schema.md
     - table-type.md
+    - upsert.md
     - iceberg.md

@@ -1,4 +1,4 @@
-# Table Schema
+# Schema
 
 ## Primitive Types
 

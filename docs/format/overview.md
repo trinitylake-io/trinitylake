@@ -43,8 +43,6 @@ This Trinity LakeHouse is a tree of order 3, with the following objects:
 - Namespace `ns2`
     - Table `table1`: this is an Apache Iceberg table, which further points to its own metadata JSON file,
       manifests Avro files and Parquet/Avro/ORC data files, following the Iceberg table format specification.
-      Note that these files in the Iceberg table are not considered a part of the TrinityLake and 
-      does not need to follow the [Location Specification](./location.md).
     - Index `index1`
 - Namespace `ns3`
     - Materialized View `mv1`

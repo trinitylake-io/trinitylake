@@ -1,0 +1,7 @@
+syntax = "proto3";
+package io.trinitylake.models;
+
+message NamespaceDef {
+  string name = 1;
+  map<string, string> properties = 2;
+}
