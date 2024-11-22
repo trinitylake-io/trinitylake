@@ -104,11 +104,19 @@ When committing a transaction, the writer does the following:
 Because the TriniyLake tree node is versioned, time travel against the tree root, 
 i.e. time travel against the entire Trinity LakeHouse, is possible.
 
-The engines should match the ANSI-SQL:
+The engines should match the time travel ANSI-SQL semantics in the following way:
 
-- `FOR SYSTEM_VERSION AS OF` semantics to the numeric version of the tree root,
-- `FOR SYSTEM_TIME AS OF` semantics to the [creation/modification time](#file-creationmodification-timestamp) 
+- `FOR SYSTEM_VERSION AS OF`: the numeric version of the tree root,
+- `FOR SYSTEM_TIME AS OF`: the [creation/modification time](#file-creationmodification-timestamp) 
 of the tree root node file.
+
+!!! note
+    
+    There is a fundamental difference between the TrinityLake time travel semantics versus the one in open table formats
+    like Iceberg and Delta. TrinityLake leverages the system timestamp reported by the storage as the time travel basis.
+    This is because we consider the competion of committing to the storage as the completion of transaction.
+    Leveraging anything maintained within the format, e.g. a timestamp value in a metadata file, would not reflect
+    the true transaction completion time in storage. Although the  
 
 ## Snapshot Export
 

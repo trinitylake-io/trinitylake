@@ -1,0 +1,13 @@
+syntax = "proto3";
+package io.trinitylake.models;
+
+message LakeHouseDef {
+  string name = 1;
+  uint32 major_version_number = 2;
+  uint32 order = 3;
+  uint32 namespace_name_max_size_bytes = 4;
+  uint32 table_name_max_size_bytes = 5;
+  uint32 file_name_max_size_bytes = 6;
+  uint64 node_file_max_size_bytes = 7;
+  map<string, string> properties = 8;
+}

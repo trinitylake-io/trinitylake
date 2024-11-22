@@ -29,9 +29,16 @@ Compared to external table, federated table could support more operations such a
 - Altering or dropping the source table definition
 - Always reading the latest table without the need for manual or push/pull-based refresh
 
-However, compared to managed table, federated table lowers the guarantee of the transactional semantics provided by
-the TrinityLake format. If a user performs multi-table transaction against a managed table with a federated table,
-the isolation level would be lowered to READ UNCOMMITTED level in the worst case.
+The key characteristics of federated table from ACID perspective is that,
+the latest version of the table for read is not determined at transaction start time,
+but at the time that the table is initially loaded.
+This is similar to the [Read Latest](../streaming.md#read-latest) isolation mode that we see in managed table streaming,
+but for federated table it is even worse because we cannot make assumptions about how "latest" the response really is,
+and we also do not know the implication of writing to such a "latest" table.
+
+Because of this behavior, compared to managed table, federated table lowers the guarantee of the transactional 
+semantics provided by the TrinityLake format. If a user performs multi-table transaction against a managed table 
+with a federated table, the isolation level would be lowered to READ UNCOMMITTED level in the worst case.
 For example, a federated table could be rolling back while a managed table reads its data in a 
 JOIN operation, causing a dirty read.
 
