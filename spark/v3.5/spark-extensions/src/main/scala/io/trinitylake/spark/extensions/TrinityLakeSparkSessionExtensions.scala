@@ -11,11 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.trinitylake.spark.extensions
 
 import org.apache.spark.sql.SparkSessionExtensions
 
 class TrinityLakeSparkSessionExtensions extends (SparkSessionExtensions => Unit) {
-    override def apply(extensions: SparkSessionExtensions): Unit = {}
+  override def apply(extensions: SparkSessionExtensions): Unit = {}
 }

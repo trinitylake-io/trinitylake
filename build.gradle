@@ -74,7 +74,7 @@ subprojects {
             }
 
             scala {
-                scalafmt("3.7.5").configFile("$rootDir/.baseline/scala/.scalafmt.conf")
+                scalafmt("3.8.2").configFile("$rootDir/.baseline/scala/.scalafmt.conf")
                 licenseHeaderFile "$rootDir/.baseline/copyright/copyright-header-java.txt", "package"
             }
         }
