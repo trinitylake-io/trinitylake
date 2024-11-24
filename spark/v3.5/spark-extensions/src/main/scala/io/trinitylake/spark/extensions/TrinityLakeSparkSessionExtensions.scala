@@ -11,11 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.trinitylake.spark.extensions
 
 import org.apache.spark.sql.SparkSessionExtensions
+import org.apache.spark.sql.catalyst.parser.extensions.TrinityLakeSparkSqlExtensionsParser
+import org.apache.spark.sql.execution.datasources.v2.TrinityLakeStrategy
 
 class TrinityLakeSparkSessionExtensions extends (SparkSessionExtensions => Unit) {
-    override def apply(extensions: SparkSessionExtensions): Unit = {}
+  override def apply(extensions: SparkSessionExtensions): Unit = {
+    // parser extensions
+    extensions.injectParser { case (_, parser) => new TrinityLakeSparkSqlExtensionsParser(parser) }
+
+    // planner extensions
+    extensions.injectPlannerStrategy { spark => TrinityLakeStrategy(spark) }
+  }
 }
