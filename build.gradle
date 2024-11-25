@@ -72,6 +72,11 @@ subprojects {
                 removeUnusedImports()
                 licenseHeaderFile "$rootDir/.baseline/copyright/copyright-header-java.txt"
             }
+
+            scala {
+                scalafmt("3.8.2").configFile("$rootDir/.baseline/scala/.scalafmt.conf")
+                licenseHeaderFile "$rootDir/.baseline/copyright/copyright-header-java.txt", "package"
+            }
         }
     }
 
