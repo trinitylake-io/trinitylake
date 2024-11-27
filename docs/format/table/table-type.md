@@ -8,6 +8,10 @@ A managed table is fully compliant with the [transaction semantics](../transacti
 It can participate in multi-object and multi-statement transactions with any other managed objects in the same Trinity LakeHouse.
 When dropping the table, the data is also deleted.
 
+TrinityLake provides the overall semantics of a managed table in areas like [schema](./table-schema.md),
+[streaming](streaming.md) and [upsert](./upsert.md) behaviors, etc. and the behavior can be implemented using various table and file formats
+such as [Apache Iceberg with Apache Parquet](./iceberg.md).
+
 ## EXTERNAL
 
 An external table is managed by an external system that a Trinity LakeHouse has no knowledge about.
@@ -32,7 +36,7 @@ Compared to external table, federated table could support more operations such a
 The key characteristics of federated table from ACID perspective is that,
 the latest version of the table for read is not determined at transaction start time,
 but at the time that the table is initially loaded.
-This is similar to the [Read Latest](../streaming.md#read-latest) isolation mode that we see in managed table streaming,
+This is similar to the [Read Latest](streaming.md#read-latest) isolation mode that we see in managed table streaming,
 but for federated table it is even worse because we cannot make assumptions about how "latest" the response really is,
 and we also do not know the implication of writing to such a "latest" table.
 

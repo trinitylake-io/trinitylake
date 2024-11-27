@@ -17,11 +17,12 @@ materialized views, etc. within a LakeHouse.
 Users could start to leverage standard SQL BEGIN and COMMIT semantics and expect ACID enforcement 
 at SNAPSHOT or SERIALIZABLE isolation level across the entire LakeHouse.
 
-## Consistent Time Travel and Snapshot Export
+## Consistent Time Travel, Rollback and Snapshot Export
 
 TrinityLake provides a single timeline for all the transactions that have taken place within a LakeHouse.
 Users can perform time travel to get a consistent view of all the objects in the LakeHouse,
-and choose to export a snapshot of the entire LakeHouse at any given point of time.
+rollback the LakeHouse to a consistent previous state,
+or choose to export a snapshot of the entire LakeHouse at any given point of time.
 
 ## Storage Only
 

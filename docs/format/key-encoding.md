@@ -11,11 +11,31 @@ any other system-internal object definitions such as [LakeHouse](#lakehouse-key)
 User-facing object keys must start with a `[space]`,
 and system-internal object keys must not start with a `[space]`.
 
-## LakeHouse Key
+## System Internal Keys
 
-The [LakeHouse definition file](./lakehouse.md) pointer is stored with key `lakehouse`.
-This key is special that it does not participate in the TrinityLake tree key sorting algorithm,
-and always stay in the root node so that it is read as the first entry to bootstrap a TrinityLake reader or writer.
+In general, system internal keys do not participate in the TrinityLake tree key sorting algorithm and always stay in 
+the designated node.
+
+### LakeHouse Definition Key
+
+The [LakeHouse definition file](./lakehouse.md) pointer is stored with key `lakehouse_def` in the root node.
+
+### Previous Root Node Key
+
+The pointer to the previous root node is stored with key `previous_root` in the root node.
+
+### Rollback Root Node Key
+
+The pointer to the root node that was rolled back from, if the root node is created during a [Rollback](./transaction.md#rollback-committed-version)
+It is stored with key `rollback_from_root` in the root node.
+
+### Version Key
+
+The version of the root node, stored with the key `version` in the root node.
+
+### Creation Timestamp Key
+
+The key `created_at_millis` writes the timestamp that a node is created.
 
 ## Object ID Key
 

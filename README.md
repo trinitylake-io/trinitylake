@@ -17,6 +17,14 @@ accessing and manipulating these objects. It offers the following key features:
 For more details about the format specification, and how to get started and use it with various open engines such as Apache Spark, 
 please visit [trinitylake.io](https://trinitylake.io).
 
+## Join Us
+
+This project is still at early development stage. 
+If you are interested in developing this project with us together,
+we mainly use [Slack (click for invite link)](https://join.slack.com/t/trinitylake/shared_invite/zt-2uukxce7a-CzY3rR9q~3f0PRmm7mgEFw) 
+for communication. We also use [GitHub Issues](https://github.com/trinitylake-io/trinitylake/issues) 
+and [GitHub Discussions](https://github.com/trinitylake-io/trinitylake/discussions) for discussion purpose. 
+
 ## Project Website Development
 
 The project website is built using the [mkdocs-material](https://pypi.org/project/mkdocs-material/) framework with a few other plugins.

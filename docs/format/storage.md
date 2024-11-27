@@ -5,16 +5,15 @@ Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs
 
 ## Node File Schema
 
-| ID | Name  | Arrow Type | Description                                    | Required? | Default |
-|----|-------|------------|------------------------------------------------|-----------|---------|
-| 1  | key   | String     | Name of the key                                | no        |         |
-| 2  | value | String     | The value of the key                           | no        |         |
-| 3  | pnode | String     | File location pointer to the value of the node | no        |         |
+| ID | Name  | Arrow Type | Description                                          | Required? | Default |
+|----|-------|------------|------------------------------------------------------|-----------|---------|
+| 1  | key   | String     | Name of the key                                      | no        |         |
+| 2  | value | String     | The value of the key                                 | no        |         |
+| 3  | pnode | String     | File location pointer to the value of the child node | no        |         |
 
 ## System-Internal Rows for Root Node
 
-System-internal keys such as `lakehouse` will appear as the top rows in the file.
-Such keys do not exist in non-root node, and do not participate in the tree storage algorithm.
+[System-internal keys](./key-encoding.md#system-internal-keys) will appear as the top rows in the file.
 
 ## Node Pointers
 
@@ -32,8 +31,8 @@ There will be `N-k` rows with all column values as `NULL`s.
 The write buffer rows start after the node pointer rows.
 These rows must have a `key` that is not `NULL`, and the `pnode` is always `NULL`.
 
-- When the `pvalue` is `NULL`, it is a message to delete the `key`.
-- When the `pvalue` is not `NULL`, it is a message to set the current `pvalue` of the key in the tree to the new one in the write buffer.
+- When the `value` is `NULL`, it is a message to delete the `key`.
+- When the `value` is not `NULL`, it is a message to set the current `pvalue` of the key in the tree to the new one in the write buffer.
 
 ## Node File Size
 

@@ -52,4 +52,6 @@ There are also a set of write operations that are performed against the objects 
 
 - Update the definition of existing table `table1` in `ns1`
 - Create a new materialized view `mv2` in namespace `ns2`
-- Delete existing table `table1` in namespace `ns3`
+
+The root tree node is at version 4, and also points to the previous version of the root node of the LakeHouse.
+This is used for achieving time travel, rollback and snapshot export.

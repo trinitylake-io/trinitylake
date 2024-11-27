@@ -38,5 +38,5 @@ Because of the backward and forward compatibility requirement, minor and patch v
 so that people can know what has been changing and update their implementations accordingly.
 This is also why only the major version is directly recorded in the [LakeHouse definition](./lakehouse.md).
 
-It is recommended that format implementations explicitly check the format version and 
-fail the reader accordingly for unsupported future format version.
+It is recommended that format implementations explicitly check the format major version and 
+fail the reader accordingly for unsupported future format major version.

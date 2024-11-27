@@ -2,5 +2,6 @@ nav:
     - overview.md
     - table-schema.md
     - table-type.md
+    - streaming.md
     - upsert.md
     - iceberg.md

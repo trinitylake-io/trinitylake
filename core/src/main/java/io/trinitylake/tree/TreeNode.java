@@ -11,19 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.trinitylake.tree;
 
-apply plugin: 'com.google.protobuf'
-
-dependencies {
-    implementation 'com.google.protobuf:protobuf-java:4.28.3'
-    protobuf files("$rootDir/proto/")
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
-}
-
-
-protobuf {
-    protoc {
-        // The artifact spec for the Protobuf Compiler
-        artifact = 'com.google.protobuf:protoc:4.28.3'
-    }
-}
+public interface TreeNode {}
