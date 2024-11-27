@@ -17,15 +17,9 @@ This feature is widely available in most storage systems, for examples:
 - On Linux File System through [O_EXCL](https://linux.die.net/man/2/open)
 - On Hadoop Distributed File System through [atomic rename](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/filesystem/filesystem.html#boolean_rename.28Path_src.2C_Path_d.29)
 - On Amazon S3 through [IF-NONE-MATCH](https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html#API_PutObject_RequestSyntax)
+- On Amazon DynamoDB through [conditional PutItem](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html)
 - On Google Cloud Storage through [IF-NONE-MATCH](https://cloud.google.com/storage/docs/xml-api/reference-headers#ifnonematch)
 - On Azure Data Lake Storage through [IF-NONE-MATCH](https://learn.microsoft.com/en-us/rest/api/storageservices/specifying-conditional-headers-for-blob-service-operations)
-
-### File Creation/Modification Timestamp
-
-Storage systems typically provide metadata about when the file is created or modified.
-In our use case, these 2 values are equivalent because as we see later in [Immutable Copy-on-Write](#immutable-copy-on-write-cow) 
-the TrinityLake tree node files are immutable once written until deletion.
-We do not require such timestamp to be exactly accurate, and it is only used for [time travel](#time-travel) purpose.
 
 ### Consistency
 
@@ -106,28 +100,43 @@ i.e. time travel against the entire Trinity LakeHouse, is possible.
 
 The engines should match the time travel ANSI-SQL semantics in the following way:
 
-- `FOR SYSTEM_VERSION AS OF`: the numeric version of the tree root,
-- `FOR SYSTEM_TIME AS OF`: the [creation/modification time](#file-creationmodification-timestamp) 
-of the tree root node file.
+### FOR SYSTEM_TIME AS OF
 
-!!! note
-    
-    There is a fundamental difference between the TrinityLake time travel semantics versus the one in open table formats
-    like Iceberg and Delta. TrinityLake leverages the system timestamp reported by the storage as the time travel basis.
-    This is because we consider the competion of committing to the storage as the completion of transaction.
-    Leveraging anything maintained within the format, e.g. a timestamp value in a metadata file, would not reflect
-    the true transaction completion time in storage. Although the  
+The timestamp-based time travel can be achieved by continuously tracing the [previous root node key](./key-encoding.md#previous-root-node-key) 
+to older root nodes, and check the [creation timestamp key](./key-encoding.md#creation-timestamp-key) until the right root
+node for time travel is found.
+
+### FOR SYSTEM_VERSION AS OF
+
+When the system version is a numeric value, it should map to the version of the tree root node.
+The root node of the specific version can directly be found based on the [root node file name](#root-node-file-name).
+
+When the system version is a string that does not resemble a numeric value, it should map to a possible [exported snapshot](#snapshot-export).
+
+## Rollback Committed Version
+
+TrinityLake uses the roll forward technique for rolling back any committed version.
+If the current latest root node version is `v`, and a user would like to rollback to version `v-1`,
+Rollback is performed by committing a new root node with version `v+1` which is most identical to the root node file `v-1`,
+with the difference that the root node `v` should be recorded as the [rollback root node key](./key-encoding.md#rollback-root-node-key).
 
 ## Snapshot Export
 
 A snapshot export for a Trinity LakeHouse means to export a specific version of the TrinityLake tree root node,
 and all the files that are reachable through that root node.
 
+Every time an export is created, the [LakeHouse definition](./lakehouse.md) should be updated to record the name of the export
+and the root node file that the export is at.
 
+There are many types of export that can be achieved, because the export process can decide to stop replication
+at any level of the tree and call it an export.
+At one extreme, a process can replicate any reachable files starting at the root node. We call this a **Full Export**.
+On the other side, a process can simply replicate the specific version of tree root node, 
+and all other files reachable from the root node are not replicated. We call this a **Minimal Export**.
+We call any export that is in between a **Partial Export**.
 
-
-
-
-
-
-
+Any file that is referenced by both the exported snapshot and the source LakeHouse might be removed by the 
+LakeHouse version expiration process.
+With a full snapshot export, all files are replicated and dereferenced from the source LakeHouse.
+With a partial or minimal export, additional retention policy settings are required to make sure the
+version expiration process still keep those files available for a certain amount of time.

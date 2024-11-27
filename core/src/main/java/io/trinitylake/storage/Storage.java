@@ -11,19 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.trinitylake.storage;
 
-apply plugin: 'com.google.protobuf'
+import java.io.IOException;
+import java.io.InputStream;
 
-dependencies {
-    implementation 'com.google.protobuf:protobuf-java:4.28.3'
-    protobuf files("$rootDir/proto/")
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
-}
+public interface Storage {
 
+  void put(String key, InputStream value) throws IOException;
 
-protobuf {
-    protoc {
-        // The artifact spec for the Protobuf Compiler
-        artifact = 'com.google.protobuf:protoc:4.28.3'
-    }
+  InputStream get(String key) throws IOException;
 }

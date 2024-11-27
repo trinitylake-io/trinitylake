@@ -20,7 +20,9 @@ import org.apache.spark.sql.execution.datasources.v2.TrinityLakeStrategy
 class TrinityLakeSparkSessionExtensions extends (SparkSessionExtensions => Unit) {
   override def apply(extensions: SparkSessionExtensions): Unit = {
     // parser extensions
-    extensions.injectParser { case (_, parser) => new TrinityLakeSparkSqlExtensionsParser(parser) }
+    extensions.injectParser { case (_, parser) =>
+      new TrinityLakeSparkSqlExtensionsParser(parser)
+    }
 
     // planner extensions
     extensions.injectPlannerStrategy { spark => TrinityLakeStrategy(spark) }

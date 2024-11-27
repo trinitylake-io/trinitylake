@@ -38,7 +38,7 @@ There ar 2 modes that a reader can choose from when reading a table with a strea
 ### Read Transacted
 
 In this mode, the reader only reads whatever is presented based on the transactions in the LakeHouse.
-The behavior is identical to [the one described in the Transaction Specification](./transaction.md#read-isolation).
+The behavior is identical to [the one described in the Transaction Specification](../transaction.md#read-isolation).
 
 The pro of this mode is that it strictly follows the multi-object multi-statement transaction semantics with ACID enforcement.
 The con of this mode is that the data will be stale.

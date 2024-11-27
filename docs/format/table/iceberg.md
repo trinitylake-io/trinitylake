@@ -31,6 +31,7 @@ For a managed table, TrinityLake maps the data type to Iceberg in the following 
 | map              | map                                                  |
 | list             | list                                                 |
 
+Currently only Apache Parquet file format is supported when using a Trinitylake managed Iceberg table.
 
 ## External Iceberg Table
 

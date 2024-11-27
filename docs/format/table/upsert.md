@@ -31,7 +31,3 @@ If there are 2 rows `(order_id=1, ts=100)` and `(order_id=1, ts=200)`, then duri
 `(order_id=1, ts=200)` will be the result returned by the reader and `(order_id=1, ts=100)` will be discarded.
 
 This definition works for both managed, federated and external tables, as long as they provide the proper definition.
-
-## Upsert with Schema Evolution
-
-TODO

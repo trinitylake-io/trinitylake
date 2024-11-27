@@ -11,19 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.trinitylake.exception;
 
-apply plugin: 'com.google.protobuf'
+public class ObjectNotFoundException extends TrinityLakeRuntimeException {
 
-dependencies {
-    implementation 'com.google.protobuf:protobuf-java:4.28.3'
-    protobuf files("$rootDir/proto/")
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
-}
+  public ObjectNotFoundException(Throwable cause, String message, Object... args) {
+    super(cause, message, args);
+  }
 
-
-protobuf {
-    protoc {
-        // The artifact spec for the Protobuf Compiler
-        artifact = 'com.google.protobuf:protoc:4.28.3'
-    }
+  public ObjectNotFoundException(String message, Object... args) {
+    super(message, args);
+  }
 }

@@ -44,6 +44,12 @@ Given an **Original File Name**, the **Optimized File Name** in storage can be c
 For example, an original file name `my-table-definition.binpb` will be transformed to 
 `0101/0101/0101/10101100-my-table-definition.binpb`.
 
-Note that not all the file names will be optimized in this way.
-A few system-internal files such as the [root node file](./transaction.md#root-node-file-name) 
-will not be stored using this scheme.
+!!!Note
+
+    Not all the file names will be optimized in this way. A few system-internal files such as the 
+    [root node file](./transaction.md#root-node-file-name) will not be stored using this scheme.
+
+!!!Note
+    
+    File name optimization is a write side feature, and should not be used by readers to reverse-engineer
+    the original file name.

@@ -13,4 +13,43 @@
  */
 package io.trinitylake;
 
-public class LakeHouse {}
+import io.trinitylake.storage.Storage;
+
+public class LakeHouse {
+
+  private final Storage storage;
+  private final String rootLocation;
+
+  public LakeHouse(Storage storage, String rootLocation) {
+    this.storage = storage;
+    this.rootLocation = rootLocation;
+  }
+
+  /**
+   * Begin a transaction
+   *
+   * @param transaction transaction ID
+   * @return the version of the LakeHouse for all read and write
+   */
+  public LakeHouseVersion beginTransaction(String transaction) {
+    return null;
+  }
+
+  /**
+   * Commit a transaction
+   *
+   * @param transaction transaction ID
+   * @return the new version of the LakeHouse after commit
+   * @throws io.trinitylake.exception.CommitFailureException if commit failed
+   */
+  public LakeHouseVersion commitTransaction(String transaction) {
+    return null;
+  }
+
+  /**
+   * Rollback an ongoing transaction
+   *
+   * @param transaction transaction ID
+   */
+  public void rollbackTransaction(String transaction) {}
+}
