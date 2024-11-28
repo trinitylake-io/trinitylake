@@ -11,13 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake.key;
 
-public interface TreeNode {
+public enum ObjectDefType {
+  NAMESPACE(1),
+  TABLE(2);
 
-  long createdAtMillis();
+  private final int schemaVersion;
 
-  String findValue(String key);
+  ObjectDefType(int schemaVersion) {
+    this.schemaVersion = schemaVersion;
+  }
 
-  TreeNode findChild(String key);
+  public int schemaVersion() {
+    return schemaVersion;
+  }
 }

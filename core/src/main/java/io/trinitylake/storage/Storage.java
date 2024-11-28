@@ -18,7 +18,9 @@ import java.io.InputStream;
 
 public interface Storage {
 
-  void put(String key, InputStream value) throws IOException;
+  String root();
+
+  void putIfNotExist(String key, InputStream value) throws IOException;
 
   InputStream get(String key) throws IOException;
 }

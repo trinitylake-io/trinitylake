@@ -26,7 +26,7 @@ The TrinityLake format contains the following specifications:
 
 - The TrinityLake tree is persisted in storage and follows [Storage Specification](./storage.md).
 - The TrinityLake tree is assessed and updated following the [Transaction Specification](./transaction.md).
-- The object definitions are persisted in storage and follows the [Object Definition File Specification](./object-definition-file.md)
+- The object definitions are persisted in storage and follows the [Object Definition File Specification](./object-definition-file.md).
 - The key names in a TrinityLake tree follow the [Key Encoding Specification](./key-encoding.md).
 - The locations used in a TrinityLake tree follow the [Location Specification](./location.md).
 

@@ -11,13 +11,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake.key;
 
-public interface TreeNode {
+import io.trinitylake.models.LakeHouseDef;
+import io.trinitylake.util.Pair;
 
-  long createdAtMillis();
+public class KeyEncoding {
 
-  String findValue(String key);
+  private final LakeHouseDef lakeHouseDef;
 
-  TreeNode findChild(String key);
+  public KeyEncoding(LakeHouseDef lakeHouseDef) {
+    this.lakeHouseDef = lakeHouseDef;
+  }
+
+  public String encodeNamespace(String name) {
+    return null;
+  }
+
+  public String encodeTable(String namespaceName, String tableName) {
+    return null;
+  }
+
+  public Pair<ObjectDefType, String> decode(String key) {
+    return null;
+  }
 }

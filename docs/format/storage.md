@@ -55,11 +55,11 @@ This remaining size is used as the write buffer for each node.
 For users that would like to fine-tune the performance characteristics of a TrinityLake tree,
 this formula can be used to readjust the node file size to achieve the desired epsilon value.
 
-## Node File Name
+## Non-Root Node File Name
 
-Non-root node file name will be in the form of a base64 encoded UUID with suffix `.ipc`.
+Non-root node file name will be in the form of a version 4 UUID with suffix `.ipc`.
 For example, if a UUID `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8` is generated for the node file,
-the original file name of the node file will be `b8tRS7h4TJ2Vt43Dp85v2A.ipc`,
+the original file name of the node file will be `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc`,
 and that further goes through the [file name optimization](./location.md#optimized-file-name) 
 to produce the final node file name.
 
