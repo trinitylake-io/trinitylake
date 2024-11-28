@@ -11,13 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake.key;
 
-public interface TreeNode {
+public class InternalKeys {
 
-  long createdAtMillis();
+  public static String LAKEHOUSE_DEFINITION = "lakehouse_def";
 
-  String findValue(String key);
+  public static String PREVIOUS_ROOT_NODE = "previous_root";
 
-  TreeNode findChild(String key);
+  public static String VERSION = "version";
+
+  public static String ROLLBACK_FROM_ROOT_NODE = "rollback_from_root";
+
+  public static String CREATED_AT_MILLIS = "created_at_millis";
 }

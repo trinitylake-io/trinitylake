@@ -16,8 +16,11 @@ package io.trinitylake;
 import io.trinitylake.models.LakeHouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
+import io.trinitylake.tree.TreeNode;
 
 public class LakeHouseVersion {
+
+  public LakeHouseVersion(TreeNode treeNode) {}
 
   /**
    * Retrieve the LakeHouse definition

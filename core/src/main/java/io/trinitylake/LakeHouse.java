@@ -18,11 +18,9 @@ import io.trinitylake.storage.Storage;
 public class LakeHouse {
 
   private final Storage storage;
-  private final String rootLocation;
 
-  public LakeHouse(Storage storage, String rootLocation) {
+  public LakeHouse(Storage storage) {
     this.storage = storage;
-    this.rootLocation = rootLocation;
   }
 
   /**
@@ -39,10 +37,11 @@ public class LakeHouse {
    * Commit a transaction
    *
    * @param transaction transaction ID
+   * @param version the version to be committed
    * @return the new version of the LakeHouse after commit
    * @throws io.trinitylake.exception.CommitFailureException if commit failed
    */
-  public LakeHouseVersion commitTransaction(String transaction) {
+  public LakeHouseVersion commitTransaction(String transaction, LakeHouseVersion version) {
     return null;
   }
 
