@@ -13,14 +13,14 @@ Please see [Versioning](./versioning.md) about the versioning semantics of this 
 
 ## Introduction
 
-The TrinityLake format defines a LakeHouse-specific [key-value map](tree/search-tree-map.md) 
+The TrinityLake format defines a Lakehouse-specific [key-value map](tree/search-tree-map.md) 
 implemented using a [B-epsilon tree](tree/b-epsilon-tree.md).
 
-- The keys of this map are IDs of objects in a LakeHouse
+- The keys of this map are IDs of objects in a Lakehouse
 - The values of this map are location pointers to the **Object Definitions** 
 
 We denote such tree as the **TrinityLake Tree**, 
-and denote a LakeHouse implemented using the TrinityLake format as a **Trinity LakeHouse**.
+and denote a Lakehouse implemented using the TrinityLake format as a **Trinity Lakehouse**.
 
 The TrinityLake format contains the following specifications:
 
@@ -36,7 +36,7 @@ Here is an example logical representation of a TrinityLake tree:
 
 ![Overview](overview-example-logical.png)
 
-This Trinity LakeHouse is a tree of order 3, with the following objects:
+This Trinity Lakehouse is a tree of order 3, with the following objects:
 
 - Namespace `ns1`
     - Table `table1`
@@ -53,5 +53,5 @@ There are also a set of write operations that are performed against the objects 
 - Update the definition of existing table `table1` in `ns1`
 - Create a new materialized view `mv2` in namespace `ns2`
 
-The root tree node is at version 4, and also points to the previous version of the root node of the LakeHouse.
+The root tree node is at version 4, and also points to the previous version of the root node of the Lakehouse.
 This is used for achieving time travel, rollback and snapshot export.

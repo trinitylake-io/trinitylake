@@ -1,33 +1,33 @@
 # Location
 
-## Root LakeHouse Location
+## Root Lakehouse Location
 
-A Trinity LakeHouse should be created at a location that we call **Root Location**.
+A Trinity Lakehouse should be created at a location that we call **Root Location**.
 
 Although TrinityLake in general does not depend on the directory concept in file system,
-The root location is expected to behave like a directory where all files in the LakeHouse are stored in
+The root location is expected to behave like a directory where all files in the Lakehouse are stored in
 locations that have the root location as the prefix.
 
 To avoid user confusion, we will always treat the root location as ending with a `/` even when the user input does not.
 For example, if the user defines the root location as `s3://my-bucket/my-lakehouse`,
 it is treated as `s3://my-bucket/my-lakehouse/` when used.
 
-The LakeHouse root location is not stored within the TrinityLake format itself.
+The Lakehouse root location is not stored within the TrinityLake format itself.
 It is expected that a user would specify the root location at runtime.
 
 ## Relative File Location
 
 Any file location in a TrinityLake format must always be the relative location
-against the root location of the LakeHouse.
+against the root location of the Lakehouse.
 
-For example, if the LakeHouse root location is at `s3://my-bucket/my-lakehouse`,
+For example, if the Lakehouse root location is at `s3://my-bucket/my-lakehouse`,
 and a file is at location `s3://my-bucket/my-lakehouse/my-table-definition.binpb`,
 then the location value stored in the TrinityLake format should be `my-table-definition.binpb`.
 
 ## File Name Size
 
 All files stored in TrinityLake format must have a maximum file name size 
-defined in the [LakeHouse definition file](./lakehouse.md).
+defined in the [Lakehouse definition file](./lakehouse.md).
 
 ## Optimized File Name
 

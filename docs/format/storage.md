@@ -1,6 +1,6 @@
 # Storage
 
-The LakeHouse tree in general follows the [storage layout of N-way search tree map](tree/search-tree-map.md#storage-layout).
+The Lakehouse tree in general follows the [storage layout of N-way search tree map](tree/search-tree-map.md#storage-layout).
 Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs/format/Columnar.html#format-ipc) with suffix `.ipc`.
 
 ## Node File Schema
@@ -36,7 +36,7 @@ These rows must have a `key` that is not `NULL`, and the `pnode` is always `NULL
 
 ## Node File Size
 
-Each node is targeted for the same specific size, which is configurable in the [LakeHouse definition](./lakehouse.md).
+Each node is targeted for the same specific size, which is configurable in the [Lakehouse definition](./lakehouse.md).
 
 The estimated size of the `N` rows should be:
 

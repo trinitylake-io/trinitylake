@@ -5,7 +5,7 @@ There are 3 table types in TrinityLake, MANAGED, EXTERNAL and FEDERATED.
 ## MANAGED
 
 A managed table is fully compliant with the [transaction semantics](../transaction.md) defined by the TrinityLake format.
-It can participate in multi-object and multi-statement transactions with any other managed objects in the same Trinity LakeHouse.
+It can participate in multi-object and multi-statement transactions with any other managed objects in the same Trinity Lakehouse.
 When dropping the table, the data is also deleted.
 
 TrinityLake provides the overall semantics of a managed table in areas like [schema](./table-schema.md),
@@ -14,7 +14,7 @@ such as [Apache Iceberg with Apache Parquet](./iceberg.md).
 
 ## EXTERNAL
 
-An external table is managed by an external system that a Trinity LakeHouse has no knowledge about.
+An external table is managed by an external system that a Trinity Lakehouse has no knowledge about.
 It has 4 key characteristics:
 
 1. External tables are **read-only**, thus do not participate in write transactions.
@@ -24,7 +24,7 @@ It has 4 key characteristics:
 
 ## FEDERATED
 
-A federated table is managed by an external system that a Trinity LakeHouse can connect to 
+A federated table is managed by an external system that a Trinity Lakehouse can connect to 
 and perform read or write or both through the federation connection.
 
 Compared to external table, federated table could support more operations such as:

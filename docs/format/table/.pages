@@ -4,4 +4,4 @@ nav:
     - table-type.md
     - streaming.md
     - upsert.md
-    - iceberg.md
+    - format-iceberg.md

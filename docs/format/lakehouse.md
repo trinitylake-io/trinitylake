@@ -1,6 +1,6 @@
-# LakeHouse
+# Lakehouse
 
-LakeHouse is the top level container.
+Lakehouse is the top level container.
 
 ## Object Definition Schema
 
@@ -8,7 +8,7 @@ LakeHouse is the top level container.
 
 | Field Name                           | Protobuf Type       | Description                                                                                                    | Required? | Default       |
 |--------------------------------------|---------------------|----------------------------------------------------------------------------------------------------------------|-----------|---------------|
-| name                                 | string              | A user-friendly name of this LakeHouse                                                                         | Yes       |               |
+| name                                 | string              | A user-friendly name of this Lakehouse                                                                         | Yes       |               |
 | major_version                        | uint32              | The major version of the format                                                                                | No        | 0             |
 | order                                | uint32              | The order of the B-epsilon tree                                                                                | No        | 128           |
 | namespace_name_max_size_bytes        | uint32              | The maximum size of a namespace name in bytes                                                                  | No        | 100           |

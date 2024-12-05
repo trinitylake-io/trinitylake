@@ -11,28 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.key;
+package io.trinitylake;
 
-import io.trinitylake.models.LakeHouseDef;
-import io.trinitylake.util.Pair;
+import io.trinitylake.models.LakehouseDef;
+import io.trinitylake.models.NamespaceDef;
+import io.trinitylake.models.TableDef;
+import java.util.List;
 
-public class KeyEncoding {
+public interface LakehouseVersion {
 
-  private final LakeHouseDef lakeHouseDef;
+  long version();
 
-  public KeyEncoding(LakeHouseDef lakeHouseDef) {
-    this.lakeHouseDef = lakeHouseDef;
-  }
+  LakehouseDef describeLakehouse();
 
-  public String encodeNamespace(String name) {
-    return null;
-  }
+  NamespaceDef describeNamespace(String namespaceName);
 
-  public String encodeTable(String namespaceName, String tableName) {
-    return null;
-  }
+  List<String> showTables(String namespaceName);
 
-  public Pair<ObjectDefType, String> decode(String key) {
-    return null;
-  }
+  TableDef describeTable(String namespaceName, String tableName);
 }
