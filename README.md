@@ -1,16 +1,16 @@
 # TrinityLake
 
-***An Open LakeHouse Format for Big Data Analytics, ML & AI***
+***An Open Lakehouse Format for Big Data Analytics, ML & AI***
 
 ![TrinityLake Logo](https://github.com/trinitylake-io/trinitylake/blob/main/docs/logo/blue-text-horizontal.png?raw=true)
 
 ## Introduction
 
-The TrinityLake format defines the objects in a LakeHouse and provides a consistent and efficient way for 
+The TrinityLake format defines the objects in a Lakehouse and provides a consistent and efficient way for 
 accessing and manipulating these objects. It offers the following key features:
 - **Multi-object multi-statement transactions** with standard SQL `BEGIN` and `COMMIT` semantics
-- **Consistent time travel and snapshot export** across all objects in the LakeHouse
-- **Storage only** as a LakeHouse solution that works exactly the same way locally, on premise and in the cloud
+- **Consistent time travel and snapshot export** across all objects in the Lakehouse
+- **Storage only** as a Lakehouse solution that works exactly the same way locally, on premise and in the cloud
 - **Compatibility with open table formats** like Apache Iceberg, supporting both standard SQL `MANAGED` and `EXTERNAL` as well as federation-based access patterns.
 - **Compatibility with open catalog standards** like Apache Iceberg REST Catalog specification, serving as a highly scalable yet extremely lightweight backend implementation
 

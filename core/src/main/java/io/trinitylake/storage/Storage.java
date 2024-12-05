@@ -13,14 +13,45 @@
  */
 package io.trinitylake.storage;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.reactivestreams.Publisher;
 
-public interface Storage {
+/**
+ * Storage that starts with a root URI location. All access to the storage should be to paths under
+ * the root. The only exception is for accessing external tables, and that should directly use
+ * {@link #ops()} to access the full external URI.
+ */
+public interface Storage extends Closeable {
 
-  String root();
+  URI root();
 
-  void putIfNotExist(String key, InputStream value) throws IOException;
+  StorageOps ops();
 
-  InputStream get(String key) throws IOException;
+  default void prepareToRead(String path) {
+    ops().prepareToRead(root().extendPath(path));
+  }
+
+  default SeekableInputStream startRead(String path) {
+    return ops().startRead(root().extendPath(path));
+  }
+
+  default PositionOutputStream startWrite(String path) {
+    return ops().startWrite(root().extendPath(path));
+  }
+
+  default void delete(List<String> paths) {
+    ops().delete(paths.stream().map(root()::extendPath).collect(Collectors.toList()));
+  }
+
+  default Publisher<URI> list(String prefixPath) {
+    return ops().list(root().extendPath(prefixPath));
+  }
+
+  @Override
+  default void close() throws IOException {
+    ops().close();
+  }
 }

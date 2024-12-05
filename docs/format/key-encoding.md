@@ -6,8 +6,8 @@
 
 ## First Byte
 
-The first byte of a key in a TrinityLake tree is used to differentiate user-facing objects in LakeHouse vs
-any other system-internal object definitions such as [LakeHouse](#lakehouse-key).
+The first byte of a key in a TrinityLake tree is used to differentiate user-facing objects in Lakehouse vs
+any other system-internal object definitions such as [Lakehouse](#lakehouse-key).
 User-facing object keys must start with a `[space]`,
 and system-internal object keys must not start with a `[space]`.
 
@@ -16,9 +16,9 @@ and system-internal object keys must not start with a `[space]`.
 In general, system internal keys do not participate in the TrinityLake tree key sorting algorithm and always stay in 
 the designated node.
 
-### LakeHouse Definition Key
+### Lakehouse Definition Key
 
-The [LakeHouse definition file](./lakehouse.md) pointer is stored with key `lakehouse_def` in the root node.
+The [Lakehouse definition file](./lakehouse.md) pointer is stored with key `lakehouse_def` in the root node.
 
 ### Previous Root Node Key
 
@@ -40,7 +40,7 @@ The key `created_at_millis` writes the timestamp that a node is created.
 ## Object ID Key
 
 The object ID key is a UTF-8 string that uniquely identifies the object and also allows sorting it in a 
-lexicographical order that resembles the object hierarchy in a LakeHouse.
+lexicographical order that resembles the object hierarchy in a Lakehouse.
 
 ### Object Name
 
@@ -55,7 +55,7 @@ The following UTF-8 characters are not permitted in an object name:
 ### Encoded Object Name
 
 When used in an object ID key, the object name is right-padded with space up to the maximum size 
-(excluding the initial byte). For example, a namespace `default` under LakeHouse definition 
+(excluding the initial byte). For example, a namespace `default` under Lakehouse definition 
 `namespace_name_max_size_bytes=8` will have an encoded object name`[space]default[space]`.
 
 ### Encoded Object Definition Schema ID

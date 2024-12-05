@@ -1,11 +1,11 @@
-# Apache Iceberg Tables
+# Apache Iceberg Table Format
 
 Apache Iceberg is one of the supported formats of a TrinityLake table.
 
 ## Managed Iceberg Table
 
 TrinityLake managed Iceberg tables should be created without any format properties in the [table definition](./overview.md#object-definition-schema).
-The TrinityLake format determines what works the best for managing an Iceberg table within a Trinity LakeHouse.
+The TrinityLake format determines what works the best for managing an Iceberg table within a Trinity Lakehouse.
 
 For a managed table, TrinityLake maps the data type to Iceberg in the following way:
 

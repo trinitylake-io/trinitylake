@@ -1,6 +1,6 @@
 # Namespace
 
-A namespace is a container in a LakeHouse to organize different objects.
+A namespace is a container in a Lakehouse to organize different objects.
 
 ## Object Definition Schema
 

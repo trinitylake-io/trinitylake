@@ -9,7 +9,7 @@ Each schema has a schema ID, and is used as a part of the TrinityLake tree [key 
 
 The TrinityLake format currently provides the following object definitions with their corresponding schemas:
 
-- [LakeHouse](./lakehouse.md)
+- [Lakehouse](./lakehouse.md)
 - [Namespace](./namespace.md)
 - [Table](./table/overview.md)
 

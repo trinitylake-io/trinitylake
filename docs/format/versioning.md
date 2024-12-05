@@ -36,7 +36,7 @@ until a past version is declared as deprecated.
 
 Because of the backward and forward compatibility requirement, minor and patch versions are for information only
 so that people can know what has been changing and update their implementations accordingly.
-This is also why only the major version is directly recorded in the [LakeHouse definition](./lakehouse.md).
+This is also why only the major version is directly recorded in the [Lakehouse definition](./lakehouse.md).
 
 It is recommended that format implementations explicitly check the format major version and 
 fail the reader accordingly for unsupported future format major version.

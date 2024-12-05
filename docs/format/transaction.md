@@ -96,7 +96,7 @@ When committing a transaction, the writer does the following:
 ## Time Travel
 
 Because the TriniyLake tree node is versioned, time travel against the tree root, 
-i.e. time travel against the entire Trinity LakeHouse, is possible.
+i.e. time travel against the entire Trinity Lakehouse, is possible.
 
 The engines should match the time travel ANSI-SQL semantics in the following way:
 
@@ -122,10 +122,10 @@ with the difference that the root node `v` should be recorded as the [rollback r
 
 ## Snapshot Export
 
-A snapshot export for a Trinity LakeHouse means to export a specific version of the TrinityLake tree root node,
+A snapshot export for a Trinity Lakehouse means to export a specific version of the TrinityLake tree root node,
 and all the files that are reachable through that root node.
 
-Every time an export is created, the [LakeHouse definition](./lakehouse.md) should be updated to record the name of the export
+Every time an export is created, the [Lakehouse definition](./lakehouse.md) should be updated to record the name of the export
 and the root node file that the export is at.
 
 There are many types of export that can be achieved, because the export process can decide to stop replication
@@ -135,8 +135,8 @@ On the other side, a process can simply replicate the specific version of tree r
 and all other files reachable from the root node are not replicated. We call this a **Minimal Export**.
 We call any export that is in between a **Partial Export**.
 
-Any file that is referenced by both the exported snapshot and the source LakeHouse might be removed by the 
-LakeHouse version expiration process.
-With a full snapshot export, all files are replicated and dereferenced from the source LakeHouse.
+Any file that is referenced by both the exported snapshot and the source Lakehouse might be removed by the 
+Lakehouse version expiration process.
+With a full snapshot export, all files are replicated and dereferenced from the source Lakehouse.
 With a partial or minimal export, additional retention policy settings are required to make sure the
 version expiration process still keep those files available for a certain amount of time.

@@ -14,41 +14,42 @@
 package io.trinitylake;
 
 import io.trinitylake.storage.Storage;
+import java.util.List;
 
-public class LakeHouse {
+public class BasicLakehouse implements Lakehouse {
 
   private final Storage storage;
 
-  public LakeHouse(Storage storage) {
+  public BasicLakehouse(Storage storage) {
     this.storage = storage;
   }
 
-  /**
-   * Begin a transaction
-   *
-   * @param transaction transaction ID
-   * @return the version of the LakeHouse for all read and write
-   */
-  public LakeHouseVersion beginTransaction(String transaction) {
+  @Override
+  public BasicLakehouseVersion beginTransaction(String transaction) {
     return null;
   }
 
-  /**
-   * Commit a transaction
-   *
-   * @param transaction transaction ID
-   * @param version the version to be committed
-   * @return the new version of the LakeHouse after commit
-   * @throws io.trinitylake.exception.CommitFailureException if commit failed
-   */
-  public LakeHouseVersion commitTransaction(String transaction, LakeHouseVersion version) {
+  @Override
+  public BasicLakehouseVersion commitTransaction(
+      String transaction, BasicLakehouseVersion version) {
     return null;
   }
 
-  /**
-   * Rollback an ongoing transaction
-   *
-   * @param transaction transaction ID
-   */
+  @Override
   public void rollbackTransaction(String transaction) {}
+
+  @Override
+  public List<Long> showLakehouseVersions() {
+    return null;
+  }
+
+  @Override
+  public LakehouseVersion loadLakehouseVersion(long version) {
+    return null;
+  }
+
+  @Override
+  public LakehouseVersion loadLatestLakehouseVersion() {
+    return null;
+  }
 }
