@@ -13,14 +13,16 @@
  */
 package org.apache.spark.sql.execution.datasources.v2
 
+import io.trinitylake.spark.SparkCatalog
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Attribute
 
-case class BeginTransactionExec() extends LeafV2CommandExec {
+case class BeginTransactionExec(sparkCatalog: SparkCatalog) extends LeafV2CommandExec {
 
   override lazy val output: Seq[Attribute] = Nil
 
   override protected def run(): Seq[InternalRow] = {
+    sparkCatalog.beginTransaction()
     Seq.empty
   }
 

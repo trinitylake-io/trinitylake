@@ -11,6 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.spark;
+package io.trinitylake.exception;
 
-public class TrinityLakeCatalog {}
+public class NoActiveTransactionException extends TrinityLakeRuntimeException {
+
+  public NoActiveTransactionException(Throwable cause, String message, Object... args) {
+    super(cause, message, args);
+  }
+
+  public NoActiveTransactionException(String message, Object... args) {
+    super(message, args);
+  }
+}
