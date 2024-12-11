@@ -29,6 +29,8 @@ public class SmokeTest {
             .master("local[2]")
             .appName("SmokeTest")
             .config("spark.sql.extensions", TrinityLakeSparkSessionExtensions.class.getName())
+            .config("spark.sql.catalog.my_catalog", SparkCatalog.class.getName())
+            .config("spark.sql.defaultCatalog", "my_catalog")
             .getOrCreate();
   }
 

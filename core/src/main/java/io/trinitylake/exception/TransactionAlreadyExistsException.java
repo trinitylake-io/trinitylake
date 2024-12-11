@@ -11,22 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.sql.execution.datasources.v2
+package io.trinitylake.exception;
 
-import io.trinitylake.spark.SparkCatalog
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Attribute
+public class TransactionAlreadyExistsException extends TrinityLakeRuntimeException {
 
-case class CommitTransactionExec(sparkCatalog: SparkCatalog) extends LeafV2CommandExec {
-
-  override lazy val output: Seq[Attribute] = Nil
-
-  override protected def run(): Seq[InternalRow] = {
-    sparkCatalog.commitTransaction()
-    Seq.empty
+  public TransactionAlreadyExistsException(Throwable cause, String message, Object... args) {
+    super(cause, message, args);
   }
 
-  override def simpleString(maxFields: Int): String = {
-    "CommitTransactionExec"
+  public TransactionAlreadyExistsException(String message, Object... args) {
+    super(message, args);
   }
 }

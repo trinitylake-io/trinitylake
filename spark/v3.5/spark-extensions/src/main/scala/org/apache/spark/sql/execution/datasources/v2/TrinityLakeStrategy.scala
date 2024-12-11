@@ -13,6 +13,8 @@
  */
 package org.apache.spark.sql.execution.datasources.v2
 
+import io.trinitylake.spark.SparkCatalog
+import io.trinitylake.spark.source.SupportsTransactions
 import org.apache.spark.sql.catalyst.plans.logical.BeginTransactionCommand
 import org.apache.spark.sql.catalyst.plans.logical.CommitTransactionCommand
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
@@ -24,11 +26,21 @@ case class TrinityLakeStrategy(spark: SparkSession) extends Strategy {
 
   override def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
     case BeginTransactionCommand() =>
-      BeginTransactionExec() :: Nil
+      BeginTransactionExec(getCatalogWithTransactions) :: Nil
     case CommitTransactionCommand() =>
-      CommitTransactionExec() :: Nil
+      CommitTransactionExec(getCatalogWithTransactions) :: Nil
     case RollbackTransactionCommand() =>
-      RollbackTransactionExec() :: Nil
+      RollbackTransactionExec(getCatalogWithTransactions) :: Nil
     case _ => Nil
+  }
+
+  private def getCatalogWithTransactions: SparkCatalog = {
+    val catalog = spark.sessionState.catalogManager.currentCatalog
+    catalog match {
+      case c: SparkCatalog if c.isInstanceOf[SupportsTransactions] => c
+      case _ =>
+        throw new UnsupportedOperationException(
+          s"Catalog ${catalog.name()} does not support transactions")
+    }
   }
 }
