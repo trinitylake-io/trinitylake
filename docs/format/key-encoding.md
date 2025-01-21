@@ -48,6 +48,7 @@ The object name has maximum size in bytes defined in [Lakehouse definition file]
 with one configuration for each type of object.
 
 The following UTF-8 characters are not permitted in an object name:
+
 - any control characters (hex value 00 to 1F)
 - the space character (hex value 20)
 - the DEL character (hex value 7F)
@@ -60,12 +61,24 @@ When used in an object ID key, the object name is right-padded with space up to 
 
 ### Encoded Object Definition Schema ID
 
-The schema of the [object definition](./object-definition-file.md) has a numeric ID, 
-and is encoded to a base64 value of size 4 with padding.
+The schema of the [object definition](./object-definition-file.md) has a numeric ID starting from 0, 
+and is encoded to a 4 character base64 string that uses the following encoding:
+
+- Uppercase letters: A–Z, with indices 0–25
+- Lowercase letters: a–z, with indices 26–51
+- Digits: 0–9, with indices 52–61
+- Special symbols: `+` and `/`, with indices 62–63
+- Padding character `=`, which may only appear at the end of the string
+
+For example, schema ID `4` is encoded to `D===`.
 
 ### Encoded Object ID
 
-The encoded object ID that is used as the object ID key is defined as the following:
+Combing all the rules above, 
+the encoded object ID that is used as the object ID key is defined as the following:
+(contents in `<>` should be substituted)
 
-- Namespace: encoded namespace name + encoded schema ID
-- Table: encoded namespace name + encoded table name + encoded schema ID
+| Object Type | Schema ID | Object ID Format                                          | Example                                 |
+|-------------|-----------|-----------------------------------------------------------|-----------------------------------------|
+| Namespace   | 1         | `[space]B===<encoded namespace name>`                     | `[space]B===default[space]`             |
+| Table       | 2         | `[space]C===<encoded namespace name><encoded table name>` | `[space]C===default[space]table[space][space][space]` |

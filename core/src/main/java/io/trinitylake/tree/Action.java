@@ -11,19 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.key;
+package io.trinitylake.tree;
 
-public enum ObjectDefType {
-  NAMESPACE(1),
-  TABLE(2);
-
-  private final int schemaVersion;
-
-  ObjectDefType(int schemaVersion) {
-    this.schemaVersion = schemaVersion;
-  }
-
-  public int schemaVersion() {
-    return schemaVersion;
-  }
-}
+public interface Action {}

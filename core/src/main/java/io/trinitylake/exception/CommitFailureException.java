@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class CommitFailureException extends TrinityLakeRuntimeException {
 
+  public CommitFailureException(Throwable cause) {
+    super(cause);
+  }
+
   public CommitFailureException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }

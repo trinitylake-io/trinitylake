@@ -13,38 +13,23 @@
  */
 package io.trinitylake;
 
-import io.trinitylake.models.LakehouseDef;
-import io.trinitylake.models.NamespaceDef;
-import io.trinitylake.models.TableDef;
-import java.util.List;
+import com.google.common.collect.ImmutableMap;
+import io.trinitylake.tree.TreeRoot;
+import java.util.Map;
 
 public interface Lakehouse {
 
-  BasicLakehouseVersion beginTransaction(String transaction);
-
-  BasicLakehouseVersion commitTransaction(String transaction, BasicLakehouseVersion version);
-
-  void rollbackTransaction(String transaction);
-
-  List<Long> showLakehouseVersions();
-
-  LakehouseVersion loadLakehouseVersion(long version);
-
-  LakehouseVersion loadLatestLakehouseVersion();
-
-  default LakehouseDef describeLakehouse() {
-    return loadLatestLakehouseVersion().describeLakehouse();
+  default TransactionContext beginTransaction() {
+    return beginTransaction(ImmutableMap.of());
   }
 
-  default NamespaceDef describeNamespace(String namespaceName) {
-    return loadLatestLakehouseVersion().describeNamespace(namespaceName);
-  }
+  TransactionContext beginTransaction(Map<String, String> options);
 
-  default TableDef describeTable(String namespaceName, String tableName) {
-    return loadLatestLakehouseVersion().describeTable(namespaceName, tableName);
-  }
+  LakehouseVersion commitTransaction(TransactionContext version, TreeRoot root);
 
-  default List<String> showTables(String namespaceName) {
-    return loadLatestLakehouseVersion().showTables(namespaceName);
-  }
+  Iterable<LakehouseVersion> listVersions();
+
+  LakehouseVersion loadVersion(long version);
+
+  LakehouseVersion loadLatestVersion();
 }

@@ -4,7 +4,7 @@ A table is a collection of related data organized in tabular format; consisting 
 
 ## Object Definition Schema
 
-***Schema ID: 3***
+***Schema ID: 2***
 
 | Field Name                 | Protobuf Type       | Description                                                                                                      | Required? | Default |
 |----------------------------|---------------------|------------------------------------------------------------------------------------------------------------------|-----------|---------|

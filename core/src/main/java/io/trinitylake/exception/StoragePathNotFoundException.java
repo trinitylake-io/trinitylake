@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class StoragePathNotFoundException extends TrinityLakeRuntimeException {
 
+  public StoragePathNotFoundException(Throwable cause) {
+    super(cause);
+  }
+
   public StoragePathNotFoundException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }

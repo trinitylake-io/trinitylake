@@ -16,6 +16,10 @@ apply plugin: 'com.google.protobuf'
 
 dependencies {
     protobuf files("$rootDir/proto/")
+
+    annotationProcessor "org.immutables:value:2.10.1"
+    compileOnly "org.immutables:value:2.10.1"
+
     implementation 'com.google.guava:guava:33.3.1-jre'
     implementation 'com.google.protobuf:protobuf-java:4.28.3'
     implementation 'software.amazon.awssdk:s3:2.29.22'
@@ -23,6 +27,7 @@ dependencies {
     implementation 'software.amazon.awssdk.crt:aws-crt:0.33.3'
     implementation 'dev.failsafe:failsafe:3.3.2'
     implementation "com.github.ben-manes.caffeine:caffeine:2.9.3"
+    implementation "org.apache.arrow:arrow-vector:18.1.0"
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
 }

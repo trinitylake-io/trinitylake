@@ -14,6 +14,7 @@ Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs
 ## System-Internal Rows for Root Node
 
 [System-internal keys](./key-encoding.md#system-internal-keys) will appear as the top rows in the file.
+There is no specific ordering required for the system-internal rows.
 
 ## Node Pointers
 

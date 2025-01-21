@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class ObjectNotFoundException extends TrinityLakeRuntimeException {
 
+  public ObjectNotFoundException(Throwable cause) {
+    super(cause);
+  }
+
   public ObjectNotFoundException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }

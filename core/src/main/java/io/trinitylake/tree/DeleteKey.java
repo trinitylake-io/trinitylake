@@ -11,19 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.exception;
+package io.trinitylake.tree;
 
-public class StorageReadFailureException extends TrinityLakeRuntimeException {
+import org.immutables.value.Value;
 
-  public StorageReadFailureException(Throwable cause) {
-    super(cause);
-  }
+@Value.Immutable
+public interface DeleteKey extends Action {
 
-  public StorageReadFailureException(Throwable cause, String message, Object... args) {
-    super(cause, message, args);
-  }
-
-  public StorageReadFailureException(String message, Object... args) {
-    super(message, args);
-  }
+  String key();
 }

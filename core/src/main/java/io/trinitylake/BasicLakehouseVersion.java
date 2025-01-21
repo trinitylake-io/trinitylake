@@ -13,30 +13,65 @@
  */
 package io.trinitylake;
 
+import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
 import io.trinitylake.storage.Storage;
+import io.trinitylake.tree.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class BasicLakehouseVersion implements LakehouseVersion {
 
   private final Storage storage;
-  private final long version;
+  private final TreeRoot root;
 
-  public BasicLakehouseVersion(Storage storage, long version) {
+  public BasicLakehouseVersion(Storage storage, TreeRoot root) {
     this.storage = storage;
-    this.version = version;
-  }
-
-  @Override
-  public LakehouseDef describeLakehouse() {
-    return null;
+    this.root = root;
   }
 
   @Override
   public long version() {
-    return version;
+    return root.version();
+  }
+
+  @Override
+  public LakehouseDef definition() {
+    InputStream stream = storage.startRead(root.lakehouseDefPath());
+    try {
+      return LakehouseDef.parseFrom(stream);
+    } catch (IOException e) {
+      throw new StorageReadFailureException(
+          "Failed to parse Lakehouse definition from " + root.lakehouseDefPath(), e);
+    }
+  }
+
+  @Override
+  public long createdAtMillis() {
+    return root.createdAtMillis();
+  }
+
+  @Nullable
+  @Override
+  public LakehouseVersion previousVersion() {
+    TreeRoot previousRoot = new ArrowTreeRoot(storage, root.previousRootPath());
+    return new BasicLakehouseVersion(storage, previousRoot);
+  }
+
+  @Nullable
+  @Override
+  public LakehouseVersion rollbackFromVersion() {
+    TreeRoot rollbackFromRoot = new ArrowTreeRoot(storage, root.rollbackFromRootPath());
+    return new BasicLakehouseVersion(storage, rollbackFromRoot);
+  }
+
+  @Override
+  public List<String> showNamespaces() {
+    return null;
   }
 
   @Override

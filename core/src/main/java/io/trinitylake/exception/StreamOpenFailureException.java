@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class StreamOpenFailureException extends TrinityLakeRuntimeException {
 
+  public StreamOpenFailureException(Throwable cause) {
+    super(cause);
+  }
+
   public StreamOpenFailureException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }

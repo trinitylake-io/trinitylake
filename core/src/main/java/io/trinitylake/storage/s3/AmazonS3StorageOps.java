@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.trinitylake.exception.StorageDeleteFailureException;
+import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.storage.BasicStorageOpsProperties;
 import io.trinitylake.storage.PositionOutputStream;
 import io.trinitylake.storage.SeekableFileInputStream;
@@ -49,12 +50,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.Delete;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.DownloadFileRequest;
 import software.amazon.awssdk.transfer.s3.model.FileDownload;
@@ -124,6 +120,22 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
+  public SeekableFileInputStream startReadLocal(URI uri) {
+    Pair<FileDownload, File> fileDownloadResult = preparedFiles.getIfPresent(uri);
+    if (fileDownloadResult != null) {
+      prepareToRead(uri);
+      fileDownloadResult = preparedFiles.getIfPresent(uri);
+    }
+
+    try {
+      fileDownloadResult.first().completionFuture().get();
+      return new SeekableFileInputStream(fileDownloadResult.second());
+    } catch (ExecutionException | InterruptedException e) {
+      throw new StorageReadFailureException(e);
+    }
+  }
+
+  @Override
   public SeekableInputStream startRead(URI uri) {
     Pair<FileDownload, File> fileDownloadResult = preparedFiles.getIfPresent(uri);
     if (fileDownloadResult != null) {
@@ -136,6 +148,19 @@ public class AmazonS3StorageOps implements StorageOps {
     }
     LOG.info("Start read without preparation, directly open S3 object: {}", uri);
     return new S3InputStream(s3, uri);
+  }
+
+  @Override
+  public boolean exists(URI uri) {
+    try {
+      s3.headObject(HeadObjectRequest.builder().bucket(uri.authority()).key(uri.path()).build())
+          .get();
+      return true;
+    } catch (ExecutionException e) {
+      return false;
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

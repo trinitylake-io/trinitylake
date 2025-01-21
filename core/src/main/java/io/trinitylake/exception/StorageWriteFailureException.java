@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class StorageWriteFailureException extends TrinityLakeRuntimeException {
 
+  public StorageWriteFailureException(Throwable cause) {
+    super(cause);
+  }
+
   public StorageWriteFailureException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }
