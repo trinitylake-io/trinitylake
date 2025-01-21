@@ -21,8 +21,8 @@ public class Pair<X, Y> {
     return new Pair<>(first, second);
   }
 
-  private X first;
-  private Y second;
+  private final X first;
+  private final Y second;
 
   private Pair(X first, Y second) {
     this.first = first;

@@ -13,11 +13,18 @@
  */
 package io.trinitylake.tree;
 
+import io.trinitylake.util.Pair;
+
 public interface TreeNode {
 
   long createdAtMillis();
 
-  String findValue(String key);
-
-  TreeNode findChild(String key);
+  /**
+   * Find value in the current node
+   *
+   * @param key key
+   * @return the specific value if exists at the first position, or the pointer to the next node at
+   *     the second position
+   */
+  Pair<String, String> findValue(String key);
 }

@@ -38,6 +38,14 @@ public interface Storage extends Closeable {
     return ops().startRead(root().extendPath(path));
   }
 
+  default SeekableFileInputStream startReadLocal(String path) {
+    return ops().startReadLocal(root().extendPath(path));
+  }
+
+  default boolean exists(String path) {
+    return ops().exists(root().extendPath(path));
+  }
+
   default PositionOutputStream startWrite(String path) {
     return ops().startWrite(root().extendPath(path));
   }

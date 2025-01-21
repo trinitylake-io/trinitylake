@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class TrinityLakeRuntimeException extends RuntimeException {
 
+  public TrinityLakeRuntimeException(Throwable cause) {
+    super(cause);
+  }
+
   public TrinityLakeRuntimeException(String message, Object... args) {
     super(String.format(message, args));
   }

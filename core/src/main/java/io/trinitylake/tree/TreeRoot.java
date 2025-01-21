@@ -11,19 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.exception;
+package io.trinitylake.tree;
 
-public class StorageReadFailureException extends TrinityLakeRuntimeException {
+public interface TreeRoot extends TreeNode {
 
-  public StorageReadFailureException(Throwable cause) {
-    super(cause);
-  }
+  String lakehouseDefPath();
 
-  public StorageReadFailureException(Throwable cause, String message, Object... args) {
-    super(cause, message, args);
-  }
+  String previousRootPath();
 
-  public StorageReadFailureException(String message, Object... args) {
-    super(message, args);
-  }
+  String rollbackFromRootPath();
+
+  long version();
 }

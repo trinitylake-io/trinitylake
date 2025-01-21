@@ -14,15 +14,22 @@ it is treated as `s3://my-bucket/my-lakehouse/` when used.
 
 The Lakehouse root location is not stored within the TrinityLake format itself.
 It is expected that a user would specify the root location at runtime.
+This ensures the whole lakehouse is portable for use cases like replication.
 
 ## Relative File Location
 
-Any file location in a TrinityLake format must always be the relative location
+A file location in a TrinityLake format should always be the relative location
 against the root location of the Lakehouse.
 
 For example, if the Lakehouse root location is at `s3://my-bucket/my-lakehouse`,
 and a file is at location `s3://my-bucket/my-lakehouse/my-table-definition.binpb`,
 then the location value stored in the TrinityLake format should be `my-table-definition.binpb`.
+
+!!!Note
+
+    Not all file locations follow this rule. Here are the exceptions:
+    
+    - [external table location](./table/table-type.md#external)
 
 ## File Name Size
 
@@ -38,7 +45,7 @@ Given an **Original File Name**, the **Optimized File Name** in storage can be c
 2. Get the first 20 bytes and convert it to binary string representation and use it as the prefix. 
    This maximizes the throughput in object storages like S3.
 3. For the first, second and third group of 4 characters in the prefix, further separated with `/`. 
-   This maximizes the throughput in file systems like HDFS if a full directory listing at root location is necessary.
+   This maximizes the throughput in file systems when a directory listing at root location is necessary.
 4. Concatenate the prefix before the original file name using the `-` character.
 
 For example, an original file name `my-table-definition.binpb` will be transformed to 
@@ -46,10 +53,12 @@ For example, an original file name `my-table-definition.binpb` will be transform
 
 !!!Note
 
-    Not all the file names will be optimized in this way. A few system-internal files such as the 
-    [root node file](./transaction.md#root-node-file-name) will not be stored using this scheme.
+    Not all the file names will be optimized in this way. Here are the exceptions:
 
-!!!Note
+    - [root node file name](./transaction.md#root-node-file-name)
+
+
+!!!Warning
     
     File name optimization is a write side feature, and should not be used by readers to reverse-engineer
     the original file name.

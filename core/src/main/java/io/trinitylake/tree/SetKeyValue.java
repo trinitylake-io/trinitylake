@@ -11,19 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.exception;
+package io.trinitylake.tree;
 
-public class StorageReadFailureException extends TrinityLakeRuntimeException {
-
-  public StorageReadFailureException(Throwable cause) {
-    super(cause);
-  }
-
-  public StorageReadFailureException(Throwable cause, String message, Object... args) {
-    super(cause, message, args);
-  }
-
-  public StorageReadFailureException(String message, Object... args) {
-    super(message, args);
-  }
-}
+public class SetKeyValue {}

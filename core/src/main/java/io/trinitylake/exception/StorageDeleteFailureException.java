@@ -15,6 +15,10 @@ package io.trinitylake.exception;
 
 public class StorageDeleteFailureException extends TrinityLakeRuntimeException {
 
+  public StorageDeleteFailureException(Throwable cause) {
+    super(cause);
+  }
+
   public StorageDeleteFailureException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }

@@ -28,7 +28,11 @@ public interface StorageOps extends Closeable {
 
   SeekableInputStream startRead(URI uri);
 
+  SeekableFileInputStream startReadLocal(URI uri);
+
   PositionOutputStream startWrite(URI uri);
+
+  boolean exists(URI uri);
 
   void delete(List<URI> uris);
 

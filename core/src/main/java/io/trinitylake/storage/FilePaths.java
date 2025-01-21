@@ -11,17 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.key;
+package io.trinitylake.storage;
 
-public class InternalKeys {
+public class FilePaths {
 
-  public static String LAKEHOUSE_DEFINITION = "lakehouse_def";
+  public static final String LATEST_VERSION_HINT = "_latest_hint.txt";
 
-  public static String PREVIOUS_ROOT_NODE = "previous_root";
-
-  public static String VERSION = "version";
-
-  public static String ROLLBACK_FROM_ROOT_NODE = "rollback_from_root";
-
-  public static String CREATED_AT_MILLIS = "created_at_millis";
+  public static String rootNodeFilePath(Long version) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("cpi.");
+    sb.append(Long.toBinaryString(version));
+    sb.append("_");
+    sb.reverse();
+    return sb.toString();
+  }
 }

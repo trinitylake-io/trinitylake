@@ -13,20 +13,32 @@
  */
 package io.trinitylake;
 
+import io.trinitylake.exception.ObjectNotFoundException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public interface LakehouseVersion {
 
   long version();
 
-  LakehouseDef describeLakehouse();
+  long createdAtMillis();
 
-  NamespaceDef describeNamespace(String namespaceName);
+  LakehouseDef definition();
 
-  List<String> showTables(String namespaceName);
+  @Nullable
+  LakehouseVersion previousVersion();
 
-  TableDef describeTable(String namespaceName, String tableName);
+  @Nullable
+  LakehouseVersion rollbackFromVersion();
+
+  List<String> showNamespaces();
+
+  NamespaceDef describeNamespace(String namespaceName) throws ObjectNotFoundException;
+
+  List<String> showTables(String namespaceName) throws ObjectNotFoundException;
+
+  TableDef describeTable(String namespaceName, String tableName) throws ObjectNotFoundException;
 }

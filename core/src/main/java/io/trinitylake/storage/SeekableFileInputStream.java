@@ -17,6 +17,7 @@ import io.trinitylake.exception.StreamOpenFailureException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 public class SeekableFileInputStream extends SeekableInputStream {
 
@@ -30,6 +31,10 @@ public class SeekableFileInputStream extends SeekableInputStream {
     } catch (IOException e) {
       throw new StreamOpenFailureException(e, "Fail to open file: %s", file);
     }
+  }
+
+  public FileChannel channel() {
+    return stream.getChannel();
   }
 
   private void open() throws IOException {

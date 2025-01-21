@@ -55,7 +55,7 @@ For example, the 100th version of the root node file would be stored with name `
 
 ## Root Node Latest Version Hint File
 
-A file with name `_latest_hint` is stored and marks the hint to the latest version of the TrinityLake tree root node file.
+A file with name `_latest_hint.txt` is stored and marks the hint to the latest version of the TrinityLake tree root node file.
 The file name is persisted in storage as is without [optimization](./location.md#optimized-file-name)
 The file contains a number that marks the presumably latest version of the tree root node, such as `100`.
 
