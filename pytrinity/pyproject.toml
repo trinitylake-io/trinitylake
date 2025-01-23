@@ -2,9 +2,7 @@
 name = "pytrinity"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Drew Gallardo",email = "imgeru@gmail.com"}
-]
+authors = []
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
