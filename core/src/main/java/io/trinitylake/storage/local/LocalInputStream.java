@@ -11,20 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake.storage.local;
 
 import io.trinitylake.exception.StreamOpenFailureException;
+import io.trinitylake.storage.SeekableInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-public class SeekableFileInputStream extends SeekableInputStream {
+public class LocalInputStream extends SeekableInputStream {
 
   private final File file;
   private FileInputStream stream;
 
-  public SeekableFileInputStream(File file) {
+  public LocalInputStream(File file) {
     try {
       this.file = file;
       open();

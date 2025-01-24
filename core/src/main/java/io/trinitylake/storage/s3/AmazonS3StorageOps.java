@@ -24,12 +24,12 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.trinitylake.exception.StorageDeleteFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
-import io.trinitylake.storage.BasicStorageOpsProperties;
-import io.trinitylake.storage.PositionOutputStream;
-import io.trinitylake.storage.SeekableFileInputStream;
+import io.trinitylake.storage.AtomicOutputStream;
+import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.storage.SeekableInputStream;
 import io.trinitylake.storage.StorageOps;
 import io.trinitylake.storage.URI;
+import io.trinitylake.storage.local.LocalInputStream;
 import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.Pair;
 import java.io.File;
@@ -46,7 +46,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -63,8 +62,8 @@ public class AmazonS3StorageOps implements StorageOps {
 
   private final S3AsyncClient s3;
   private final S3TransferManager transferManager;
-  private final BasicStorageOpsProperties basicStorageOpsProperties;
-  private final AmazonS3StorageOpsProperties s3StorageProperties;
+  private final CommonStorageOpsProperties commonProperties;
+  private final AmazonS3StorageOpsProperties s3Properties;
 
   private final AtomicBoolean isResourceClosed = new AtomicBoolean(false);
   private final Cache<URI, Pair<FileDownload, File>> preparedFiles;
@@ -72,41 +71,41 @@ public class AmazonS3StorageOps implements StorageOps {
   public AmazonS3StorageOps() {
     this(
         S3AsyncClient.crtCreate(),
-        BasicStorageOpsProperties.instance(),
+        CommonStorageOpsProperties.instance(),
         AmazonS3StorageOpsProperties.instance());
   }
 
   public AmazonS3StorageOps(
       S3AsyncClient s3,
-      BasicStorageOpsProperties basicStorageOpsProperties,
-      AmazonS3StorageOpsProperties s3StorageProperties) {
+      CommonStorageOpsProperties commonProperties,
+      AmazonS3StorageOpsProperties s3Properties) {
     this.s3 = s3;
     this.transferManager = S3TransferManager.builder().s3Client(s3).build();
-    this.basicStorageOpsProperties = basicStorageOpsProperties;
-    this.s3StorageProperties = s3StorageProperties;
+    this.commonProperties = commonProperties;
+    this.s3Properties = s3Properties;
     this.preparedFiles =
         Caffeine.newBuilder()
             .expireAfterAccess(
-                Duration.ofMillis(basicProperties().prepareReadCacheExpirationMillis()))
-            .maximumSize(basicStorageOpsProperties.prepareReadCacheSize())
+                Duration.ofMillis(commonProperties().prepareReadCacheExpirationMillis()))
+            .maximumSize(commonProperties.prepareReadCacheSize())
             .build();
   }
 
   @Override
-  public BasicStorageOpsProperties basicProperties() {
-    return basicStorageOpsProperties;
+  public CommonStorageOpsProperties commonProperties() {
+    return commonProperties;
   }
 
   @Override
-  public AmazonS3StorageOpsProperties moreProperties() {
-    return s3StorageProperties;
+  public AmazonS3StorageOpsProperties systemSpecificProperties() {
+    return s3Properties;
   }
 
   @Override
   public void prepareToRead(URI uri) {
     try {
       File tempFile =
-          FileUtil.createTempFile("s3-", basicProperties().prepareReadStagingDirectory());
+          FileUtil.createTempFile("s3-", commonProperties().prepareReadStagingDirectory());
       DownloadFileRequest downloadFileRequest =
           DownloadFileRequest.builder()
               .getObjectRequest(b -> b.bucket(uri.authority()).key(uri.path()))
@@ -120,7 +119,7 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public SeekableFileInputStream startReadLocal(URI uri) {
+  public LocalInputStream startReadLocal(URI uri) {
     Pair<FileDownload, File> fileDownloadResult = preparedFiles.getIfPresent(uri);
     if (fileDownloadResult != null) {
       prepareToRead(uri);
@@ -129,7 +128,7 @@ public class AmazonS3StorageOps implements StorageOps {
 
     try {
       fileDownloadResult.first().completionFuture().get();
-      return new SeekableFileInputStream(fileDownloadResult.second());
+      return new LocalInputStream(fileDownloadResult.second());
     } catch (ExecutionException | InterruptedException e) {
       throw new StorageReadFailureException(e);
     }
@@ -141,7 +140,7 @@ public class AmazonS3StorageOps implements StorageOps {
     if (fileDownloadResult != null) {
       try {
         fileDownloadResult.first().completionFuture().get();
-        return new SeekableFileInputStream(fileDownloadResult.second());
+        return new LocalInputStream(fileDownloadResult.second());
       } catch (ExecutionException | InterruptedException e) {
         LOG.warn("Failed to prepare downloading file: {}", uri, e);
       }
@@ -164,8 +163,8 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public PositionOutputStream startWrite(URI uri) {
-    return new S3OutputStream(s3, uri, s3StorageProperties);
+  public AtomicOutputStream startWrite(URI uri) {
+    return new S3OutputStream(s3, uri, commonProperties, s3Properties);
   }
 
   @Override
@@ -178,7 +177,7 @@ public class AmazonS3StorageOps implements StorageOps {
       String bucket = uri.authority();
       String objectKey = uri.path();
       bucketToObjects.get(bucket).add(objectKey);
-      if (bucketToObjects.get(bucket).size() == basicProperties().deleteBatchSize()) {
+      if (bucketToObjects.get(bucket).size() == commonProperties().deleteBatchSize()) {
         Set<String> keys = Sets.newHashSet(bucketToObjects.get(bucket));
         Future<List<String>> deletionTask =
             executorService().submit(() -> deleteBatch(bucket, keys));
@@ -247,13 +246,16 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public Publisher<URI> list(URI prefix) {
+  public List<URI> list(URI prefix) {
     ListObjectsV2Request request =
         ListObjectsV2Request.builder().bucket(prefix.authority()).prefix(prefix.path()).build();
 
-    return s3.listObjectsV2Paginator(request)
+    List<URI> result = Lists.newArrayList();
+    s3.listObjectsV2Paginator(request)
         .flatMapIterable(ListObjectsV2Response::contents)
-        .map(obj -> new URI(prefix.scheme(), prefix.authority(), obj.key()));
+        .map(obj -> new URI(prefix.scheme(), prefix.authority(), obj.key()))
+        .subscribe(result::add);
+    return result;
   }
 
   private ExecutorService executorService() {

@@ -22,7 +22,7 @@ import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
 import io.trinitylake.storage.FilePaths;
-import io.trinitylake.storage.Storage;
+import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.tree.BasicTreeNode;
 import io.trinitylake.tree.TreeKeys;
 import io.trinitylake.tree.TreeNode;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class TrinityLake {
 
-  public static void createLakehouse(Storage storage, LakehouseDef lakehouseDef) {
+  public static void createLakehouse(LakehouseStorage storage, LakehouseDef lakehouseDef) {
     String lakehouseDefFilePath = FilePaths.newLakehouseDefFilePath();
     ObjectDefinitions.writeLakehouseDef(storage, lakehouseDefFilePath, lakehouseDef);
 
@@ -45,11 +45,12 @@ public class TrinityLake {
     TreeOperations.writeNodeFile(storage, rootNodeFilePath, root);
   }
 
-  public static RunningTransaction beginTransaction(Storage storage) {
+  public static RunningTransaction beginTransaction(LakehouseStorage storage) {
     return beginTransaction(storage, ImmutableMap.of());
   }
 
-  public static RunningTransaction beginTransaction(Storage storage, Map<String, String> options) {
+  public static RunningTransaction beginTransaction(
+      LakehouseStorage storage, Map<String, String> options) {
     TreeNode current = TreeOperations.findLatestRoot(storage);
     IsolationLevel isolationLevel = TransactionOptions.isolationLevel(options);
     return ImmutableRunningTransaction.builder()
@@ -62,7 +63,7 @@ public class TrinityLake {
   }
 
   public static CommittedTransaction commitTransaction(
-      Storage storage, RunningTransaction transaction) throws CommitFailureException {
+      LakehouseStorage storage, RunningTransaction transaction) throws CommitFailureException {
     Preconditions.checkArgument(
         !TreeOperations.hasVersion(transaction.runningRoot()),
         "There is no change to be committed");
@@ -75,7 +76,8 @@ public class TrinityLake {
         .build();
   }
 
-  public static List<String> showNamespaces(Storage storage, RunningTransaction transaction) {
+  public static List<String> showNamespaces(
+      LakehouseStorage storage, RunningTransaction transaction) {
     return transaction.runningRoot().allKeyValues().stream()
         .map(Map.Entry::getKey)
         .filter(TreeKeys::isNamespaceKey)
@@ -84,7 +86,7 @@ public class TrinityLake {
   }
 
   public static NamespaceDef describeNamespace(
-      Storage storage, RunningTransaction transaction, String namespaceName)
+      LakehouseStorage storage, RunningTransaction transaction, String namespaceName)
       throws ObjectNotFoundException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
     String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
@@ -96,7 +98,7 @@ public class TrinityLake {
   }
 
   public static RunningTransaction createNamespace(
-      Storage storage,
+      LakehouseStorage storage,
       RunningTransaction transaction,
       String namespaceName,
       NamespaceDef namespaceDef)
@@ -115,7 +117,7 @@ public class TrinityLake {
   }
 
   public static RunningTransaction alterNamespace(
-      Storage storage,
+      LakehouseStorage storage,
       RunningTransaction transaction,
       String namespaceName,
       NamespaceDef namespaceDef)
@@ -134,7 +136,7 @@ public class TrinityLake {
   }
 
   public static RunningTransaction dropNamespace(
-      Storage storage, RunningTransaction transaction, String namespaceName)
+      LakehouseStorage storage, RunningTransaction transaction, String namespaceName)
       throws ObjectNotFoundException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
     String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
@@ -148,7 +150,7 @@ public class TrinityLake {
   }
 
   public static List<String> showTables(
-      Storage storage, RunningTransaction transaction, String namespaceName)
+      LakehouseStorage storage, RunningTransaction transaction, String namespaceName)
       throws ObjectNotFoundException {
     return transaction.runningRoot().allKeyValues().stream()
         .map(Map.Entry::getKey)
@@ -158,7 +160,10 @@ public class TrinityLake {
   }
 
   public static TableDef describeTable(
-      Storage storage, RunningTransaction transaction, String namespaceName, String tableName)
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String tableName)
       throws ObjectNotFoundException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
     String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
@@ -175,7 +180,7 @@ public class TrinityLake {
   }
 
   public static RunningTransaction createTable(
-      Storage storage,
+      LakehouseStorage storage,
       RunningTransaction transaction,
       String namespaceName,
       String tableName,
@@ -200,7 +205,7 @@ public class TrinityLake {
   }
 
   public static RunningTransaction alterTable(
-      Storage storage,
+      LakehouseStorage storage,
       RunningTransaction transaction,
       String namespaceName,
       String tableName,
@@ -225,7 +230,10 @@ public class TrinityLake {
   }
 
   public static RunningTransaction dropTable(
-      Storage storage, RunningTransaction transaction, String namespaceName, String tableName)
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String tableName)
       throws ObjectNotFoundException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
     String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);

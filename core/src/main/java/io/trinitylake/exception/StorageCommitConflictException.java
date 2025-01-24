@@ -11,25 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake.exception;
 
-public class BasicStorage implements Storage {
+public class StorageCommitConflictException extends TrinityLakeRuntimeException {
 
-  private final URI root;
-  private final StorageOps ops;
-
-  public BasicStorage(URI root, StorageOps ops) {
-    this.ops = ops;
-    this.root = root;
+  public StorageCommitConflictException(Throwable cause) {
+    super(cause);
   }
 
-  @Override
-  public URI root() {
-    return root;
+  public StorageCommitConflictException(Throwable cause, String message, Object... args) {
+    super(cause, message, args);
   }
 
-  @Override
-  public StorageOps ops() {
-    return ops;
+  public StorageCommitConflictException(String message, Object... args) {
+    super(message, args);
   }
 }
