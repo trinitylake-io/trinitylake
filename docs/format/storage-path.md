@@ -1,8 +1,12 @@
-# Location
+# Storage Path
 
-## Root Lakehouse Location
+## Root in Lakehouse Storage
 
-A Trinity Lakehouse should be created at a location that we call **Root Location**.
+A Trinity Lakehouse always starts at a storage **Root** location.
+The root location must be a fully qualified URI, for example `s3://my-trinity-lakehouse/`.
+All the 
+
+## Directory in a storage
 
 Although TrinityLake in general does not depend on the directory concept in file system,
 The root location is expected to behave like a directory where all files in the Lakehouse are stored in
@@ -16,9 +20,9 @@ The Lakehouse root location is not stored within the TrinityLake format itself.
 It is expected that a user would specify the root location at runtime.
 This ensures the whole lakehouse is portable for use cases like replication.
 
-## Relative File Location
+## File Path in Lakehouse Storage
 
-A file location in a TrinityLake format should always be the relative location
+A **File Path** in a TrinityLake format should always be the relative location
 against the root location of the Lakehouse.
 
 For example, if the Lakehouse root location is at `s3://my-bucket/my-lakehouse`,
@@ -29,16 +33,27 @@ then the location value stored in the TrinityLake format should be `my-table-def
 
     Not all file locations follow this rule. Here are the exceptions:
     
-    - [external table location](./table/table-type.md#external)
+    - [External table location](./table/table-type.md#external)
 
-## File Name Size
 
-All files stored in TrinityLake format must have a maximum file name size 
-defined in the [Lakehouse definition file](./lakehouse.md).
+## Non-Root Node File Path
 
-## Optimized File Name
+Non-root node file name will be in the form of prefix `node-` plus a version 4 UUID with suffix `.ipc`.
+For example, if a UUID `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8` is generated for the node file,
+the original file name of the node file will be `node-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc`,
+and that further goes through the [file name optimization](./storage-path#optimized-file-name)
+to produce the final node file name.
 
-A file name in the TrinityLake format is designed for optimized performance in storage.
+For root node file, please refer to [Transaction Specification](./transaction.md#root-node-file-name)
+for more details since the name is involved as a part of the transaction process.
+
+## Lakehouse Definition File Path
+
+should be `_lakehouse_def_` plus UUID plus `.binpb`
+
+## Optimized File Path
+
+A file path in the TrinityLake format is designed for optimized performance in storage.
 Given an **Original File Name**, the **Optimized File Name** in storage can be calculated as the following:
 
 1. Calculate the MurMur3 hash of the file name in bytes.
@@ -55,7 +70,9 @@ For example, an original file name `my-table-definition.binpb` will be transform
 
     Not all the file names will be optimized in this way. Here are the exceptions:
 
-    - [root node file name](./transaction.md#root-node-file-name)
+    - [Root node file name](./transaction.md#root-node-file-name)
+    - [Version hint file name](./transaction.md#root-node-latest-version-hint-file)
+    - [Lakehouse definition file name](./transaction.md#
 
 
 !!!Warning

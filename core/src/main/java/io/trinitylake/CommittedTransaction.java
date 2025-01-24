@@ -13,23 +13,13 @@
  */
 package io.trinitylake;
 
-import com.google.common.collect.ImmutableMap;
-import io.trinitylake.tree.TreeRoot;
-import java.util.Map;
+import io.trinitylake.tree.TreeNode;
+import org.immutables.value.Value;
 
-public interface Lakehouse {
+@Value.Immutable
+public interface CommittedTransaction {
 
-  default TransactionContext beginTransaction() {
-    return beginTransaction(ImmutableMap.of());
-  }
+  String transactionId();
 
-  TransactionContext beginTransaction(Map<String, String> options);
-
-  LakehouseVersion commitTransaction(TransactionContext version, TreeRoot root);
-
-  Iterable<LakehouseVersion> listVersions();
-
-  LakehouseVersion loadVersion(long version);
-
-  LakehouseVersion loadLatestVersion();
+  TreeNode committedRoot();
 }

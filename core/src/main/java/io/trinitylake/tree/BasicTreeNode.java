@@ -13,31 +13,40 @@
  */
 package io.trinitylake.tree;
 
-import io.trinitylake.storage.Storage;
+import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.Set;
 
-public class ArrowTreeRoot extends ArrowTreeNode implements TreeRoot {
+public class BasicTreeNode implements TreeNode {
 
-  public ArrowTreeRoot(Storage storage, String path) {
-    super(storage, path);
+  private final Map<String, String> values;
+
+  public BasicTreeNode() {
+    this.values = Maps.newHashMap();
   }
 
   @Override
-  public String lakehouseDefPath() {
-    return findValue(KeyNames.LAKEHOUSE_DEFINITION).first();
+  public String get(String key) {
+    return values.get(key);
   }
 
   @Override
-  public String previousRootPath() {
-    return findValue(KeyNames.PREVIOUS_ROOT_NODE).first();
+  public void set(String key, String value) {
+    values.put(key, value);
   }
 
   @Override
-  public String rollbackFromRootPath() {
-    return findValue(KeyNames.ROLLBACK_FROM_ROOT_NODE).first();
+  public boolean contains(String key) {
+    return values.containsKey(key);
   }
 
   @Override
-  public long version() {
-    return Long.parseLong(findValue(KeyNames.VERSION).first());
+  public void remove(String key) {
+    values.remove(key);
+  }
+
+  @Override
+  public Set<Map.Entry<String, String>> allKeyValues() {
+    return values.entrySet();
   }
 }

@@ -22,3 +22,6 @@ A table is a collection of related data organized in tabular format; consisting 
 | format_properties          | map<string, string> | Free form format-specific key-value string properties, e.g. [Apache Iceberg](./iceberg.md)                       | No        |         |
 | properties                 | map<string, string> | Free form user-defined key-value string properties                                                               | No        |         |
 
+## Name Size
+
+All table names must obey the maximum size configuration defined in the [Lakehouse definition file](../lakehouse.md).

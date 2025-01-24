@@ -13,17 +13,16 @@
  */
 package io.trinitylake;
 
+import io.trinitylake.util.PropertyUtil;
 import java.util.Map;
-import org.immutables.value.Value;
 
-@Value.Immutable
-public interface TransactionContext {
+public class TransactionOptions {
 
-  String transactionId();
+  public static final String ISOLATION_LEVEL = "isolation_level";
+  public static final String ISOLATION_LEVEL_DEFAULT = "SNAPSHOT";
 
-  LakehouseVersion version();
-
-  long startedAtMillis();
-
-  Map<String, String> options();
+  public static IsolationLevel isolationLevel(Map<String, String> options) {
+    return IsolationLevel.valueOf(
+        PropertyUtil.propertyAsString(options, ISOLATION_LEVEL, ISOLATION_LEVEL_DEFAULT));
+  }
 }

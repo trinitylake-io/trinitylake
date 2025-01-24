@@ -1,7 +1,7 @@
-# Storage
+# Storage Layout
 
-The Lakehouse tree in general follows the [storage layout of N-way search tree map](tree/search-tree-map.md#storage-layout).
-Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs/format/Columnar.html#format-ipc) with suffix `.ipc`.
+The Lakehouse tree in general follows the storage layout of [N-way search tree map](tree/search-tree-map.md#storage-layout).
+Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs/format/Columnar.html#format-ipc).
 
 ## Node File Schema
 
@@ -10,6 +10,7 @@ Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs
 | 1  | key   | String     | Name of the key                                      | no        |         |
 | 2  | value | String     | The value of the key                                 | no        |         |
 | 3  | pnode | String     | File location pointer to the value of the child node | no        |         |
+| 4  | txn   | String     | Transaction ID for [write buffer](./#write-buffer)   | no        |         |
 
 ## System-Internal Rows for Root Node
 
@@ -35,6 +36,8 @@ These rows must have a `key` that is not `NULL`, and the `pnode` is always `NULL
 - When the `value` is `NULL`, it is a message to delete the `key`.
 - When the `value` is not `NULL`, it is a message to set the current `pvalue` of the key in the tree to the new one in the write buffer.
 
+New changes are appended to the bottom of the write buffer.
+
 ## Node File Size
 
 Each node is targeted for the same specific size, which is configurable in the [Lakehouse definition](./lakehouse.md).
@@ -45,8 +48,8 @@ The estimated size of the `N` rows should be:
 N * (
   namespace_name_size_max_bytes + 
   table_name_size_max_bytes + 
-  file_name_size_max_Bytes +
-  5 // 1 initial byte, 4 bytes for schema ID 
+  file_path_size_max_bytes +
+  4 bytes for schema ID with padding 
 )
 ```
 
@@ -55,14 +58,3 @@ This remaining size is used as the write buffer for each node.
 
 For users that would like to fine-tune the performance characteristics of a TrinityLake tree,
 this formula can be used to readjust the node file size to achieve the desired epsilon value.
-
-## Non-Root Node File Name
-
-Non-root node file name will be in the form of a version 4 UUID with suffix `.ipc`.
-For example, if a UUID `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8` is generated for the node file,
-the original file name of the node file will be `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc`,
-and that further goes through the [file name optimization](./location.md#optimized-file-name) 
-to produce the final node file name.
-
-For root node file, please refer to [Transaction Specification](./transaction.md#root-node-file-name)
-for more details since the name is involved as a part of the transaction process.
