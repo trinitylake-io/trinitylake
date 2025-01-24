@@ -6,8 +6,8 @@
 
 ## First Byte
 
-The first byte of a key in a TrinityLake tree is used to differentiate user-facing objects in Lakehouse vs
-any other system-internal object definitions such as [Lakehouse](#lakehouse-key).
+The first byte of a key in a TrinityLake tree is used to differentiate user-facing object definitions in Lakehouse 
+vs any other system-internal object definitions such as [Lakehouse](#lakehouse-key).
 User-facing object keys must start with a `[space]`,
 and system-internal object keys must not start with a `[space]`.
 
@@ -37,9 +37,9 @@ The version of the root node, stored with the key `version` in the root node.
 
 The key `created_at_millis` writes the timestamp that a node is created.
 
-## Object ID Key
+## Object Key
 
-The object ID key is a UTF-8 string that uniquely identifies the object and also allows sorting it in a 
+The object key is a UTF-8 string that uniquely identifies the object and also allows sorting it in a 
 lexicographical order that resembles the object hierarchy in a Lakehouse.
 
 ### Object Name
@@ -55,8 +55,10 @@ The following UTF-8 characters are not permitted in an object name:
 
 ### Encoded Object Name
 
-When used in an object ID key, the object name is right-padded with space up to the maximum size 
-(excluding the initial byte). For example, a namespace `default` under Lakehouse definition 
+When used in an object key, the object name is right-padded with space up to the maximum size 
+(excluding the initial byte). The maximum size of each object is defined in the [Lakehouse definition file](./lakehouse.md).
+
+For example, a namespace `default` under Lakehouse definition 
 `namespace_name_max_size_bytes=8` will have an encoded object name`[space]default[space]`.
 
 ### Encoded Object Definition Schema ID
@@ -72,13 +74,14 @@ and is encoded to a 4 character base64 string that uses the following encoding:
 
 For example, schema ID `4` is encoded to `D===`.
 
-### Encoded Object ID
+### Object Key Format
 
-Combing all the rules above, 
-the encoded object ID that is used as the object ID key is defined as the following:
-(contents in `<>` should be substituted)
+The object key format combines all the [First Byte](#first-byte), [Encoded Object Name](#object-name), 
+[Encoded Object Definition Schema ID](#encoded-object-definition-schema-id) rules above to form a unique key 
+for each type of object. In more details, it is defined as the following: (contents in `<>` should be substituted)
 
-| Object Type | Schema ID | Object ID Format                                          | Example                                 |
-|-------------|-----------|-----------------------------------------------------------|-----------------------------------------|
-| Namespace   | 1         | `[space]B===<encoded namespace name>`                     | `[space]B===default[space]`             |
-| Table       | 2         | `[space]C===<encoded namespace name><encoded table name>` | `[space]C===default[space]table[space][space][space]` |
+| Object Type | Schema ID | Object ID Format                                               | Example                                               |
+|-------------|-----------|----------------------------------------------------------------|-------------------------------------------------------|
+| Lakehouse   | 0         | N/A, use [Lakehouse Definition Key](#lakehouse-definition-key) |                                                       |
+| Namespace   | 1         | `[space]B===<encoded namespace name>`                          | `[space]B===default[space]`                           |
+| Table       | 2         | `[space]C===<encoded namespace name><encoded table name>`      | `[space]C===default[space]table[space][space][space]` |

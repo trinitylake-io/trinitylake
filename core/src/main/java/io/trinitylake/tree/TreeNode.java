@@ -13,18 +13,18 @@
  */
 package io.trinitylake.tree;
 
-import io.trinitylake.util.Pair;
+import java.util.Map;
+import java.util.Set;
 
 public interface TreeNode {
 
-  long createdAtMillis();
+  String get(String key);
 
-  /**
-   * Find value in the current node
-   *
-   * @param key key
-   * @return the specific value if exists at the first position, or the pointer to the next node at
-   *     the second position
-   */
-  Pair<String, String> findValue(String key);
+  void set(String key, String value);
+
+  void remove(String key);
+
+  boolean contains(String key);
+
+  Set<Map.Entry<String, String>> allKeyValues();
 }

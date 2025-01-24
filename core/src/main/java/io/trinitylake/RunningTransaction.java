@@ -11,6 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake;
 
-public class SetKeyValue {}
+import io.trinitylake.tree.TreeNode;
+import org.immutables.value.Value;
+
+@Value.Immutable
+public interface RunningTransaction {
+
+  String transactionId();
+
+  TreeNode beginningRoot();
+
+  TreeNode runningRoot();
+
+  long beganAtMillis();
+
+  IsolationLevel isolationLevel();
+}

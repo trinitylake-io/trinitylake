@@ -35,7 +35,7 @@ For example, if you use the TrinityLake format on Amazon S3, you get 99.99999999
 
 ## Immutable Copy-on-Write (CoW)
 
-Modifying a TrinityLake tree means modifying the content of the existing [node files](./storage.md) and creating new node files.
+Modifying a TrinityLake tree means modifying the content of the existing [node files](./storage-layout) and creating new node files.
 This modification process is **Copy-on-Write (CoW)**, 
 because "modifying the content" entails reading the existing content of the node file,
 and rewriting a completely new node file that contains potentially parts of the existing content plus the updated content.
@@ -50,13 +50,13 @@ and the root node file name can be used essentially as the version of the tree.
 
 TrinityLake defines that each root node has a numeric version number, 
 and the root node is stored in a file name `_<version_number_binary_reversed>.ipc`.
-The file name is persisted in storage as is without [optimization](./location.md#optimized-file-name).
+The file name is persisted in storage as is without [optimization](./storage-path#optimized-file-name).
 For example, the 100th version of the root node file would be stored with name `_00100110000000000000000000000000.ipc`.
 
 ## Root Node Latest Version Hint File
 
 A file with name `_latest_hint.txt` is stored and marks the hint to the latest version of the TrinityLake tree root node file.
-The file name is persisted in storage as is without [optimization](./location.md#optimized-file-name)
+The file name is persisted in storage as is without [optimization](./storage-path#optimized-file-name)
 The file contains a number that marks the presumably latest version of the tree root node, such as `100`.
 
 ## Read Isolation

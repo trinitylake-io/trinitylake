@@ -11,12 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake.exception;
 
-import org.immutables.value.Value;
+public class ObjectAlreadyExistException extends TrinityLakeRuntimeException {
 
-@Value.Immutable
-public interface DeleteKey extends Action {
+  public ObjectAlreadyExistException(Throwable cause) {
+    super(cause);
+  }
 
-  String key();
+  public ObjectAlreadyExistException(Throwable cause, String message, Object... args) {
+    super(cause, message, args);
+  }
+
+  public ObjectAlreadyExistException(String message, Object... args) {
+    super(message, args);
+  }
 }

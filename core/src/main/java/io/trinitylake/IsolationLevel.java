@@ -11,6 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake;
 
-public interface Action {}
+public enum IsolationLevel {
+  SERIALIZABLE,
+  SNAPSHOT
+}
