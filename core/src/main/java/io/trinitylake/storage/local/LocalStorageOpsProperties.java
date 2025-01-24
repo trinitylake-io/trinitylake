@@ -11,27 +11,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage.s3;
+package io.trinitylake.storage.local;
 
 import com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.StorageOpsProperties;
 import java.util.Map;
 
-public class AmazonS3StorageOpsProperties implements StorageOpsProperties {
+public class LocalStorageOpsProperties implements StorageOpsProperties {
 
-  private static final AmazonS3StorageOpsProperties INSTANCE = new AmazonS3StorageOpsProperties();
+  private static final LocalStorageOpsProperties INSTANCE = new LocalStorageOpsProperties();
 
   private final Map<String, String> propertiesMap;
 
-  public AmazonS3StorageOpsProperties() {
+  public LocalStorageOpsProperties() {
     this(ImmutableMap.of());
   }
 
-  public AmazonS3StorageOpsProperties(Map<String, String> input) {
+  public LocalStorageOpsProperties(Map<String, String> input) {
     this.propertiesMap = ImmutableMap.copyOf(input);
   }
 
-  public static AmazonS3StorageOpsProperties instance() {
+  public static LocalStorageOpsProperties instance() {
     return INSTANCE;
   }
 

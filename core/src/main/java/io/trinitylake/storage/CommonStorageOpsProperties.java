@@ -20,9 +20,9 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class BasicStorageOpsProperties implements StorageOpsProperties {
+public class CommonStorageOpsProperties implements StorageOpsProperties {
 
-  private static final BasicStorageOpsProperties INSTANCE = new BasicStorageOpsProperties();
+  private static final CommonStorageOpsProperties INSTANCE = new CommonStorageOpsProperties();
 
   public static final String DELETE_BATCH_SIZE = "delete.batch-size";
   public static final int DELETE_BATCH_SIZE_DEFAULT = 1000;
@@ -39,22 +39,28 @@ public class BasicStorageOpsProperties implements StorageOpsProperties {
   public static final String PREPARE_READ_STAGING_DIRECTORY_PATH_DEFAULT =
       System.getProperty("java.io.tmpdir");
 
+  public static final String WRITE_STAGING_DIRECTORY = "write.staging-dir";
+  public static final String WRITE_STAGING_DIRECTORY_PATH_DEFAULT =
+      System.getProperty("java.io.tmpdir");
+
   private final Map<String, String> propertiesMap;
   private final int deleteBatchSize;
   private final int prepareReadCacheSize;
   private final long prepareReadCacheExpirationMillis;
   private final String prepareReadStagingDirectoryPath;
   private volatile File prepareReadStagingDirectory;
+  private final String writeStagingDirectoryPath;
+  private volatile File writeStagingDirectory;
 
-  public BasicStorageOpsProperties() {
+  public CommonStorageOpsProperties() {
     this(ImmutableMap.of());
   }
 
-  public static BasicStorageOpsProperties instance() {
+  public static CommonStorageOpsProperties instance() {
     return INSTANCE;
   }
 
-  public BasicStorageOpsProperties(Map<String, String> input) {
+  public CommonStorageOpsProperties(Map<String, String> input) {
     this.propertiesMap = ImmutableMap.copyOf(input);
     this.deleteBatchSize =
         PropertyUtil.propertyAsInt(input, DELETE_BATCH_SIZE, DELETE_BATCH_SIZE_DEFAULT);
@@ -68,6 +74,9 @@ public class BasicStorageOpsProperties implements StorageOpsProperties {
     this.prepareReadStagingDirectoryPath =
         PropertyUtil.propertyAsString(
             input, PREPARE_READ_STAGING_DIRECTORY, PREPARE_READ_STAGING_DIRECTORY_PATH_DEFAULT);
+    this.writeStagingDirectoryPath =
+        PropertyUtil.propertyAsString(
+            input, WRITE_STAGING_DIRECTORY, WRITE_STAGING_DIRECTORY_PATH_DEFAULT);
   }
 
   @Override
@@ -98,5 +107,18 @@ public class BasicStorageOpsProperties implements StorageOpsProperties {
       }
     }
     return prepareReadStagingDirectory;
+  }
+
+  public File writeStagingDirectory() {
+    if (writeStagingDirectory == null) {
+      synchronized (this) {
+        if (writeStagingDirectory == null) {
+          File path = new File(writeStagingDirectoryPath);
+          FileUtil.createStagingDirectoryIfNotExists(path);
+          this.writeStagingDirectory = path;
+        }
+      }
+    }
+    return writeStagingDirectory;
   }
 }

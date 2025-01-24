@@ -20,8 +20,8 @@ import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.storage.FilePaths;
-import io.trinitylake.storage.SeekableFileInputStream;
-import io.trinitylake.storage.Storage;
+import io.trinitylake.storage.LakehouseStorage;
+import io.trinitylake.storage.local.LocalInputStream;
 import io.trinitylake.util.FileUtil;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,11 +55,11 @@ public class TreeOperations {
     return clonedNode;
   }
 
-  public static TreeNode readNodeFile(Storage storage, String path) {
+  public static TreeNode readNodeFile(LakehouseStorage storage, String path) {
     TreeNode treeNode = new BasicTreeNode();
 
     BufferAllocator allocator = new RootAllocator();
-    try (SeekableFileInputStream stream = storage.startReadLocal(path)) {
+    try (LocalInputStream stream = storage.startReadLocal(path)) {
       ArrowFileReader reader = new ArrowFileReader(stream.channel(), allocator);
       for (ArrowBlock arrowBlock : reader.getRecordBlocks()) {
         reader.loadRecordBatch(arrowBlock);
@@ -78,7 +78,7 @@ public class TreeOperations {
     return treeNode;
   }
 
-  public static void writeNodeFile(Storage storage, String path, TreeNode node) {
+  public static void writeNodeFile(LakehouseStorage storage, String path, TreeNode node) {
     node.set(TreeKeys.CREATED_AT_MILLIS, Long.toString(System.currentTimeMillis()));
     OutputStream stream = storage.startWrite(path);
     BufferAllocator allocator = new RootAllocator();
@@ -125,15 +125,15 @@ public class TreeOperations {
     return Long.parseLong(node.get(TreeKeys.VERSION));
   }
 
-  public static boolean hasLakehouseDef(Storage storage, TreeNode node) {
+  public static boolean hasLakehouseDef(LakehouseStorage storage, TreeNode node) {
     return node.contains(TreeKeys.LAKEHOUSE_DEFINITION);
   }
 
-  public static LakehouseDef findLakehouseDef(Storage storage, TreeNode node) {
+  public static LakehouseDef findLakehouseDef(LakehouseStorage storage, TreeNode node) {
     return ObjectDefinitions.readLakehouseDef(storage, node.get(TreeKeys.LAKEHOUSE_DEFINITION));
   }
 
-  public static TreeNode findPreviousRootNode(Storage storage, TreeNode node) {
+  public static TreeNode findPreviousRootNode(LakehouseStorage storage, TreeNode node) {
     return readNodeFile(storage, node.get(TreeKeys.PREVIOUS_ROOT_NODE));
   }
 
@@ -141,7 +141,7 @@ public class TreeOperations {
     return node.contains(TreeKeys.PREVIOUS_ROOT_NODE);
   }
 
-  public static TreeNode findRollbackFromRootNode(Storage storage, TreeNode node) {
+  public static TreeNode findRollbackFromRootNode(LakehouseStorage storage, TreeNode node) {
     return readNodeFile(storage, node.get(TreeKeys.ROLLBACK_FROM_ROOT_NODE));
   }
 
@@ -149,7 +149,7 @@ public class TreeOperations {
     return node.contains(TreeKeys.ROLLBACK_FROM_ROOT_NODE);
   }
 
-  public static TreeNode findLatestRoot(Storage storage) {
+  public static TreeNode findLatestRoot(LakehouseStorage storage) {
     String latestVersionHintText =
         FileUtil.readToString(storage.startRead(FilePaths.LATEST_VERSION_HINT_FILE_PATH));
     long latestVersion = Long.parseLong(latestVersionHintText);
@@ -162,7 +162,7 @@ public class TreeOperations {
     return readNodeFile(storage, rootNodeFilePath);
   }
 
-  public static Optional<TreeNode> findRootForVersion(Storage storage, long version) {
+  public static Optional<TreeNode> findRootForVersion(LakehouseStorage storage, long version) {
     TreeNode latest = findLatestRoot(storage);
     long latestVersion = findVersion(latest);
     Preconditions.checkArgument(
@@ -183,7 +183,7 @@ public class TreeOperations {
     return Optional.empty();
   }
 
-  public static TreeNode findRootBeforeTimestamp(Storage storage, long timestampMillis) {
+  public static TreeNode findRootBeforeTimestamp(LakehouseStorage storage, long timestampMillis) {
     TreeNode latest = findLatestRoot(storage);
     long latestCreatedAtMillis = findCreatedAtMillis(latest);
     Preconditions.checkArgument(
@@ -204,16 +204,16 @@ public class TreeOperations {
     return current;
   }
 
-  public static Iterable<TreeNode> listRoots(Storage storage) {
+  public static Iterable<TreeNode> listRoots(LakehouseStorage storage) {
     return new TreeRootIterable(storage, findLatestRoot(storage));
   }
 
   private static class TreeRootIterable implements Iterable<TreeNode> {
 
-    private final Storage storage;
+    private final LakehouseStorage storage;
     private final TreeNode latest;
 
-    public TreeRootIterable(Storage storage, TreeNode latest) {
+    public TreeRootIterable(LakehouseStorage storage, TreeNode latest) {
       this.storage = storage;
       this.latest = latest;
     }
@@ -226,11 +226,11 @@ public class TreeOperations {
 
   private static class LakehouseVersionIterator implements Iterator<TreeNode> {
 
-    private final Storage storage;
+    private final LakehouseStorage storage;
     private final TreeNode latest;
     private TreeNode current;
 
-    public LakehouseVersionIterator(Storage storage, TreeNode latest) {
+    public LakehouseVersionIterator(LakehouseStorage storage, TreeNode latest) {
       this.storage = storage;
       this.latest = latest;
       this.current = null;

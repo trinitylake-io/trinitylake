@@ -13,18 +13,17 @@
  */
 package io.trinitylake.storage;
 
+import io.trinitylake.storage.local.LocalInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.reactivestreams.Publisher;
 
 /**
- * Storage that starts with a root URI location. All access to the storage should be to paths under
- * the root. The only exception is for accessing external tables, and that should directly use
- * {@link #ops()} to access the full external URI.
+ * A Lakehouse storage starts with a root URI location. Most access to the lakehouse storage should
+ * be to paths under the root. Accessing the full URI should directly use {@link #ops()}.
  */
-public interface Storage extends Closeable {
+public interface LakehouseStorage extends Closeable {
 
   URI root();
 
@@ -38,7 +37,7 @@ public interface Storage extends Closeable {
     return ops().startRead(root().extendPath(path));
   }
 
-  default SeekableFileInputStream startReadLocal(String path) {
+  default LocalInputStream startReadLocal(String path) {
     return ops().startReadLocal(root().extendPath(path));
   }
 
@@ -46,7 +45,7 @@ public interface Storage extends Closeable {
     return ops().exists(root().extendPath(path));
   }
 
-  default PositionOutputStream startWrite(String path) {
+  default AtomicOutputStream startWrite(String path) {
     return ops().startWrite(root().extendPath(path));
   }
 
@@ -54,7 +53,7 @@ public interface Storage extends Closeable {
     ops().delete(paths.stream().map(root()::extendPath).collect(Collectors.toList()));
   }
 
-  default Publisher<URI> list(String prefixPath) {
+  default List<URI> list(String prefixPath) {
     return ops().list(root().extendPath(prefixPath));
   }
 

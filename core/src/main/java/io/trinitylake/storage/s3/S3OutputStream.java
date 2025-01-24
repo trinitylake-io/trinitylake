@@ -17,9 +17,11 @@ import com.google.common.io.CountingOutputStream;
 import dev.failsafe.Failsafe;
 import dev.failsafe.FailsafeException;
 import dev.failsafe.RetryPolicy;
+import io.trinitylake.exception.CommitFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.exception.StreamOpenFailureException;
-import io.trinitylake.storage.PositionOutputStream;
+import io.trinitylake.storage.AtomicOutputStream;
+import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.storage.URI;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -33,7 +35,7 @@ import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-class S3OutputStream extends PositionOutputStream {
+class S3OutputStream extends AtomicOutputStream {
   private static final Logger LOG = LoggerFactory.getLogger(S3OutputStream.class);
 
   private final S3AsyncClient s3;
@@ -61,24 +63,22 @@ class S3OutputStream extends PositionOutputStream {
           .build();
 
   public S3OutputStream(
-      S3AsyncClient s3, URI uri, AmazonS3StorageOpsProperties s3StorageProperties) {
+      S3AsyncClient s3,
+      URI uri,
+      CommonStorageOpsProperties commonProperties,
+      AmazonS3StorageOpsProperties s3Properties) {
     this.s3 = s3;
     this.uri = uri;
     // TODO: given the file size is limited to 1MB by default, is it still worth buffering to
     // staging file?
     //  pending benchmarking to confirm.
-    this.stagingDirectory = s3StorageProperties.stagingDirectory();
+    this.stagingDirectory = commonProperties.writeStagingDirectory();
 
     try {
       newStream();
     } catch (IOException e) {
       throw new StreamOpenFailureException(e, "Failed to open stream: %s", uri);
     }
-  }
-
-  @Override
-  public long getPos() {
-    return pos;
   }
 
   @Override
@@ -111,11 +111,11 @@ class S3OutputStream extends PositionOutputStream {
   }
 
   @Override
-  public void close() throws IOException {
-    close(true);
+  public void seal() throws CommitFailureException, IOException {
+    seal(true);
   }
 
-  private void close(boolean completeUploads) throws IOException {
+  private void seal(boolean completeUploads) throws IOException {
     if (closed) {
       return;
     }
@@ -156,7 +156,7 @@ class S3OutputStream extends PositionOutputStream {
   protected void finalize() throws Throwable {
     super.finalize();
     if (!closed) {
-      close(false);
+      seal(false);
     }
   }
 }

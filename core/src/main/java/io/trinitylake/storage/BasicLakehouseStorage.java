@@ -13,15 +13,23 @@
  */
 package io.trinitylake.storage;
 
-import java.io.IOException;
-import java.io.OutputStream;
+public class BasicLakehouseStorage implements LakehouseStorage {
 
-public abstract class PositionOutputStream extends OutputStream {
-  /**
-   * Return the current position in the OutputStream.
-   *
-   * @return current position in bytes from the start of the stream
-   * @throws IOException If the underlying stream throws IOException
-   */
-  public abstract long getPos() throws IOException;
+  private final URI root;
+  private final StorageOps ops;
+
+  public BasicLakehouseStorage(URI root, StorageOps ops) {
+    this.ops = ops;
+    this.root = root;
+  }
+
+  @Override
+  public URI root() {
+    return root;
+  }
+
+  @Override
+  public StorageOps ops() {
+    return ops;
+  }
 }

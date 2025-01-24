@@ -13,28 +13,22 @@
  */
 package io.trinitylake.storage;
 
-import io.trinitylake.storage.local.LocalInputStream;
-import java.io.Closeable;
-import java.util.List;
+import io.trinitylake.exception.CommitFailureException;
+import java.io.IOException;
+import java.io.OutputStream;
 
-/** Common operations that should be supported by a TrinityLake storage */
-public interface StorageOps extends Closeable {
+public abstract class AtomicOutputStream extends OutputStream {
 
-  StorageOpsProperties commonProperties();
+  /**
+   * Atomically seal the file that is being written to
+   *
+   * @throws CommitFailureException if the sealing process fails due to atomicity conflict
+   * @throws IOException for any other failure in write
+   */
+  public abstract void seal() throws CommitFailureException, IOException;
 
-  StorageOpsProperties systemSpecificProperties();
-
-  void prepareToRead(URI uri);
-
-  SeekableInputStream startRead(URI uri);
-
-  LocalInputStream startReadLocal(URI uri);
-
-  AtomicOutputStream startWrite(URI uri);
-
-  boolean exists(URI uri);
-
-  void delete(List<URI> uris);
-
-  List<URI> list(URI prefix);
+  @Override
+  public void close() throws IOException {
+    super.close();
+  }
 }

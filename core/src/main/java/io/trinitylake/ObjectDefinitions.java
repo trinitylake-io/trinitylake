@@ -18,14 +18,15 @@ import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
-import io.trinitylake.storage.Storage;
+import io.trinitylake.storage.LakehouseStorage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class ObjectDefinitions {
 
-  public static void writeLakehouseDef(Storage storage, String path, LakehouseDef lakehouseDef) {
+  public static void writeLakehouseDef(
+      LakehouseStorage storage, String path, LakehouseDef lakehouseDef) {
 
     try (OutputStream stream = storage.startWrite(path)) {
       lakehouseDef.writeTo(stream);
@@ -35,7 +36,7 @@ public class ObjectDefinitions {
     }
   }
 
-  public static LakehouseDef readLakehouseDef(Storage storage, String path) {
+  public static LakehouseDef readLakehouseDef(LakehouseStorage storage, String path) {
     try (InputStream stream = storage.startRead(path)) {
       return LakehouseDef.parseFrom(stream);
     } catch (IOException e) {
@@ -48,7 +49,7 @@ public class ObjectDefinitions {
   }
 
   public static void writeNamespaceDef(
-      Storage storage, String path, String namespaceName, NamespaceDef namespaceDef) {
+      LakehouseStorage storage, String path, String namespaceName, NamespaceDef namespaceDef) {
     try (OutputStream stream = storage.startWrite(path)) {
       namespaceDef.writeTo(stream);
     } catch (IOException e) {
@@ -61,7 +62,7 @@ public class ObjectDefinitions {
     }
   }
 
-  public static NamespaceDef readNamespaceDef(Storage storage, String path) {
+  public static NamespaceDef readNamespaceDef(LakehouseStorage storage, String path) {
     try (InputStream stream = storage.startRead(path)) {
       return NamespaceDef.parseFrom(stream);
     } catch (IOException e) {
@@ -74,7 +75,11 @@ public class ObjectDefinitions {
   }
 
   public static void writeTableDef(
-      Storage storage, String path, String namespaceName, String tableName, TableDef tableDef) {
+      LakehouseStorage storage,
+      String path,
+      String namespaceName,
+      String tableName,
+      TableDef tableDef) {
     try (OutputStream stream = storage.startWrite(path)) {
       tableDef.writeTo(stream);
     } catch (IOException e) {
@@ -88,7 +93,7 @@ public class ObjectDefinitions {
     }
   }
 
-  public static TableDef readTableDef(Storage storage, String path) {
+  public static TableDef readTableDef(LakehouseStorage storage, String path) {
     try (InputStream stream = storage.startRead(path)) {
       return TableDef.parseFrom(stream);
     } catch (IOException e) {
