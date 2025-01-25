@@ -13,22 +13,22 @@ Please see [Versioning](./versioning.md) about the versioning semantics of this 
 
 ## Introduction
 
-The TrinityLake format defines a Lakehouse-specific [key-value map](tree/search-tree-map.md) 
-implemented using a [B-epsilon tree](tree/b-epsilon-tree.md).
+The TrinityLake format defines a storage-only lakehouse 
+implemented using a modified version of the [B-epsilon tree](tree/b-epsilon-tree.md) [key-value map](tree/search-tree-map.md).
 
-- The keys of this map are IDs of objects in a Lakehouse
+- The keys of this map are IDs of objects in a lakehouse
 - The values of this map are location pointers to the **Object Definitions** 
 
-We denote such tree as the **TrinityLake Tree**, 
-and denote a Lakehouse implemented using the TrinityLake format as a **Trinity Lakehouse**.
+We call such tree as the **TrinityLake Tree**, 
+and call a lakehouse implemented using the TrinityLake format as a **Trinity Lakehouse**.
 
 The TrinityLake format contains the following specifications:
 
-- The TrinityLake tree is persisted in storage and follows [Storage Specification](./storage-layout).
-- The TrinityLake tree is assessed and updated following the [Transaction Specification](./transaction.md).
-- The object definitions are persisted in storage and follows the [Object Definition File Specification](./object-definition-file.md).
-- The key names in a TrinityLake tree follow the [Key Encoding Specification](./key-encoding.md).
-- The locations used in a TrinityLake tree follow the [Location Specification](./storage-path).
+- The TrinityLake tree is persisted in storage following [Storage Layout Specification](./storage-layout).
+- The files in a TrinityLake tree are stored according to the [Storage Location Specification](./storage-location).
+- The TrinityLake tree is assessed and updated following the [Transaction Specification](./storage-transaction).
+- The keys in a TrinityLake tree follow the [Key Encoding Specification](./key-encoding.md).
+- The object definitions in a TrinityLake tree follow the [Object Definition File Specification](./object-definition-file.md).
 
 ## Example
 

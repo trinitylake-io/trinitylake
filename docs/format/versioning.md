@@ -27,7 +27,7 @@ We expect to bump up:
 
 - Major version when the format introduces forward incompatible changes.
 - Minor version for any new feature release in the format that is still forward compatible.
-- Patch version if there are bugs, typos, etc. that should be corrected in the minor version.
+- Patch version if there are bugs, typos, improvements in wording, additional explanations, etc. that are added to the format.
 
 ## Format Implementation Expectations
 
@@ -39,4 +39,4 @@ so that people can know what has been changing and update their implementations 
 This is also why only the major version is directly recorded in the [Lakehouse definition](./lakehouse.md).
 
 It is recommended that format implementations explicitly check the format major version and 
-fail the reader accordingly for unsupported future format major version.
+fail the reader or writer accordingly for unsupported major version.
