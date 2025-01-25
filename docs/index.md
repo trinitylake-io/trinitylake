@@ -48,7 +48,7 @@ as well as through federation when the table resides in other systems that can b
 TrinityLake can be used as an implementation of open catalog standards like the Apache Iceberg REST Catalog (IRC) specification.
 The project provides an IRC server that users can run as a proxy to access TrinityLake and leverage all open source and 
 vendor products that support IRC. This provides a highly scalable yet extremely lightweight IRC implementation 
-where the IRC server is mainly just an authorization engine, and the main execution logic is pushed down to the storage
+where the IRC server is mainly just an AuthN & AuthZ engine, and the main execution logic is pushed down to the storage
 layer and handled by this open Lakehouse format.
 
 ### Open Engines

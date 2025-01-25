@@ -2,10 +2,11 @@ nav:
     - overview.md
     - versioning.md
     - storage-layout.md
-    - storage-path.md
+    - storage-location.md
+    - storage-transaction.md
     - transaction.md
-    - object-definition-file.md
     - key-encoding.md
+    - object-definition-file.md
     - lakehouse.md
     - namespace.md
     - table

@@ -10,7 +10,7 @@ A B-epsilon tree is a variant of B-tree that is more optimized for writes.
 It was originally proposed in _[Lower Bounds for External Memory Dictionaries](http://perso.ens-lyon.fr/loris.marchal/docs-data-aware/brodal_fagerberg_LB_EM_dict.pdf)_ 
 in 2003 as a way to demonstrate an asymptotic performance tradeoff curve between B-trees and buffered repository trees.
 The concept is re-introduced for database applications in _[An Introduction to Bepsilon-trees and Write-Optimization](https://www.usenix.org/system/files/login/articles/login_oct15_05_bender.pdf)_
-in 2015. Some applications of the B-epsilon tree include [BtrFS](https://btrfs.readthedocs.io/en/latest/), 
+in 2015. One application of the B-epsilon tree in the storage domain is [BtrFS](https://btrfs.readthedocs.io/en/latest/), 
 an implementation of the Linux file system using this data structure.
 
 ## Write
@@ -19,8 +19,10 @@ On top of the B-tree structure, B-epsilon tree introduces a **Write Buffer** in 
 The write buffer holds **Messages** about the operations to be performed in the tree.
 When a write happens, instead of updating a huge portion of the tree nodes, 
 the writer simply writes a message in the message buffer.
+
 If the message buffer is full, it sends the message down the node until a node where the buffer is not full,
 and also applies the existing messages in the buffer to the nodes along the way if possible.
+This behavior is called **Flushing the Write Buffer**.
 
 ## Read
 

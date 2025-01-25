@@ -4,7 +4,7 @@ There are 3 table types in TrinityLake, MANAGED, EXTERNAL and FEDERATED.
 
 ## MANAGED
 
-A managed table is fully compliant with the [transaction semantics](../transaction.md) defined by the TrinityLake format.
+A managed table is fully compliant with the [transaction semantics](../storage-transaction) defined by the TrinityLake format.
 It can participate in multi-object and multi-statement transactions with any other managed objects in the same Trinity Lakehouse.
 When dropping the table, the data is also deleted.
 

@@ -4,13 +4,6 @@
 
     we use the literal `[space]` to represent the space character (hex value 20) in this document for clarity
 
-## First Byte
-
-The first byte of a key in a TrinityLake tree is used to differentiate user-facing object definitions in Lakehouse 
-vs any other system-internal object definitions such as [Lakehouse](#lakehouse-key).
-User-facing object keys must start with a `[space]`,
-and system-internal object keys must not start with a `[space]`.
-
 ## System Internal Keys
 
 In general, system internal keys do not participate in the TrinityLake tree key sorting algorithm and always stay in 
@@ -26,7 +19,7 @@ The pointer to the previous root node is stored with key `previous_root` in the 
 
 ### Rollback Root Node Key
 
-The pointer to the root node that was rolled back from, if the root node is created during a [Rollback](./transaction.md#rollback-committed-version)
+The pointer to the root node that was rolled back from, if the root node is created during a [Rollback](./storage-transaction#rollback-committed-version)
 It is stored with key `rollback_from_root` in the root node.
 
 ### Version Key
@@ -76,12 +69,12 @@ For example, schema ID `4` is encoded to `D===`.
 
 ### Object Key Format
 
-The object key format combines all the [First Byte](#first-byte), [Encoded Object Name](#object-name), 
+The object key format combines the [Encoded Object Name](#object-name), 
 [Encoded Object Definition Schema ID](#encoded-object-definition-schema-id) rules above to form a unique key 
-for each type of object. In more details, it is defined as the following: (contents in `<>` should be substituted)
+for each type of object. See the table below for the format for each type of object: (contents in `<>` should be substituted)
 
 | Object Type | Schema ID | Object ID Format                                               | Example                                               |
 |-------------|-----------|----------------------------------------------------------------|-------------------------------------------------------|
 | Lakehouse   | 0         | N/A, use [Lakehouse Definition Key](#lakehouse-definition-key) |                                                       |
-| Namespace   | 1         | `[space]B===<encoded namespace name>`                          | `[space]B===default[space]`                           |
-| Table       | 2         | `[space]C===<encoded namespace name><encoded table name>`      | `[space]C===default[space]table[space][space][space]` |
+| Namespace   | 1         | `[space]B===<encoded namespace name>`                          | `B===default[space]`                           |
+| Table       | 2         | `[space]C===<encoded namespace name><encoded table name>`      | `C===default[space]table[space][space][space]` |

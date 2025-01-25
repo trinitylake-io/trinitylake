@@ -1,48 +1,79 @@
 # Storage Layout
 
-The Lakehouse tree in general follows the storage layout of [N-way search tree map](tree/search-tree-map.md#storage-layout).
-Each node file is in the [Apache Arrow IPC format](https://arrow.apache.org/docs/format/Columnar.html#format-ipc).
+The TrinityLake tree in general follows [the storage layout of N-way search tree map](./tree/search-tree-map.md).
+In this document, we describe the details of the tree's layout in storage.
+
+## Node File Format
+
+Similar to a [N-way search tree map](./tree/search-tree-map.md), 
+each node of the TrinityLake tree is a [node file](./tree/search-tree-map.md#node-file) in storage. 
+Each file fully describes tabular data using the [Apache Arrow IPC format](https://arrow.apache.org/docs/format/Columnar.html#format-ipc).
 
 ## Node File Schema
 
-| ID | Name  | Arrow Type | Description                                          | Required? | Default |
-|----|-------|------------|------------------------------------------------------|-----------|---------|
-| 1  | key   | String     | Name of the key                                      | no        |         |
-| 2  | value | String     | The value of the key                                 | no        |         |
-| 3  | pnode | String     | File location pointer to the value of the child node | no        |         |
-| 4  | txn   | String     | Transaction ID for [write buffer](./#write-buffer)   | no        |         |
+The node file has the following schema:
 
-## System-Internal Rows for Root Node
+| ID | Name  | Arrow Type | Description                                        | Required? | Default |
+|----|-------|------------|----------------------------------------------------|-----------|---------|
+| 1  | key   | String     | Name of the key                                    | no        |         |
+| 2  | value | String     | The value of the key                               | no        |         |
+| 3  | pnode | String     | Pointer to the path to the child node              | no        |         |
+| 4  | txn   | String     | Transaction ID for [write buffer](./#write-buffer) | no        |         |
 
-[System-internal keys](./key-encoding.md#system-internal-keys) will appear as the top rows in the file.
-There is no specific ordering required for the system-internal rows.
+## Node File Content
 
-## Node Pointers
+Each node file contains 3 sections from top to bottom:
 
-To read the node pointers, the reader for the tree should skip the keys until it reaches the ones starting with `[space]`.
-There are exactly `N` rows of the file are reserved for the `N` pointers of each node for a tree of order `N`.
+- System internal rows
+- [Node key table](./tree/search-tree-map.md#node-key-table)
+- Write buffer
 
-The fist row in these `N` rows must have `key` and `value` as `NULL` because the first pointer points to all
-keys that are smaller than the key of the second row.
+They all share the same [node file schema](#node-file-schema) above, but use it in different ways.
 
-A node might not have all `N` child nodes yet. If there are `k <= N` child nodes,
-There will be `N-k` rows with all column values as `NULL`s.
+## System-Internal Rows
+
+Only the `key` and `value` columns in the [node file schema](#node-file-schema) are meaningful to system internal rows,
+and they are required to be non-null.
+
+These rows are used for recording system internal information such as node creation time, version, etc.
+See [system-internal keys](./key-encoding.md#system-internal-keys) for more details.
+
+There is no specific ordering expected for the system-internal rows, and there might be more system internal rows added over time.
+because the first row of the [node key table](./tree/search-tree-map.md#node-key-table) must have `NULL` key and `NULL` value,
+readers of a node file are expected to treat all rows before this row as system internal rows.
+
+## Node Key Table
+
+To read the node key table, the reader should skip all system internal rows, 
+which means to skip all rows until it reaches the first row that has a `NULL` key and `NULL` value.
+
+Then based on the rules of the [node key table](./tree/search-tree-map.md#node-key-table),
+There are exactly `N` rows for the node key table section of the node file.
 
 ## Write Buffer
 
-The write buffer rows start after the node pointer rows.
-These rows must have a `key` that is not `NULL`, and the `pnode` is always `NULL`.
+The [B-epsilon tree](./tree/b-epsilon-tree.md)-like write buffer of the TrinityLake tree starts after
+the [system internal rows](#system-internal-rows) and the [node key table](#node-key-table) rows.
 
-- When the `value` is `NULL`, it is a message to delete the `key`.
-- When the `value` is not `NULL`, it is a message to set the current `pvalue` of the key in the tree to the new one in the write buffer.
+Each row in the write buffer represents a message to be applied to the TrinityLake tree.
+New messages are appended at the bottom of the write buffer.
+These rows have the following requirements:
 
-New changes are appended to the bottom of the write buffer.
+1. `key` must not be `NULL`
+2. `transaction` must not be `NULL`
+3. `pnode` must be `NULL`
+4. If `value` is `NULL`, it is a message to delete the key. If `value` is not `NULL`, it is a message to set the key to the specific value.
+
+Note that different from a standard [B-epsilon tree](./tree/b-epsilon-tree.md),
+when flushing write buffer against the TrinityLake tree during a [write](./tree/b-epsilon-tree.md#write) or 
+[compaction](./tree/b-epsilon-tree.md#compaction), the messages in the latest committed transaction will not be flushed,
+because it will be used for ensuring different level of isolation guarantee during Trinity Lakehouse commit phase.
+See [Transaction and ACID Enforcement](./storage-transaction) for more details.
 
 ## Node File Size
 
 Each node is targeted for the same specific size, which is configurable in the [Lakehouse definition](./lakehouse.md).
-
-The estimated size of the `N` rows should be:
+Based on those configurations, users can roughly estimate the size of the node key table as:
 
 ```
 N * (
@@ -58,3 +89,4 @@ This remaining size is used as the write buffer for each node.
 
 For users that would like to fine-tune the performance characteristics of a TrinityLake tree,
 this formula can be used to readjust the node file size to achieve the desired epsilon value.
+

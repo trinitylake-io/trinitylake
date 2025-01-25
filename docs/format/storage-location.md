@@ -1,4 +1,15 @@
-# Storage Path
+# Storage Location
+
+In the [Storage Layout](./storage-layout.md) document, we have described how a TrinityLake tree is persisted in a storage.
+This document describes the specification for the location of persisted files.
+
+## Terminology
+
+We in general use 3 terminologies:
+
+- Path: a path 
+- URI: a URI is a fully qualified address with scheme, authority, path components
+- Location: a location can be either a relative path, or a fully qualified URI
 
 ## Root in Lakehouse Storage
 
@@ -36,22 +47,9 @@ then the location value stored in the TrinityLake format should be `my-table-def
     - [External table location](./table/table-type.md#external)
 
 
-## Non-Root Node File Path
+## Standard File Paths
 
-Non-root node file name will be in the form of prefix `node-` plus a version 4 UUID with suffix `.ipc`.
-For example, if a UUID `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8` is generated for the node file,
-the original file name of the node file will be `node-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc`,
-and that further goes through the [file name optimization](./storage-path#optimized-file-name)
-to produce the final node file name.
-
-For root node file, please refer to [Transaction Specification](./transaction.md#root-node-file-name)
-for more details since the name is involved as a part of the transaction process.
-
-## Lakehouse Definition File Path
-
-should be `_lakehouse_def_` plus UUID plus `.binpb`
-
-## Optimized File Path
+### File Path Optimization
 
 A file path in the TrinityLake format is designed for optimized performance in storage.
 Given an **Original File Name**, the **Optimized File Name** in storage can be calculated as the following:
@@ -66,16 +64,44 @@ Given an **Original File Name**, the **Optimized File Name** in storage can be c
 For example, an original file name `my-table-definition.binpb` will be transformed to 
 `0101/0101/0101/10101100-my-table-definition.binpb`.
 
-!!!Note
-
-    Not all the file names will be optimized in this way. Here are the exceptions:
-
-    - [Root node file name](./transaction.md#root-node-file-name)
-    - [Version hint file name](./transaction.md#root-node-latest-version-hint-file)
-    - [Lakehouse definition file name](./transaction.md#
-
-
 !!!Warning
     
     File name optimization is a write side feature, and should not be used by readers to reverse-engineer
     the original file name.
+
+
+### Non-Root Node File Path
+
+Non-root node file name will be in the form of prefix `node-` plus a version 4 UUID with suffix `.ipc`.
+For example, if a UUID `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8` is generated for the node file,
+the original file name of the node file will be `node-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc`,
+and that further goes through the [file name optimization](./storage-location#optimized-file-name)
+to produce the final node file name.
+
+### Object Definition File Path
+
+TODO
+
+
+## Non-Standard File Paths
+
+### Root Node File Path
+
+With CoW, the root node file name is important because every change to the tree would create a new root node file,
+and the root node file name can be used essentially as the version of the tree.
+
+TrinityLake defines that each root node has a numeric version number,
+and the root node is stored in a file name `_<version_number_binary_reversed>.ipc`.
+The file name is persisted in storage as is without [optimization](./storage-location#optimized-file-name).
+For example, the 100th version of the root node file would be stored with name `_00100110000000000000000000000000.ipc`.
+
+### Root Node Latest Version Hint File Path
+
+A file with name `_latest_hint.txt` is stored and marks the hint to the latest version of the TrinityLake tree root node file.
+The file name is persisted in storage as is without [optimization](./storage-location#optimized-file-name)
+The file contains a number that marks the presumably latest version of the tree root node, such as `100`.
+
+
+### Lakehouse Definition File Path
+
+should be `_lakehouse_def_` plus UUID plus `.binpb`
