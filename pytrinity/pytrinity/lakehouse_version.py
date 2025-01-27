@@ -11,7 +11,7 @@ from pytrinity.const import (
 from pytrinity.object_key_encoder import ObjectKeyEncoder
 from pytrinity.protobuf.Definitions_pb2 import NamespaceDef, TableDef, LakehouseDef
 from pytrinity.storage import Storage
-from tree.trinity_tree import TrinityNode, TrinityTree
+from pytrinity.tree import TrinityNode, TrinityTree
 
 
 class LakehouseVersion:

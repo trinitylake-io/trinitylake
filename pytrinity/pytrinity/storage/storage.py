@@ -4,7 +4,7 @@ from typing import Optional
 from urllib.parse import urlparse
 
 from pyarrow import ipc, memory_map, array, string, OSFile, schema, record_batch, field
-from ..tree.trinity_tree import TrinityNode
+from pytrinity.tree import TrinityNode
 
 
 class Storage:
@@ -15,7 +15,6 @@ class Storage:
             field("pnode", string(), nullable=True),
         ]
     )
-    ROW_SEPERATOR = " "
 
     def __init__(self, directory):
         self.uri = urlparse(directory)
@@ -36,13 +35,14 @@ class Storage:
         with open(self._full_path(path), "wb") as f:
             f.write(content)
 
-    def serialize_protobuf(self, proto_msg) -> str:
+    def serialize_protobuf(self, proto_msg, file_name=None) -> str:
+        if not file_name:
+            file_name = f"{str(uuid.uuid4())}.ipc"
         serialized_data = proto_msg.SerializeToString()
-        uuid_str = f"{str(uuid.uuid4())}.binp"
-        file_path = self._full_path(uuid_str)
+        file_path = self._full_path(file_name)
         with open(file_path, "wb") as f:
             f.write(serialized_data)
-        return uuid_str
+        return file_name
 
     def deserialize_protobuf(self, file_name, proto_class) -> object:
         with open(self._full_path(file_name), "rb") as f:
@@ -59,28 +59,35 @@ class Storage:
         for key, value in node.system_rows:
             keys.append(key)
             values.append(value)
-            pnodes.append(None)
+            pnodes.append("system_row")
 
-        for key, value in node.rows:
-            keys.append(key)
-            values.append(value)
-            pnodes.append(None)
+        row_count = len(node.rows) + 1
+        for i in range(row_count):
+            if i < len(node.rows):
+                key, value = node.rows[i]
+                keys.append(key)
+                values.append(value)
+            else:
+                keys.append(None)
+                values.append(None)
+            if i < len(node.children):
+                child = node.children[i]
+                if child:
+                    child_file_path = f"{str(uuid.uuid4())}.ipc"
+                    self.serialize_tree(child, child_file_path)
+                    pnodes.append(child_file_path)
+                else:
+                    pnodes.append(None)
+            else:
+                pnodes.append(None)
 
-        keys.append(self.ROW_SEPERATOR)
-        values.append(self.ROW_SEPERATOR)
+        keys.append(None)
+        values.append(None)
         pnodes.append(None)
-
-        for child in node.children:
-            child_file_path = f"{str(uuid.uuid4())}.ipc"
-            self.serialize_tree(child, child_file_path)
-            keys.append(None)
-            values.append(None)
-            pnodes.append(child_file_path)
-
         for key, value in node.buffer:
             keys.append(key)
             values.append(value)
-            pnodes.append(None)
+            pnodes.append("buffer_row")
 
         batch = record_batch(
             [array(keys), array(values), array(pnodes)], schema=self.NODE_SCHEMA
@@ -106,23 +113,22 @@ class Storage:
         pnodes = table.column("pnode").to_pylist()
         node = TrinityNode()
         row_count = len(keys)
-        idx = 0
 
-        while idx < row_count and keys[idx][0] != " ":
-            node.system_rows.append((keys[idx], values[idx]))
-            idx += 1
-
-        while idx < row_count and keys[idx] and values[idx]:
-            node.rows.append((keys[idx], values[idx]))
-            idx += 1
-
-        while idx < row_count and not keys[idx] and not values[idx]:
-            node.children.append(self._deserialize_node(pnodes[idx]))
-            idx += 1
-
-        while idx < row_count and keys[idx] and values[idx]:
-            node.buffer.append((keys[idx], values[idx]))
-            idx += 1
+        for i in range(row_count):
+            if keys[i] and values[i] and pnodes[i] == "system_row":
+                node.system_rows.append((keys[i], values[i]))
+            elif keys[i] and values[i] and pnodes[i] == "buffer_row":
+                node.buffer.append((keys[i], values[i]))
+            else:
+                key, value, child_node = None, None, None
+                if i < len(keys):
+                    key = keys[i]
+                if i < len(values):
+                    value = values[i]
+                if i < len(pnodes) and pnodes[i]:
+                    child_node = self._deserialize_node(pnodes[i])
+                node.rows.append((key, value))
+                node.children.append(child_node)
         return node
 
     def _read_ipc_file(self, path: str):
@@ -132,3 +138,6 @@ class Storage:
 
     def _full_path(self, path: str) -> str:
         return os.path.join(self.root_path, path)
+
+    def _generate_uuid(self):
+        return str(uuid.uuid4())
