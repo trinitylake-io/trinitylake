@@ -1,5 +1,5 @@
 import pytest
-from tree import TrinityTree, TrinityNode
+from trinitylake.tree import TrinityTree, TrinityNode
 
 
 @pytest.fixture

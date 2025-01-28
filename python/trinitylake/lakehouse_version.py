@@ -1,17 +1,17 @@
 import time
 
 from const import CREATED_AT
-from pytrinity.const import (
+from trinitylake.const import (
     LAKEHOUSE_DEF,
     RESERVED_CHARS,
     SCHEMA_ID_TABLE,
     SCHEMA_ID_NAMESPACE,
     VERSION,
 )
-from pytrinity.object_key_encoder import ObjectKeyEncoder
-from pytrinity.protobuf.Definitions_pb2 import NamespaceDef, TableDef, LakehouseDef
-from pytrinity.storage import Storage
-from pytrinity.tree import TrinityNode, TrinityTree
+from trinitylake.object_key_encoder import ObjectKeyEncoder
+from trinitylake.protobuf.Definitions_pb2 import NamespaceDef, TableDef, LakehouseDef
+from trinitylake.storage import Storage
+from trinitylake.tree import TrinityNode, TrinityTree
 
 
 class LakehouseVersion:
@@ -173,12 +173,11 @@ class LakehouseVersion:
         root_node = TrinityNode()
 
         lakehouse_def = LakehouseDef()
-        lakehouse_def.name = "default"
         lakehouse_def.major_version = 0
         lakehouse_def.order = 128
         lakehouse_def.namespace_name_max_size_bytes = 100
         lakehouse_def.table_name_max_size_bytes = 100
-        lakehouse_def.file_name_max_size_bytes = 200
+        lakehouse_def.file_path_max_size_bytes = 200
         lakehouse_def.node_file_max_size_bytes = 1048576
         lakehouse_def.minimum_versions_to_keep = 3
         lakehouse_def.maximum_version_age_millis = 604800000  # 7days
