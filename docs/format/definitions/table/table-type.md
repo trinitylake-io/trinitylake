@@ -8,8 +8,8 @@ A managed table is fully compliant with the [transaction semantics](../storage-t
 It can participate in multi-object and multi-statement transactions with any other managed objects in the same Trinity Lakehouse.
 When dropping the table, the data is also deleted.
 
-TrinityLake provides the overall semantics of a managed table in areas like [schema](./table-schema.md),
-[streaming](streaming.md) and [upsert](./upsert.md) behaviors, etc. and the behavior can be implemented using various table and file formats
+TrinityLake provides the overall semantics of a managed table in areas like [schema](table-schema.md),
+[streaming](streaming.md) and [upsert](upsert.md) behaviors, etc. and the behavior can be implemented using various table and file formats
 such as [Apache Iceberg with Apache Parquet](./iceberg.md).
 
 ## EXTERNAL

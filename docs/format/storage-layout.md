@@ -72,7 +72,7 @@ See [Transaction and ACID Enforcement](./storage-transaction) for more details.
 
 ## Node File Size
 
-Each node is targeted for the same specific size, which is configurable in the [Lakehouse definition](./lakehouse.md).
+Each node is targeted for the same specific size, which is configurable in the [Lakehouse definition](definitions/lakehouse.md).
 Based on those configurations, users can roughly estimate the size of the node key table as:
 
 ```

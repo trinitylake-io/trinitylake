@@ -4,7 +4,7 @@ Apache Iceberg is one of the supported formats of a TrinityLake table.
 
 ## Managed Iceberg Table
 
-TrinityLake managed Iceberg tables should be created without any format properties in the [table definition](./overview.md#object-definition-schema).
+TrinityLake managed Iceberg tables should be created without any format properties in the [table definition](overview.md#object-definition-schema).
 The TrinityLake format determines what works the best for managing an Iceberg table within a Trinity Lakehouse.
 
 For a managed table, TrinityLake maps the data type to Iceberg in the following way:
@@ -35,7 +35,7 @@ Currently only Apache Parquet file format is supported when using a Trinitylake 
 
 ## External Iceberg Table
 
-To use an external Iceberg table in TrinityLake, you can configure the following [format properties](./overview.md#object-definition-schema):
+To use an external Iceberg table in TrinityLake, you can configure the following [format properties](overview.md#object-definition-schema):
 
 | Property          | Description                                                                                          | Required? | Default |
 |-------------------|------------------------------------------------------------------------------------------------------|-----------|---------|
@@ -69,7 +69,7 @@ For an external table, TrinityLake surfaces the data type in Iceberg to TrinityL
 
 To use a federated Iceberg table in TrinityLake, you need to configure Iceberg 
 [catalog properties](https://iceberg.apache.org/docs/latest/configuration/?h=catalog+properties#catalog-properties)
-inside the [format properties](./overview.md#object-definition-schema).
+inside the [format properties](overview.md#object-definition-schema).
 TrinityLake will use the catalog properties to initialize an Iceberg catalog to federate into the external system
 to perform read and write.
 The federated table's data types will be surfaced to TrinityLake in the same way as external tables.

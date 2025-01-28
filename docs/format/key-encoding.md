@@ -37,7 +37,7 @@ lexicographical order that resembles the object hierarchy in a Lakehouse.
 
 ### Object Name
 
-The object name has maximum size in bytes defined in [Lakehouse definition file](./lakehouse.md), 
+The object name has maximum size in bytes defined in [Lakehouse definition file](definitions/lakehouse.md), 
 with one configuration for each type of object.
 
 The following UTF-8 characters are not permitted in an object name:
@@ -49,14 +49,14 @@ The following UTF-8 characters are not permitted in an object name:
 ### Encoded Object Name
 
 When used in an object key, the object name is right-padded with space up to the maximum size 
-(excluding the initial byte). The maximum size of each object is defined in the [Lakehouse definition file](./lakehouse.md).
+(excluding the initial byte). The maximum size of each object is defined in the [Lakehouse definition file](definitions/lakehouse.md).
 
 For example, a namespace `default` under Lakehouse definition 
 `namespace_name_max_size_bytes=8` will have an encoded object name`[space]default[space]`.
 
 ### Encoded Object Definition Schema ID
 
-The schema of the [object definition](./object-definition-file.md) has a numeric ID starting from 0, 
+The schema of the [object definition](definitions/overview) has a numeric ID starting from 0, 
 and is encoded to a 4 character base64 string that uses the following encoding:
 
 - Uppercase letters: A–Z, with indices 0–25

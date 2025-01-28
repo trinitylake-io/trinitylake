@@ -14,5 +14,5 @@ A namespace is a container in a Lakehouse to organize different objects.
 
 ## Name Size
 
-All namespace names must obey the maximum size configuration defined in the [Lakehouse definition file](./lakehouse.md).
+All namespace names must obey the maximum size configuration defined in the [Lakehouse definition file](lakehouse.md).
 

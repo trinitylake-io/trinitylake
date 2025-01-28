@@ -4,10 +4,7 @@ nav:
     - storage-layout.md
     - storage-location.md
     - storage-transaction.md
-    - transaction.md
+    - lakehouse-transaction.md
     - key-encoding.md
-    - object-definition-file.md
-    - lakehouse.md
-    - namespace.md
-    - table
+    - definitions
     - tree

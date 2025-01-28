@@ -36,7 +36,7 @@ The value of a tombstone key represents if a specific row is marked as deleted.
 TrinityLake supports the following ways of expressions:
 
 - If the key is a boolean type, and the value is `true`.
-- If the key is a string type (char or varchar), `tombstone_string_key_value` field of [Table definition](./overview.md) is defined, 
+- If the key is a string type (char or varchar), `tombstone_string_key_value` field of [Table definition](overview.md) is defined, 
    and the actual value is equal to one in definition.
 - If the key is a primitive type, and the value is not `NULL`.
 

@@ -4,7 +4,11 @@ title: Storage Transaction
 
 # Storage Transaction and ACID Enforcement
 
+In this document, we discuss how the TrinityLake integrates with a storage system to deliver transactional features.
+
 ## Storage Requirements
+
+A storage used in TrinityLake must have the following properties:
 
 ### Mutual Exclusion of File Creation
 
@@ -35,7 +39,7 @@ For example, if you use the TrinityLake format on Amazon S3, you get 99.99999999
 
 ## Immutable Copy-on-Write (CoW)
 
-Modifying a TrinityLake tree means modifying the content of the existing [node files](./storage-layout) and creating new node files.
+Modifying a TrinityLake tree in storage means modifying the content of the existing [node files](./storage-layout) and creating new node files.
 This modification process is **Copy-on-Write (CoW)**, 
 because "modifying the content" entails reading the existing content of the node file,
 and rewriting a completely new node file that contains potentially parts of the existing content plus the updated content.
@@ -45,30 +49,31 @@ This means all node files are immutable once written until deletion.
 
 ## Read Isolation
 
-Here we discuss how the **I**solation aspect of ACID is enforced in TrinityLake.
+Here we discuss how the **I**solation aspect of ACID is enforced in TrinityLake, at the storage layer.
 
-A transaction, either for read or write or both, 
-will always start with identifying the version of the TrinityLake tree to look into.
-This is determined by:
+A transaction, either for read or write or both, will always start with identifying the version of the TrinityLake tree 
+to look into. This is determined by:
 
 1. Reading the [version hint file](./storage-location.md#root-node-latest-version-hint-file-path) if the file exists, or start from version 0
 2. Try to get files of increasing version number until the version `k` that receives a file not found error
 3. The version `k-1` will be the one to decide the [root node file name](#root-node-file-name)
 
 All the object definition resolutions within the specific transaction must happen using that version of the TrinityLake tree.
+This ensures at least all the transactions begin with a specific version.
+For how to commit changes to the lakehouse while ensuring a specific isolation level, 
+read [Lakehouse Transaction](./lakehouse-transaction) for more details.
 
 ## Commit Atomicity
 
-Here we discuss how the **A**tomicity aspect of ACID is enforced in TrinityLake.
+Here we discuss how the **A**tomicity aspect of ACID is enforced in TrinityLake at storage layer.
 
 When committing a transaction, the writer does the following:
 
 1. Apply changes and write all non-root node files
 2. Try to write to the root node file in the targeted [root node file name](#root-node-file-name)
 3. If succeeded, the commit has succeeded, write the `_latest_hint` file with the new version with best effort.
-4. If failed, the commit has failed, and the process will decide the best way to re-apply the changes, which can be 
-   either re-applying the metadata change against the new tree, or redo the entire operation, or anything in between
-   depending on the implementation of the format.
+4. If failed, the transaction commit step has failed at the storage layer. Depending o nthe overall lakehouse transaction
+    level, it might be possible to rebase and retry the commit. Read [Lakehouse Transaction](./lakehouse-transaction) for more details.
 
 !!! note
 
@@ -109,7 +114,7 @@ with the difference that the root node `v` should be recorded as the [rollback r
 A snapshot export for a Trinity Lakehouse means to export a specific version of the TrinityLake tree root node,
 and all the files that are reachable through that root node.
 
-Every time an export is created, the [Lakehouse definition](./lakehouse.md) should be updated to record the name of the export
+Every time an export is created, the [Lakehouse definition](definitions/lakehouse.md) should be updated to record the name of the export
 and the root node file that the export is at.
 
 There are many types of export that can be achieved, because the export process can decide to stop replication
