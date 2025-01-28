@@ -9,7 +9,7 @@ title: Welcome
 ## Introduction
 
 TrinityLake is an **Open Lakehouse Format** for Big Data Analytics, ML & AI. 
-It defines the objects in a Lakehouse and provides a consistent and efficient way for accessing and manipulating these objects.
+It defines different objects in a Lakehouse and provides a consistent and efficient way for accessing and manipulating these objects.
 The TrinityLake format offers the following key features:
 
 ### Multi-Object Multi-Statement Transactions
@@ -63,7 +63,7 @@ Trinity Lake, previously called Clair Engle Lake, is a beautiful reservoir on th
 the Trinity Dam and located in Trinity County, California, USA.
 Since we are building a format for Lakehouse, we decided to pick a name of a lake we like.
 
-We also like the term _trinity_ as we see it symbolizes the 2 goals of this project:
+We also like the term _trinity_ as we see it symbolizes the 2 visions of this project:
 
 1. make catalog, table format, file format operate as one unified format on storage.
 2. run analytics, ML & AI workloads all on the same Lakehouse platform.

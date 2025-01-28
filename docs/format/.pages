@@ -5,6 +5,7 @@ nav:
     - storage-location.md
     - storage-transaction.md
     - lakehouse-transaction.md
-    - key-encoding.md
-    - definitions
-    - tree
+    - 'Lakehouse Object Key Encoding': key-encoding.md
+    - 'Lakehouse Object Definitions': definitions
+    - 'Tree Concepts': tree
+    - 'Transaction concepts': transaction

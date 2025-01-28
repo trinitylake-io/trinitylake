@@ -4,11 +4,22 @@ title: Storage Transaction
 
 # Storage Transaction and ACID Enforcement
 
-In this document, we discuss how the TrinityLake integrates with a storage system to deliver transactional features.
+In this document, we discuss how the TrinityLake integrates with any storage system 
+to deliver transactional features.
 
 ## Storage Requirements
 
 A storage used in TrinityLake must have the following properties:
+
+### Basic Operations
+
+A storage must support the following operations:
+
+- Read a file to a given location
+- Write a file to a given location
+- Delete a file at a given location
+- Check if a file exists at a given location
+- List files sharing the same prefix
 
 ### Mutual Exclusion of File Creation
 
@@ -27,9 +38,9 @@ This feature is widely available in most storage systems, for examples:
 
 ### Consistency
 
-The **C**onsistency aspect of ACID is enforced in the storage system and out of the control of the TrinityLake format.
-The TrinityLake format assumes that you are using a storage system that is **Strongly Consistent**, i.e.
-all data operations are processed and reflected in a consistent order across a distributed system.
+The **C**onsistency aspect of ACID is enforced by the storage, and TrinityLake format requires a **Strongly Consistent** storage.
+This means all operations that modify the storage (e.g. write, delete) are committed reflected immediately in any 
+subsequent read operations (e.g. read, list).   
 For example, the TrinityLake format would not work as expected if you use it on eventually consistent systems like Apache Cassandra.
 
 ### Durability
@@ -37,50 +48,48 @@ For example, the TrinityLake format would not work as expected if you use it on 
 The **D**urability aspect of ACID is enforced in the storage system and out of the control of the TrinityLake format.
 For example, if you use the TrinityLake format on Amazon S3, you get 99.999999999% (11 9's) durability guarantee.
 
-## Immutable Copy-on-Write (CoW)
+## Storage Commit Process
+
+### Copy-on-Write
 
 Modifying a TrinityLake tree in storage means modifying the content of the existing [node files](./storage-layout) and creating new node files.
-This modification process is **Copy-on-Write (CoW)**, 
-because "modifying the content" entails reading the existing content of the node file,
+This modification process is **Copy-on-Write (CoW)**, because "modifying the content" entails reading the existing content of the node file,
 and rewriting a completely new node file that contains potentially parts of the existing content plus the updated content.
 
+### File Immutability
+
 When performing CoW, the node files are required to be created at a new file location, rather than overwriting an existing file.
-This means all node files are immutable once written until deletion.
+This means all node files are immutable once written until deletion through garbage collection process.
 
-## Read Isolation
-
-Here we discuss how the **I**solation aspect of ACID is enforced in TrinityLake, at the storage layer.
-
-A transaction, either for read or write or both, will always start with identifying the version of the TrinityLake tree 
-to look into. This is determined by:
-
-1. Reading the [version hint file](./storage-location.md#root-node-latest-version-hint-file-path) if the file exists, or start from version 0
-2. Try to get files of increasing version number until the version `k` that receives a file not found error
-3. The version `k-1` will be the one to decide the [root node file name](#root-node-file-name)
-
-All the object definition resolutions within the specific transaction must happen using that version of the TrinityLake tree.
-This ensures at least all the transactions begin with a specific version.
-For how to commit changes to the lakehouse while ensuring a specific isolation level, 
-read [Lakehouse Transaction](./lakehouse-transaction) for more details.
-
-## Commit Atomicity
-
-Here we discuss how the **A**tomicity aspect of ACID is enforced in TrinityLake at storage layer.
+### Commit Atomicity
 
 When committing a transaction, the writer does the following:
 
-1. Apply changes and write all non-root node files
-2. Try to write to the root node file in the targeted [root node file name](#root-node-file-name)
-3. If succeeded, the commit has succeeded, write the `_latest_hint` file with the new version with best effort.
-4. If failed, the transaction commit step has failed at the storage layer. Depending o nthe overall lakehouse transaction
-    level, it might be possible to rebase and retry the commit. Read [Lakehouse Transaction](./lakehouse-transaction) for more details.
+1. Flush write buffers if necessary and write all impacted non-root node files
+2. Try to write to the root node file with new write buffer in the targeted [root node file name](#root-node-file-name)
+    1. If this write is successful, the transaction is considered succeeded. Write the `_latest_hint` file with the new version with best effort.
+    2. If this write is not successful, the transaction commit step has failed at the storage layer. Depending on the overall lakehouse transaction
+        level, it might be possible to rebase and retry the commit. Read [Lakehouse Transaction](./lakehouse-transaction) for more details.
+        if rebased commit is not possible, the transaction is considered failed and not retryable.
 
-!!! note
+## Storage Read Isolation
 
-    At step 3, the write of the `_latest_hint` file is not guaranteed to exist or be accurate.
-    For example, if two processes A and B commit sequentially at version 2 and 3, but A wrote the hint slower than B, 
-    the hint file will be incorrect with value 2. This is why in the [Read Isolation](#read-isolation) section 
-    we explicitly try to seek for further versions instead of just trust the value in the hint file.
+Based on the commit process of TrinityLake, every change to a Trinity Lakehouse must produce a new version of the TrinityLake tree root.
+This is the core feature used for read isolation.
+A transaction, either for read or write or both, will always start with identifying the version of the TrinityLake tree 
+to look into. This version is determined by:
+
+1. Reading the [version hint file](./storage-location.md#root-node-latest-version-hint-file-path) if the file exists, or start from version 0.
+    This is because at step 3 of [Commit Atomicity](#commit-atomicity), the write of the `_latest_hint` file is not guaranteed to exist or be accurate.
+    For example, if two processes A and B commit sequentially at version 2 and 3, but A wrote the hint slower than B,
+    the hint file will be incorrect with value 2.
+2. Try to get files of increasing version number until the version `k` that receives a file not found error
+3. The version `k-1` will be the one to decide the [root node file path](./storage-location.md#root-node-file-path)
+
+All the initial object definition resolutions within the specific transaction must happen using that version of the TrinityLake tree.
+This ensures all the transactions begin with a specific version that is isolated from other concurrent processes.
+For how to commit transactions to a Trinity Lakehouse while ensuring a specific ANSI-compliant isolation level guarantee, 
+read [Lakehouse Transaction](./lakehouse-transaction) for more details.
 
 ## Time Travel
 
