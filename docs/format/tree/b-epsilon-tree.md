@@ -34,6 +34,6 @@ This is technically a **Merge-on-Read** for people that are familiar with that t
 ## Compaction
 
 Because of the delayed write mechanism using write buffer, a compaction is possible against the tree,
-where the process can force flush all the messages in the buffers to the corresponding keys to clear up the buffer space.
+where the process can force flushing all the messages in the buffers to the corresponding keys to clear up the buffer space.
 The process is not necessary because eventually the writes would bring down all the write buffers 
 to the right nodes to be applied, but doing compaction wisely would improve the write performance further.

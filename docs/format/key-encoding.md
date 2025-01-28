@@ -22,13 +22,14 @@ The pointer to the previous root node is stored with key `previous_root` in the 
 The pointer to the root node that was rolled back from, if the root node is created during a [Rollback](./storage-transaction#rollback-committed-version)
 It is stored with key `rollback_from_root` in the root node.
 
-### Version Key
-
-The version of the root node, stored with the key `version` in the root node.
-
 ### Creation Timestamp Key
 
 The key `created_at_millis` writes the timestamp that a node is created.
+
+### Number of Keys Key
+
+The key `n_keys` writes the number of keys that a node is currently having.
+This is used to determine the size of the [node key table](./tree/search-tree-map.md#node-key-table).
 
 ## Object Key
 
@@ -73,8 +74,8 @@ The object key format combines the [Encoded Object Name](#object-name),
 [Encoded Object Definition Schema ID](#encoded-object-definition-schema-id) rules above to form a unique key 
 for each type of object. See the table below for the format for each type of object: (contents in `<>` should be substituted)
 
-| Object Type | Schema ID | Object ID Format                                               | Example                                               |
-|-------------|-----------|----------------------------------------------------------------|-------------------------------------------------------|
+| Object Type | Schema ID | Object ID Format                                        | Example                                               |
+|-------------|-----------|---------------------------------------------------------|-------------------------------------------------------|
 | Lakehouse   | 0         | N/A, use [Lakehouse Definition Key](#lakehouse-definition-key) |                                                       |
-| Namespace   | 1         | `[space]B===<encoded namespace name>`                          | `B===default[space]`                           |
-| Table       | 2         | `[space]C===<encoded namespace name><encoded table name>`      | `C===default[space]table[space][space][space]` |
+| Namespace   | 1         | `B===<encoded namespace name>`                          | `B===default[space]`                           |
+| Table       | 2         | `C===<encoded namespace name><encoded table name>`      | `C===default[space]table[space][space][space]` |

@@ -14,7 +14,7 @@ Please see [Versioning](./versioning.md) about the versioning semantics of this 
 ## Introduction
 
 The TrinityLake format defines a storage-only lakehouse 
-implemented using a modified version of the [B-epsilon tree](tree/b-epsilon-tree.md) [key-value map](tree/search-tree-map.md).
+implemented using a modified version of the [B-epsilon tree](tree/b-epsilon-tree.md)-based [key-value map](tree/search-tree-map.md).
 
 - The keys of this map are IDs of objects in a lakehouse
 - The values of this map are location pointers to the **Object Definitions** 
