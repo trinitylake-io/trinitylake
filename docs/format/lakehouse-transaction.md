@@ -6,4 +6,3 @@ title: Lakehouse Transaction
 
 ## Read Isolation
 
-TODO: describe the isolation concepts and TrinityLake conflict resolution process

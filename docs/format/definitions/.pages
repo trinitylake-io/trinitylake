@@ -1,0 +1,5 @@
+nav:
+    - overview.md
+    - lakehouse.md
+    - namespace.md
+    - table
