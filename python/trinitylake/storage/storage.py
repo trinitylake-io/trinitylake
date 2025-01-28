@@ -4,7 +4,7 @@ from typing import Optional
 from urllib.parse import urlparse
 
 from pyarrow import ipc, memory_map, array, string, OSFile, schema, record_batch, field
-from pytrinity.tree import TrinityNode
+from trinitylake.tree import TrinityNode
 
 
 class Storage:

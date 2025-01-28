@@ -1,5 +1,5 @@
-from pytrinity.lakehouse import Lakehouse
-from pytrinity.storage.storage import Storage
+from trinitylake.lakehouse import Lakehouse
+from trinitylake.storage.storage import Storage
 import tempfile
 
 if __name__ == "__main__":

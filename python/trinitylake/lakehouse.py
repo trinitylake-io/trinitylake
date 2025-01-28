@@ -1,5 +1,5 @@
 from const import LATEST_HINT_FILE
-from lakehouse_version import LakehouseVersion
+from trinitylake.lakehouse_version import LakehouseVersion
 
 
 class Lakehouse:
