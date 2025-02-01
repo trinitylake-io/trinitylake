@@ -1,4 +1,5 @@
 import pytest
+
 from trinitylake.tree import TrinityTree, TrinityNode
 
 
@@ -56,3 +57,37 @@ def test_large_insertion(empty_tree):
 
     for i in range(100):
         assert empty_tree.get(str(i)) == str(i)
+
+
+def test_range_query_no_results(empty_tree):
+    for key in ["x", "y", "z"]:
+        empty_tree.insert(key, key)
+    result = empty_tree.range_query("a", "b")
+
+    assert result == []
+
+
+def test_reinsertion_after_deletion(empty_tree):
+    empty_tree.insert("key", "value")
+
+    assert empty_tree.get("key") == "value"
+    empty_tree.delete("key")
+    with pytest.raises(KeyError):
+        empty_tree.get("key")
+
+    empty_tree.insert("key", "new_value")
+    assert empty_tree.get("key") == "new_value"
+
+def test_get_non_existent_key(empty_tree):
+    with pytest.raises(KeyError):
+        empty_tree.get("non-existent")
+
+def test_deleted_key_not_in_ranged_query(empty_tree):
+    empty_tree.insert("a", "value1")
+    empty_tree.delete("a")
+    empty_tree.insert("b", "value2")
+
+    result = empty_tree.range_query("a", "z")
+    keys = [k for k, _ in result]
+    assert "a" not in keys
+    assert "b" in keys

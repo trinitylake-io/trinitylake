@@ -64,7 +64,7 @@ class Storage:
             values.append(value)
             pnodes.append("system_row")
 
-        row_count = len(node.rows) + 1
+        row_count = len(node.rows) + 1 if node.rows else 0
         for i in range(row_count):
             if i < len(node.rows):
                 key, value = node.rows[i]
@@ -84,9 +84,6 @@ class Storage:
             else:
                 pnodes.append(None)
 
-        keys.append(None)
-        values.append(None)
-        pnodes.append(None)
         for key, value in node.buffer:
             keys.append(key)
             values.append(value)

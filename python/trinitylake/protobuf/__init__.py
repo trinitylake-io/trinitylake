@@ -1,1 +1,1 @@
-from Definitions_pb2 import LakehouseDef, NamespaceDef, TableDef
+from .Definitions_pb2 import LakehouseDef, NamespaceDef, TableDef
