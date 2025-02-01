@@ -1,9 +1,12 @@
 import os
+import time
 import uuid
 from typing import Optional
 from urllib.parse import urlparse
 
 from pyarrow import ipc, memory_map, array, string, OSFile, schema, record_batch, field
+
+from const import CREATED_AT
 from trinitylake.tree import TrinityNode
 
 
@@ -61,7 +64,7 @@ class Storage:
             values.append(value)
             pnodes.append("system_row")
 
-        row_count = len(node.rows) + 1
+        row_count = len(node.rows) + 1 if node.rows else 0
         for i in range(row_count):
             if i < len(node.rows):
                 key, value = node.rows[i]
@@ -81,9 +84,6 @@ class Storage:
             else:
                 pnodes.append(None)
 
-        keys.append(None)
-        values.append(None)
-        pnodes.append(None)
         for key, value in node.buffer:
             keys.append(key)
             values.append(value)
@@ -141,3 +141,7 @@ class Storage:
 
     def _generate_uuid(self):
         return str(uuid.uuid4())
+
+    def write_node(self, node: TrinityNode, file_name: str):
+        node.system_rows.append((CREATED_AT, str(time.time() * 1000)))
+        self.serialize_tree(node, file_name)
