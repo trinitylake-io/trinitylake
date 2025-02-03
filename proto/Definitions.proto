@@ -64,7 +64,7 @@ enum DataType {
   DATE = 9;
   TIME = 10;
   TIMETZ = 11;
-  TIMEATAMP = 12;
+  TIMESTAMP = 12;
   TIMESTAMPTZ = 13;
   FIXED = 14;
   BINARY = 15;
