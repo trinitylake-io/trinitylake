@@ -19,9 +19,9 @@ please visit [trinitylake.io](https://trinitylake.io).
 
 ## Building
 
-* Build and run tests: `````./gradlew build`````
-* Build without running tests: ```./gradlew build -x test -x integrationTest```
-* Fix code style and formatting: ```./gradlew spotlessApply```
+* Build and run tests: `./gradlew build`
+* Build without running tests: `./gradlew build -x test -x integrationTest`
+* Fix code style and formatting: `./gradlew spotlessApply`
 
 ## Join Us
 
