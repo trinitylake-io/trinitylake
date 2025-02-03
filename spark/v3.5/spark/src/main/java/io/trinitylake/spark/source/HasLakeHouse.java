@@ -11,22 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.sql.execution.datasources.v2
+package io.trinitylake.spark.source;
 
-import io.trinitylake.spark.SparkCatalog
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Attribute
+import io.trinitylake.Lakehouse;
+import org.apache.spark.sql.connector.catalog.TableCatalog;
 
-case class CommitTransactionExec(sparkCatalog: SparkCatalog) extends LeafV2CommandExec {
+public interface HasLakeHouse extends TableCatalog {
 
-  override lazy val output: Seq[Attribute] = Nil
-
-  override protected def run(): Seq[InternalRow] = {
-    sparkCatalog.commitTransaction()
-    Seq.empty
-  }
-
-  override def simpleString(maxFields: Int): String = {
-    "CommitTransactionExec"
-  }
+  /** Returns the underlying {@link io.trinitylake.Lakehouse} backing this Spark Catalog */
+  Lakehouse lakeHouse();
 }

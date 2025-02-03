@@ -11,22 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.sql.execution.datasources.v2
+package io.trinitylake;
 
-import io.trinitylake.spark.SparkCatalog
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Attribute
+public class TransactionContext {
+  private final String transactionId;
+  private final BasicLakehouseVersion version;
 
-case class CommitTransactionExec(sparkCatalog: SparkCatalog) extends LeafV2CommandExec {
-
-  override lazy val output: Seq[Attribute] = Nil
-
-  override protected def run(): Seq[InternalRow] = {
-    sparkCatalog.commitTransaction()
-    Seq.empty
+  public TransactionContext(String transactionId, BasicLakehouseVersion version) {
+    this.transactionId = transactionId;
+    this.version = version;
   }
 
-  override def simpleString(maxFields: Int): String = {
-    "CommitTransactionExec"
+  public String transactionId() {
+    return transactionId;
+  }
+
+  public BasicLakehouseVersion version() {
+    return version;
   }
 }
