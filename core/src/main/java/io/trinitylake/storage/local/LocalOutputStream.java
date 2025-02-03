@@ -33,8 +33,7 @@ public class LocalOutputStream extends AtomicOutputStream {
       CommonStorageOpsProperties commonProperties,
       LocalStorageOpsProperties localProperties) {
     this.file = file;
-    this.tempFile =
-        FileUtil.createTempFile("local-", commonProperties.writeStagingDirectory());
+    this.tempFile = FileUtil.createTempFile("local-", commonProperties.writeStagingDirectory());
     try {
       this.stream = new FileOutputStream(tempFile);
     } catch (FileNotFoundException e) {

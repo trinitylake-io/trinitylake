@@ -65,8 +65,7 @@ public class TrinityLake {
   public static CommittedTransaction commitTransaction(
       LakehouseStorage storage, RunningTransaction transaction) throws CommitFailureException {
     Preconditions.checkArgument(
-        !TreeOperations.hasVersion(transaction.runningRoot()),
-        "There is no change to be committed");
+        TreeOperations.hasVersion(transaction.runningRoot()), "There is no change to be committed");
     long beginningRootVersion = TreeOperations.findVersion(transaction.beginningRoot());
     String nextVersionFilePath = FilePaths.rootNodeFilePath(beginningRootVersion + 1);
     TreeOperations.writeNodeFile(storage, nextVersionFilePath, transaction.runningRoot());
