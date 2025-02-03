@@ -17,6 +17,12 @@ accessing and manipulating these objects. It offers the following key features:
 For more details about the format specification, and how to get started and use it with various open engines such as Apache Spark, 
 please visit [trinitylake.io](https://trinitylake.io).
 
+## Building
+
+* Build and run tests: `````./gradlew build`````
+* Build without running tests: ```./gradlew build -x test -x integrationTest```
+* Fix code style and formatting: ```./gradlew spotlessApply```
+
 ## Join Us
 
 This project is still at early development stage. 
