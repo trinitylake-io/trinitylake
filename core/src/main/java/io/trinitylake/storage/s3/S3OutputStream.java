@@ -18,8 +18,8 @@ import dev.failsafe.Failsafe;
 import dev.failsafe.FailsafeException;
 import dev.failsafe.RetryPolicy;
 import io.trinitylake.exception.CommitFailureException;
+import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
-import io.trinitylake.exception.StreamOpenFailureException;
 import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.storage.URI;
@@ -77,7 +77,7 @@ class S3OutputStream extends AtomicOutputStream {
     try {
       newStream();
     } catch (IOException e) {
-      throw new StreamOpenFailureException(e, "Failed to open stream: %s", uri);
+      throw new StorageFileOpenFailureException(e, "Failed to open stream: %s", uri);
     }
   }
 

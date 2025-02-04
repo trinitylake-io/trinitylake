@@ -48,7 +48,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.S3AsyncClientBuilder;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.DownloadFileRequest;
@@ -60,35 +65,65 @@ public class AmazonS3StorageOps implements StorageOps {
 
   private static volatile ExecutorService executorService;
 
-  private final S3AsyncClient s3;
-  private final S3TransferManager transferManager;
-  private final CommonStorageOpsProperties commonProperties;
-  private final AmazonS3StorageOpsProperties s3Properties;
+  private S3AsyncClient s3;
+  private S3TransferManager transferManager;
+  private CommonStorageOpsProperties commonProperties;
+  private AmazonS3StorageOpsProperties s3Properties;
 
-  private final AtomicBoolean isResourceClosed = new AtomicBoolean(false);
-  private final Cache<URI, Pair<FileDownload, File>> preparedFiles;
+  private AtomicBoolean isResourceClosed = new AtomicBoolean(false);
+  private Cache<URI, Pair<FileDownload, File>> preparedFiles;
 
   public AmazonS3StorageOps() {
-    this(
-        S3AsyncClient.crtCreate(),
-        CommonStorageOpsProperties.instance(),
-        AmazonS3StorageOpsProperties.instance());
+    this(CommonStorageOpsProperties.instance(), AmazonS3StorageOpsProperties.instance());
   }
 
   public AmazonS3StorageOps(
-      S3AsyncClient s3,
-      CommonStorageOpsProperties commonProperties,
-      AmazonS3StorageOpsProperties s3Properties) {
-    this.s3 = s3;
-    this.transferManager = S3TransferManager.builder().s3Client(s3).build();
+      CommonStorageOpsProperties commonProperties, AmazonS3StorageOpsProperties s3Properties) {
     this.commonProperties = commonProperties;
     this.s3Properties = s3Properties;
-    this.preparedFiles =
-        Caffeine.newBuilder()
-            .expireAfterAccess(
-                Duration.ofMillis(commonProperties().prepareReadCacheExpirationMillis()))
-            .maximumSize(commonProperties.prepareReadCacheSize())
-            .build();
+    this.s3 = initializeS3AsyncClient(s3Properties);
+    this.transferManager = S3TransferManager.builder().s3Client(s3).build();
+    this.preparedFiles = initializePreparedFilesCache(commonProperties);
+  }
+
+  @Override
+  public void initialize(Map<String, String> properties) {
+    this.commonProperties = new CommonStorageOpsProperties(properties);
+    this.s3Properties = new AmazonS3StorageOpsProperties(properties);
+    this.s3 = initializeS3AsyncClient(s3Properties);
+    this.transferManager = S3TransferManager.builder().s3Client(s3).build();
+    this.preparedFiles = initializePreparedFilesCache(commonProperties);
+  }
+
+  private static S3AsyncClient initializeS3AsyncClient(AmazonS3StorageOpsProperties s3Properties) {
+    S3AsyncClientBuilder builder = S3AsyncClient.builder();
+    if (s3Properties.region() != null) {
+      builder.region(Region.of(s3Properties.region()));
+    }
+    if (s3Properties.accessKeyId() != null) {
+      if (s3Properties.sessionToken() != null) {
+        builder.credentialsProvider(
+            StaticCredentialsProvider.create(
+                AwsSessionCredentials.create(
+                    s3Properties.accessKeyId(),
+                    s3Properties.secretAccessKey(),
+                    s3Properties.sessionToken())));
+      } else {
+        builder.credentialsProvider(
+            StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(
+                    s3Properties.accessKeyId(), s3Properties.secretAccessKey())));
+      }
+    }
+    return builder.build();
+  }
+
+  private static Cache<URI, Pair<FileDownload, File>> initializePreparedFilesCache(
+      CommonStorageOpsProperties commonProperties) {
+    return Caffeine.newBuilder()
+        .expireAfterAccess(Duration.ofMillis(commonProperties.prepareReadCacheExpirationMillis()))
+        .maximumSize(commonProperties.prepareReadCacheSize())
+        .build();
   }
 
   @Override

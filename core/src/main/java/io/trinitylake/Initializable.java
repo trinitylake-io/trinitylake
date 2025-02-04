@@ -11,8 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake;
 
-import io.trinitylake.StringMapBased;
+import java.util.Map;
 
-public interface StorageOpsProperties extends StringMapBased {}
+/** Interface for objects that can be initialized through reflection */
+public interface Initializable {
+
+  public void initialize(Map<String, String> properties);
+}

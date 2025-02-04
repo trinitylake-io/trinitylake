@@ -14,8 +14,8 @@
 package io.trinitylake.util;
 
 import com.google.common.io.CharStreams;
+import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
-import io.trinitylake.exception.StreamOpenFailureException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class FileUtil {
     try {
       return File.createTempFile("trinitylake-" + filePrefix, ".tmp", stagingDirectory);
     } catch (IOException e) {
-      throw new StreamOpenFailureException(
+      throw new StorageFileOpenFailureException(
           e, "Fail to open new temp file at: %s", stagingDirectory);
     }
   }
@@ -59,7 +59,7 @@ public class FileUtil {
               "Successfully created staging directory by another process: {}",
               stagingDirectory.getAbsolutePath());
         } else {
-          throw new StreamOpenFailureException(
+          throw new StorageFileOpenFailureException(
               "Failed to create staging directory due to some unknown reason: "
                   + stagingDirectory.getAbsolutePath());
         }

@@ -13,6 +13,8 @@
  */
 package org.apache.spark.sql.execution.datasources.v2
 
+import io.trinitylake.TrinityLake
+import io.trinitylake.spark.TrinityLakeSparkCatalog
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Attribute
 
@@ -21,6 +23,23 @@ case class CommitTransactionExec() extends LeafV2CommandExec {
   override lazy val output: Seq[Attribute] = Nil
 
   override protected def run(): Seq[InternalRow] = {
+    session.sessionState.catalogManager.currentCatalog match {
+      case catalog: TrinityLakeSparkCatalog => {
+        if (!catalog.globalTransaction().isPresent) {
+          throw new IllegalStateException("No transaction to be committed")
+        }
+        try {
+          TrinityLake.commitTransaction(catalog.lakehouseStorage, catalog.globalTransaction.get)
+        } finally {
+          // regardless of successful or not, the running transaction will be cleared,
+          // because failed transaction commit cannot be retried
+          catalog.clearGlobalTransaction()
+        }
+      }
+      case _ =>
+        throw new UnsupportedOperationException(
+          "Cannot begin transaction in non-TrinityLake catalog")
+    }
     Seq.empty
   }
 

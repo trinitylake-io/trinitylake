@@ -44,3 +44,11 @@ Assuming T1 commits successfully first, the following would happen for T2:
 5. T2 now applies its change against version 4 root node file
 6. T2 commits the new root node file against version 5
 7. T2 commit succeeds
+
+!!! note
+   
+    This conflcit resolution strategy is currently not fully correct. 
+    For example, it is possible for update to `t2` to leverage infomration in `t1`, 
+    causing the commit to be not serializable.
+    We plan to introduce the concept of "Object Change Definition" to fix it, but in future iterations of the format. 
+    
