@@ -21,13 +21,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class LocalStorageOps implements StorageOps {
 
-  private final CommonStorageOpsProperties commonProperties;
-  private final LocalStorageOpsProperties localProperties;
+  private CommonStorageOpsProperties commonProperties;
+  private LocalStorageOpsProperties localProperties;
 
   public LocalStorageOps() {
     this(CommonStorageOpsProperties.instance(), LocalStorageOpsProperties.instance());
@@ -95,4 +96,10 @@ public class LocalStorageOps implements StorageOps {
 
   @Override
   public void close() throws IOException {}
+
+  @Override
+  public void initialize(Map<String, String> properties) {
+    this.commonProperties = new CommonStorageOpsProperties(properties);
+    this.localProperties = new LocalStorageOpsProperties(properties);
+  }
 }

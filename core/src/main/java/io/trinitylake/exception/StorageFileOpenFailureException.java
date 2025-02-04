@@ -13,17 +13,17 @@
  */
 package io.trinitylake.exception;
 
-public class StreamOpenFailureException extends TrinityLakeRuntimeException {
+public class StorageFileOpenFailureException extends TrinityLakeRuntimeException {
 
-  public StreamOpenFailureException(Throwable cause) {
+  public StorageFileOpenFailureException(Throwable cause) {
     super(cause);
   }
 
-  public StreamOpenFailureException(Throwable cause, String message, Object... args) {
+  public StorageFileOpenFailureException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }
 
-  public StreamOpenFailureException(String message, Object... args) {
+  public StorageFileOpenFailureException(String message, Object... args) {
     super(message, args);
   }
 }

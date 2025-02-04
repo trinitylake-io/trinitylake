@@ -13,16 +13,37 @@
  */
 package io.trinitylake;
 
+import com.google.common.collect.ImmutableSet;
 import io.trinitylake.util.PropertyUtil;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
-public class TransactionOptions {
+public class TransactionOptions implements StringMapBased {
 
-  public static final String ISOLATION_LEVEL = "isolation_level";
-  public static final String ISOLATION_LEVEL_DEFAULT = "SNAPSHOT";
+  public static final String ISOLATION_LEVEL = "isolation-level";
+  public static final String ISOLATION_LEVEL_DEFAULT = "snapshot";
 
-  public static IsolationLevel isolationLevel(Map<String, String> options) {
-    return IsolationLevel.valueOf(
-        PropertyUtil.propertyAsString(options, ISOLATION_LEVEL, ISOLATION_LEVEL_DEFAULT));
+  public static final Set<String> OPTIONS =
+      ImmutableSet.<String>builder().add(ISOLATION_LEVEL).build();
+
+  private final Map<String, String> options;
+  private final IsolationLevel isolationLevel;
+
+  public TransactionOptions(Map<String, String> options) {
+    this.options = PropertyUtil.filterProperties(options, OPTIONS::contains);
+    this.isolationLevel =
+        IsolationLevel.valueOf(
+            PropertyUtil.propertyAsString(options, ISOLATION_LEVEL, ISOLATION_LEVEL_DEFAULT)
+                .toUpperCase(Locale.ENGLISH));
+  }
+
+  @Override
+  public Map<String, String> asStringMap() {
+    return options;
+  }
+
+  public IsolationLevel isolationLevel() {
+    return isolationLevel;
   }
 }

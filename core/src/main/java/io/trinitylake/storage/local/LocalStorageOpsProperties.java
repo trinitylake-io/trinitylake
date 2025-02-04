@@ -14,12 +14,16 @@
 package io.trinitylake.storage.local;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.trinitylake.storage.StorageOpsProperties;
 import java.util.Map;
+import java.util.Set;
 
 public class LocalStorageOpsProperties implements StorageOpsProperties {
 
   private static final LocalStorageOpsProperties INSTANCE = new LocalStorageOpsProperties();
+
+  public static final Set<String> PROPERTIES = ImmutableSet.<String>builder().build();
 
   private final Map<String, String> propertiesMap;
 

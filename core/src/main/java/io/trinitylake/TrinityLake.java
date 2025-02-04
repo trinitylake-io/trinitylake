@@ -52,13 +52,13 @@ public class TrinityLake {
   public static RunningTransaction beginTransaction(
       LakehouseStorage storage, Map<String, String> options) {
     TreeNode current = TreeOperations.findLatestRoot(storage);
-    IsolationLevel isolationLevel = TransactionOptions.isolationLevel(options);
+    TransactionOptions transactionOptions = new TransactionOptions(options);
     return ImmutableRunningTransaction.builder()
         .beganAtMillis(System.currentTimeMillis())
         .transactionId(UUID.randomUUID().toString())
         .beginningRoot(current)
         .runningRoot(current)
-        .isolationLevel(isolationLevel)
+        .isolationLevel(transactionOptions.isolationLevel())
         .build();
   }
 
@@ -82,6 +82,16 @@ public class TrinityLake {
         .filter(TreeKeys::isNamespaceKey)
         .map(TreeKeys::namespaceNameFromKey)
         .collect(Collectors.toList());
+  }
+
+  public static boolean namespaceExists(
+      LakehouseStorage storage, RunningTransaction transaction, String namespaceName) {
+    LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
+    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    if (!transaction.runningRoot().contains(namespaceKey)) {
+      throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
+    }
+    return transaction.runningRoot().contains(namespaceKey);
   }
 
   public static NamespaceDef describeNamespace(
@@ -156,6 +166,24 @@ public class TrinityLake {
         .filter(TreeKeys::isTableKey)
         .map(key -> TreeKeys.tableNameFromKey(namespaceName, key))
         .collect(Collectors.toList());
+  }
+
+  public static boolean tableExists(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String tableName) {
+    LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
+    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    if (!transaction.runningRoot().contains(namespaceKey)) {
+      throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
+    }
+    String tableKey = TreeKeys.tableNameFromKey(namespaceName, tableName);
+    if (!transaction.runningRoot().contains(tableKey)) {
+      throw new ObjectNotFoundException(
+          "Namespace %s table %s does not exist", namespaceName, tableName);
+    }
+    return transaction.runningRoot().contains(tableKey);
   }
 
   public static TableDef describeTable(

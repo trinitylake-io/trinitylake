@@ -11,8 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake;
 
-import io.trinitylake.StringMapBased;
+import java.util.Map;
 
-public interface StorageOpsProperties extends StringMapBased {}
+public interface StringMapBased {
+
+  Map<String, String> asStringMap();
+}

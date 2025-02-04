@@ -14,10 +14,12 @@
 package io.trinitylake.storage;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.PropertyUtil;
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class CommonStorageOpsProperties implements StorageOpsProperties {
@@ -43,6 +45,15 @@ public class CommonStorageOpsProperties implements StorageOpsProperties {
   public static final String WRITE_STAGING_DIRECTORY_PATH_DEFAULT =
       System.getProperty("java.io.tmpdir");
 
+  public static final Set<String> PROPERTIES =
+      ImmutableSet.<String>builder()
+          .add(DELETE_BATCH_SIZE)
+          .add(PREPARE_READ_CACHE_SIZE)
+          .add(PREPARE_READ_CACHE_EXPIRATION_MILLIS)
+          .add(PREPARE_READ_STAGING_DIRECTORY)
+          .add(WRITE_STAGING_DIRECTORY)
+          .build();
+
   private final Map<String, String> propertiesMap;
   private final int deleteBatchSize;
   private final int prepareReadCacheSize;
@@ -61,7 +72,7 @@ public class CommonStorageOpsProperties implements StorageOpsProperties {
   }
 
   public CommonStorageOpsProperties(Map<String, String> input) {
-    this.propertiesMap = ImmutableMap.copyOf(input);
+    this.propertiesMap = PropertyUtil.filterProperties(input, PROPERTIES::contains);
     this.deleteBatchSize =
         PropertyUtil.propertyAsInt(input, DELETE_BATCH_SIZE, DELETE_BATCH_SIZE_DEFAULT);
     this.prepareReadCacheSize =

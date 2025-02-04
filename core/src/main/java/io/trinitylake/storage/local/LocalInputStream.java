@@ -13,7 +13,7 @@
  */
 package io.trinitylake.storage.local;
 
-import io.trinitylake.exception.StreamOpenFailureException;
+import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.storage.SeekableInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +30,7 @@ public class LocalInputStream extends SeekableInputStream {
       this.file = file;
       open();
     } catch (IOException e) {
-      throw new StreamOpenFailureException(e, "Fail to open file: %s", file);
+      throw new StorageFileOpenFailureException(e, "Fail to open file: %s", file);
     }
   }
 
