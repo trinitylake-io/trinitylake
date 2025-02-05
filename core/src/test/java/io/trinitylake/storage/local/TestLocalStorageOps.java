@@ -13,8 +13,13 @@
  */
 package io.trinitylake.storage.local;
 
+import com.google.common.io.CharStreams;
 import io.trinitylake.storage.LiteralURI;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -75,5 +80,39 @@ public class TestLocalStorageOps {
     ops.delete(files.stream().map(f -> new LiteralURI("file://" + f)).collect(Collectors.toList()));
 
     files.stream().forEach(f -> Assertions.assertThat(f.toFile().exists()).isFalse());
+  }
+
+  @Test
+  public void testReadFile(@TempDir Path tempDir) throws IOException {
+    Path file = tempDir.resolve("read.txt");
+    Files.write(file, "data".getBytes());
+    LocalStorageOps ops = new LocalStorageOps();
+    InputStream stream = ops.startRead(new LiteralURI("file://" + file));
+    Assertions.assertThat(
+            CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8)))
+        .isEqualTo("data");
+  }
+
+  @Test
+  public void testReadFileLocal(@TempDir Path tempDir) throws IOException {
+    Path file = tempDir.resolve("read.txt");
+    Files.write(file, "data".getBytes());
+    LocalStorageOps ops = new LocalStorageOps();
+    InputStream stream = ops.startReadLocal(new LiteralURI("file://" + file));
+    Assertions.assertThat(
+            CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8)))
+        .isEqualTo("data");
+  }
+
+  @Test
+  public void testWriteFile(@TempDir Path tempDir) throws IOException {
+    Path file = tempDir.resolve("write.txt");
+    LocalStorageOps ops = new LocalStorageOps();
+    OutputStream stream = ops.startWrite(new LiteralURI("file://" + file));
+    stream.write("data".getBytes());
+    stream.close();
+
+    Assertions.assertThat(new String(Files.readAllBytes(file), StandardCharsets.UTF_8))
+        .isEqualTo("data");
   }
 }

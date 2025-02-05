@@ -25,7 +25,7 @@ public interface StorageOps extends Closeable, Initializable {
 
   StorageOpsProperties systemSpecificProperties();
 
-  void prepareToRead(LiteralURI uri);
+  void prepareToReadLocal(LiteralURI uri);
 
   SeekableInputStream startRead(LiteralURI uri);
 

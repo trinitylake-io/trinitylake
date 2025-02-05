@@ -16,12 +16,20 @@ package io.trinitylake.storage;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import io.trinitylake.util.ValidationUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class FilePaths {
 
   public static final String LATEST_VERSION_HINT_FILE_PATH = "_latest_hint.txt";
+  public static final String LAKEHOUSE_DEF_FILE_PATH_PREFIX = "_lakehouse_def_";
+  public static final String PROTOBUF_BINARY_FILE_SUFFIX = ".binpb";
+
+  // underscore + 64 binary bits + .ipc suffix
+  private static final int ROOT_NODE_FILE_PATH_LENGTH = 69;
+  private static final Pattern ROOT_NODE_FILE_PATH_PATTERN = Pattern.compile("^_[01]{64}\\.ipc$");
 
   private static final HashFunction HASH_FUNC = Hashing.murmur3_32_fixed();
   // Length of entropy generated in the file path
@@ -31,33 +39,50 @@ public class FilePaths {
   // Entropy generated will be divided into this number of directories
   private static final int ENTROPY_DIR_DEPTH = 3;
 
-  public static final String PROTOBUF_BINARY_FILE_SUFFIX = ".binpb";
+  public static boolean isRootNodeFilePath(String path) {
+    return ROOT_NODE_FILE_PATH_PATTERN.matcher(path).matches();
+  }
+
+  public static long versionFromNodeFilePath(String path) {
+    ValidationUtil.checkArgument(
+        isRootNodeFilePath(path),
+        "Root node file path must match pattern: %s",
+        ROOT_NODE_FILE_PATH_PATTERN);
+    String reversedBinary = path.substring(1, path.length() - 4);
+    String binary = new StringBuilder().append(reversedBinary).reverse().toString();
+    return Long.parseLong(binary, 2);
+  }
 
   public static String rootNodeFilePath(long version) {
-    StringBuilder sb = new StringBuilder();
+    ValidationUtil.checkArgument(version >= 0, "version must be non-negative");
+    StringBuilder sb = new StringBuilder(ROOT_NODE_FILE_PATH_LENGTH);
+    String binaryLong = Long.toBinaryString(version);
     sb.append("cpi.");
-    sb.append(Long.toBinaryString(version));
+    for (int i = 0; i < 64 - binaryLong.length(); i++) {
+      sb.append("0");
+    }
+    sb.append(binaryLong);
     sb.append("_");
     return sb.reverse().toString();
   }
 
   public static String newLakehouseDefFilePath() {
-    return "_lakehouse_def_" + UUID.randomUUID() + PROTOBUF_BINARY_FILE_SUFFIX;
+    return LAKEHOUSE_DEF_FILE_PATH_PREFIX + UUID.randomUUID() + PROTOBUF_BINARY_FILE_SUFFIX;
   }
 
   public static String newNamespaceDefFilePath(String namespaceName) {
     return generateOptimizedFilePath(
-        namespaceName, UUID.randomUUID().toString(), PROTOBUF_BINARY_FILE_SUFFIX);
+        PROTOBUF_BINARY_FILE_SUFFIX, namespaceName, UUID.randomUUID().toString());
   }
 
   public static String newTableDefFilePath(String namespaceName, String tableName) {
     return generateOptimizedFilePath(
-        namespaceName, tableName, UUID.randomUUID().toString(), PROTOBUF_BINARY_FILE_SUFFIX);
+        PROTOBUF_BINARY_FILE_SUFFIX, namespaceName, tableName, UUID.randomUUID().toString());
   }
 
-  private static String generateOptimizedFilePath(String... parts) {
-    String originalName = String.join("-", parts);
-    return computeHash(originalName);
+  private static String generateOptimizedFilePath(String suffix, String... parts) {
+    String originalName = String.join("-", parts) + suffix;
+    return computeHash(originalName) + "-" + originalName;
   }
 
   private static String computeHash(String fileName) {

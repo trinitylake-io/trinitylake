@@ -48,9 +48,8 @@ public class TreeOperations {
     node.allKeyValues()
         .forEach(
             entry -> {
-              if (!TreeKeys.VERSION.equals(entry.getKey())) {
-                clonedNode.set(entry.getKey(), entry.getValue());
-              }
+              // TODO; what keys need to be excluded?
+              clonedNode.set(entry.getKey(), entry.getValue());
             });
     return clonedNode;
   }
@@ -118,11 +117,16 @@ public class TreeOperations {
   }
 
   public static boolean hasVersion(TreeNode node) {
-    return node.contains(TreeKeys.VERSION);
+    return node.path().isPresent() && FilePaths.isRootNodeFilePath(node.path().get());
   }
 
-  public static long findVersion(TreeNode node) {
-    return Long.parseLong(node.get(TreeKeys.VERSION));
+  public static long findVersionFromRootNode(TreeNode node) {
+    ValidationUtil.checkArgument(
+        node.path().isPresent(), "Cannot derive version from a node that is not persisted");
+    ValidationUtil.checkArgument(
+        FilePaths.isRootNodeFilePath(node.path().get()),
+        "Cannot derive version from a non-root node");
+    return FilePaths.versionFromNodeFilePath(node.path().get());
   }
 
   public static boolean hasLakehouseDef(LakehouseStorage storage, TreeNode node) {
@@ -164,7 +168,7 @@ public class TreeOperations {
 
   public static Optional<TreeNode> findRootForVersion(LakehouseStorage storage, long version) {
     TreeNode latest = findLatestRoot(storage);
-    long latestVersion = findVersion(latest);
+    long latestVersion = findVersionFromRootNode(latest);
     ValidationUtil.checkArgument(
         version <= latestVersion,
         "Version %d must not be higher than latest version %d",
@@ -174,7 +178,7 @@ public class TreeOperations {
     TreeNode current = latest;
     while (hasPreviousRootNode(current)) {
       TreeNode previous = findPreviousRootNode(storage, current);
-      if (version == findVersion(previous)) {
+      if (version == findVersionFromRootNode(previous)) {
         return Optional.of(previous);
       }
       current = previous;

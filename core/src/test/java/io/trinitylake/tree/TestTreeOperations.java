@@ -13,26 +13,4 @@
  */
 package io.trinitylake.tree;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-public interface TreeNode {
-
-  /**
-   * Path for a tree node, if the node is persisted in storage
-   *
-   * @return path
-   */
-  Optional<String> path();
-
-  String get(String key);
-
-  void set(String key, String value);
-
-  void remove(String key);
-
-  boolean contains(String key);
-
-  Set<Map.Entry<String, String>> allKeyValues();
-}
+public class TestTreeOperations {}

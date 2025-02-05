@@ -50,7 +50,7 @@ public class LocalStorageOps implements StorageOps {
   }
 
   @Override
-  public void prepareToRead(LiteralURI uri) {}
+  public void prepareToReadLocal(LiteralURI uri) {}
 
   @Override
   public SeekableInputStream startRead(LiteralURI uri) {
@@ -59,12 +59,12 @@ public class LocalStorageOps implements StorageOps {
 
   @Override
   public LocalInputStream startReadLocal(LiteralURI uri) {
-    return new LocalInputStream(new File(uri.toString()));
+    return new LocalInputStream(new File(fileSystemPath(uri)));
   }
 
   @Override
   public AtomicOutputStream startWrite(LiteralURI uri) {
-    return new LocalOutputStream(Paths.get(uri.toString()), commonProperties, localProperties);
+    return new LocalOutputStream(Paths.get(fileSystemPath(uri)), commonProperties, localProperties);
   }
 
   @Override
