@@ -14,22 +14,28 @@
 package io.trinitylake.storage.local;
 
 import io.trinitylake.exception.CommitFailureException;
+import io.trinitylake.exception.StorageAtomicSealFailureException;
 import io.trinitylake.exception.StoragePathNotFoundException;
 import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.util.FileUtil;
 import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalOutputStream extends AtomicOutputStream {
 
-  private final File file;
+  private static final Logger LOG = LoggerFactory.getLogger(LocalOutputStream.class);
+
+  private final Path file;
   private final File tempFile;
   private final FileOutputStream stream;
 
   public LocalOutputStream(
-      File file,
+      Path file,
       CommonStorageOpsProperties commonProperties,
       LocalStorageOpsProperties localProperties) {
     this.file = file;
@@ -42,13 +48,17 @@ public class LocalOutputStream extends AtomicOutputStream {
   }
 
   @Override
-  public void seal() throws CommitFailureException, IOException {
-    Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE);
+  public void atomicallySeal() throws CommitFailureException, IOException {
+    try {
+      Files.move(tempFile.toPath(), file);
+    } catch (FileAlreadyExistsException e) {
+      throw new StorageAtomicSealFailureException(e);
+    }
   }
 
   @Override
-  public void write(byte[] b) throws IOException {
-    stream.write(b);
+  public void write(byte[] bytes) throws IOException {
+    stream.write(bytes);
   }
 
   @Override
@@ -57,8 +67,8 @@ public class LocalOutputStream extends AtomicOutputStream {
   }
 
   @Override
-  public void write(byte[] b, int off, int len) throws IOException {
-    stream.write(b, off, len);
+  public void write(byte[] bytes, int off, int len) throws IOException {
+    stream.write(bytes, off, len);
   }
 
   @Override

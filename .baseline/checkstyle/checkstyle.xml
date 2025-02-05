@@ -83,7 +83,7 @@
         <property name="fileExtensions" value="java"/>
         <property name="matchAcrossLines" value="true"/>
         <property name="format" value="Preconditions\.checkArgument\([^;]+%d[^;]+\);"/>
-        <property name="message" value="Preconditions.checkArgument does not support %d. use %s instead"/>
+        <property name="message" value="Validations.checkArgument does not support %d. use %s instead"/>
     </module>
     <module name="RegexpMultiline">
         <property name="format" value="^\s*import\s+static\s+(?!\Qorg.assertj.core.api.Assertions.\E).*\.assertThatThrownBy;"/>
@@ -312,11 +312,11 @@
         </module>
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
             <property name="format" value="Preconditions\.checkNotNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>
-            <property name="message" value="Use Preconditions.checkNotNull(Object, String)."/>
+            <property name="message" value="Use Validations.checkNotNull(Object, String)."/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="Objects\.(require|)[Nn]onNull.*\(.*\)"/>
-            <property name="message" value="Prefer using Preconditions.checkNotNull(Object, String)."/>
+            <property name="message" value="Prefer using Validations.checkNotNull(Object, String)."/>
         </module>
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
             <property name="format" value="Validate\.notNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>

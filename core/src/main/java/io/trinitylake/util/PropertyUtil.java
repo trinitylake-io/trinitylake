@@ -13,7 +13,6 @@
  */
 package io.trinitylake.util;
 
-import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -106,7 +105,7 @@ public class PropertyUtil {
       return Collections.emptyMap();
     }
 
-    Preconditions.checkArgument(prefix != null, "Invalid prefix: null");
+    ValidationUtil.checkArgument(prefix != null, "Invalid prefix: null");
 
     return properties.entrySet().stream()
         .filter(e -> e.getKey().startsWith(prefix))
@@ -126,7 +125,7 @@ public class PropertyUtil {
       return Collections.emptyMap();
     }
 
-    Preconditions.checkArgument(keyPredicate != null, "Invalid key pattern: null");
+    ValidationUtil.checkArgument(keyPredicate != null, "Invalid key pattern: null");
 
     return properties.entrySet().stream()
         .filter(e -> keyPredicate.test(e.getKey()))

@@ -13,9 +13,9 @@
  */
 package io.trinitylake.tree;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import io.trinitylake.models.LakehouseDef;
+import io.trinitylake.util.ValidationUtil;
 import java.util.Set;
 
 public class TreeKeys {
@@ -44,7 +44,7 @@ public class TreeKeys {
   private static final String TABLE_SCHEMA_ID_PART = "C===";
 
   public static String namespaceKey(String namespaceName, LakehouseDef lakehouseDef) {
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         namespaceName.length() <= lakehouseDef.getNamespaceNameMaxSizeBytes(),
         "namespace name %s must be less than or equal to %s in lakehouse definition",
         namespaceName,
@@ -69,13 +69,13 @@ public class TreeKeys {
   }
 
   public static String tableKey(String namespaceName, String tableName, LakehouseDef lakehouseDef) {
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         namespaceName.length() <= lakehouseDef.getNamespaceNameMaxSizeBytes(),
         "namespace name %s must be less than or equal to %s in lakehouse definition",
         namespaceName,
         lakehouseDef.getNamespaceNameMaxSizeBytes());
 
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         tableName.length() <= lakehouseDef.getTableNameMaxSizeBytes(),
         "table name %s must be less than or equal to %s in lakehouse definition",
         tableName,

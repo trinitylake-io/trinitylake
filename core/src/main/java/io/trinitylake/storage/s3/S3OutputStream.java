@@ -22,7 +22,7 @@ import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
-import io.trinitylake.storage.URI;
+import io.trinitylake.storage.LiteralURI;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,7 @@ class S3OutputStream extends AtomicOutputStream {
   private static final Logger LOG = LoggerFactory.getLogger(S3OutputStream.class);
 
   private final S3AsyncClient s3;
-  private final URI uri;
+  private final LiteralURI uri;
 
   private CountingOutputStream stagingFileStream;
   private final File stagingDirectory;
@@ -64,7 +64,7 @@ class S3OutputStream extends AtomicOutputStream {
 
   public S3OutputStream(
       S3AsyncClient s3,
-      URI uri,
+      LiteralURI uri,
       CommonStorageOpsProperties commonProperties,
       AmazonS3StorageOpsProperties s3Properties) {
     this.s3 = s3;
@@ -111,7 +111,7 @@ class S3OutputStream extends AtomicOutputStream {
   }
 
   @Override
-  public void seal() throws CommitFailureException, IOException {
+  public void atomicallySeal() throws CommitFailureException, IOException {
     seal(true);
   }
 
@@ -148,15 +148,6 @@ class S3OutputStream extends AtomicOutputStream {
       Failsafe.with(retryPolicy).run(stagingFile::delete);
     } catch (FailsafeException e) {
       LOG.warn("Failed to delete staging file: {}", stagingFile, e);
-    }
-  }
-
-  @SuppressWarnings({"checkstyle:NoFinalizer", "Finalize"})
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    if (!closed) {
-      seal(false);
     }
   }
 }

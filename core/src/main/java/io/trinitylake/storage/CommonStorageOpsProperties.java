@@ -24,8 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 public class CommonStorageOpsProperties implements StorageOpsProperties {
 
-  private static final CommonStorageOpsProperties INSTANCE = new CommonStorageOpsProperties();
-
   public static final String DELETE_BATCH_SIZE = "delete.batch-size";
   public static final int DELETE_BATCH_SIZE_DEFAULT = 1000;
 
@@ -53,6 +51,8 @@ public class CommonStorageOpsProperties implements StorageOpsProperties {
           .add(PREPARE_READ_STAGING_DIRECTORY)
           .add(WRITE_STAGING_DIRECTORY)
           .build();
+
+  private static final CommonStorageOpsProperties INSTANCE = new CommonStorageOpsProperties();
 
   private final Map<String, String> propertiesMap;
   private final int deleteBatchSize;

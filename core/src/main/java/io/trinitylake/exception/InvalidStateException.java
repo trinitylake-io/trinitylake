@@ -13,17 +13,17 @@
  */
 package io.trinitylake.exception;
 
-public class ObjectAlreadyExistException extends TrinityLakeRuntimeException {
+public class InvalidStateException extends TrinityLakeRuntimeException {
 
-  public ObjectAlreadyExistException(Throwable cause) {
+  public InvalidStateException(Throwable cause) {
     super(cause);
   }
 
-  public ObjectAlreadyExistException(Throwable cause, String message, Object... args) {
-    super(cause, message, args);
+  public InvalidStateException(String message, Object... args) {
+    super(String.format(message, args));
   }
 
-  public ObjectAlreadyExistException(String message, Object... args) {
-    super(message, args);
+  public InvalidStateException(Throwable cause, String message, Object... args) {
+    super(String.format(message, args), cause);
   }
 }

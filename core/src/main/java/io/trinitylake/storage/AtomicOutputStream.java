@@ -13,7 +13,7 @@
  */
 package io.trinitylake.storage;
 
-import io.trinitylake.exception.CommitFailureException;
+import io.trinitylake.exception.StorageAtomicSealFailureException;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -22,13 +22,14 @@ public abstract class AtomicOutputStream extends OutputStream {
   /**
    * Atomically seal the file that is being written to
    *
-   * @throws CommitFailureException if the sealing process fails due to atomicity conflict
-   * @throws IOException for any other failure in write
+   * @throws StorageAtomicSealFailureException if the sealing process fails due to atomicity
+   *     conflict
+   * @throws IOException for any other failure
    */
-  public abstract void seal() throws CommitFailureException, IOException;
+  public abstract void atomicallySeal() throws StorageAtomicSealFailureException, IOException;
 
   @Override
   public void close() throws IOException {
-    super.close();
+    atomicallySeal();
   }
 }

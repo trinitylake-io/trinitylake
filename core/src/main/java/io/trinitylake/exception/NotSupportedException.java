@@ -11,25 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake.exception;
 
-public class BasicLakehouseStorage implements LakehouseStorage {
+public class NotSupportedException extends TrinityLakeRuntimeException {
 
-  private final LiteralURI root;
-  private final StorageOps ops;
-
-  public BasicLakehouseStorage(LiteralURI root, StorageOps ops) {
-    this.ops = ops;
-    this.root = root;
+  public NotSupportedException(Throwable cause) {
+    super(cause);
   }
 
-  @Override
-  public LiteralURI root() {
-    return root;
+  public NotSupportedException(String message, Object... args) {
+    super(String.format(message, args));
   }
 
-  @Override
-  public StorageOps ops() {
-    return ops;
+  public NotSupportedException(Throwable cause, String message, Object... args) {
+    super(String.format(message, args), cause);
   }
 }

@@ -28,8 +28,6 @@ dependencies {
     implementation 'dev.failsafe:failsafe:3.3.2'
     implementation "com.github.ben-manes.caffeine:caffeine:2.9.3"
     implementation "org.apache.arrow:arrow-vector:18.1.0"
-
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.1"
 }
 
 

@@ -13,17 +13,17 @@
  */
 package io.trinitylake.exception;
 
-public class StorageListFailureException extends TrinityLakeRuntimeException {
+public class ObjectAlreadyExistsException extends TrinityLakeRuntimeException {
 
-  public StorageListFailureException(Throwable cause) {
+  public ObjectAlreadyExistsException(Throwable cause) {
     super(cause);
   }
 
-  public StorageListFailureException(Throwable cause, String message, Object... args) {
+  public ObjectAlreadyExistsException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }
 
-  public StorageListFailureException(String message, Object... args) {
+  public ObjectAlreadyExistsException(String message, Object... args) {
     super(message, args);
   }
 }

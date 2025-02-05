@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public interface LakehouseStorage extends Closeable {
 
-  URI root();
+  LiteralURI root();
 
   StorageOps ops();
 
@@ -53,7 +53,7 @@ public interface LakehouseStorage extends Closeable {
     ops().delete(paths.stream().map(root()::extendPath).collect(Collectors.toList()));
   }
 
-  default List<URI> list(String prefixPath) {
+  default List<LiteralURI> list(String prefixPath) {
     return ops().list(root().extendPath(prefixPath));
   }
 

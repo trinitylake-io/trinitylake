@@ -11,25 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake.exception;
 
-public class BasicLakehouseStorage implements LakehouseStorage {
+public class StorageAtomicSealFailureException extends TrinityLakeRuntimeException {
 
-  private final LiteralURI root;
-  private final StorageOps ops;
-
-  public BasicLakehouseStorage(LiteralURI root, StorageOps ops) {
-    this.ops = ops;
-    this.root = root;
+  public StorageAtomicSealFailureException(Throwable cause) {
+    super(cause);
   }
 
-  @Override
-  public LiteralURI root() {
-    return root;
+  public StorageAtomicSealFailureException(Throwable cause, String message, Object... args) {
+    super(cause, message, args);
   }
 
-  @Override
-  public StorageOps ops() {
-    return ops;
+  public StorageAtomicSealFailureException(String message, Object... args) {
+    super(message, args);
   }
 }
