@@ -137,7 +137,7 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public void prepareToRead(LiteralURI uri) {
+  public void prepareToReadLocal(LiteralURI uri) {
     try {
       File tempFile =
           FileUtil.createTempFile("s3-", commonProperties().prepareReadStagingDirectory());
@@ -157,7 +157,7 @@ public class AmazonS3StorageOps implements StorageOps {
   public LocalInputStream startReadLocal(LiteralURI uri) {
     Pair<FileDownload, File> fileDownloadResult = preparedFiles.getIfPresent(uri);
     if (fileDownloadResult != null) {
-      prepareToRead(uri);
+      prepareToReadLocal(uri);
       fileDownloadResult = preparedFiles.getIfPresent(uri);
     }
 

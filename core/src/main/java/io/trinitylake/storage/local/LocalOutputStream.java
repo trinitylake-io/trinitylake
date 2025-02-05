@@ -50,6 +50,11 @@ public class LocalOutputStream extends AtomicOutputStream {
   @Override
   public void atomicallySeal() throws CommitFailureException, IOException {
     try {
+      // this would result in potential orphan directories,
+      // but there is not a better way at this moment
+      // plus with the file path optimization strategy,
+      // it is okay to create these folders since they would be used eventually
+      Files.createDirectories(file.getParent());
       Files.move(tempFile.toPath(), file);
     } catch (FileAlreadyExistsException e) {
       throw new StorageAtomicSealFailureException(e);

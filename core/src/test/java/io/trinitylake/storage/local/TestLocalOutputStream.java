@@ -50,6 +50,24 @@ public class TestLocalOutputStream {
   }
 
   @Test
+  public void testWriteToFileInNewFolder(@TempDir Path tempDir) throws IOException {
+    CommonStorageOpsProperties commonProperties =
+        new CommonStorageOpsProperties(
+            ImmutableMap.of(
+                CommonStorageOpsProperties.WRITE_STAGING_DIRECTORY, tempDir.toString()));
+
+    Path targetFilePath = tempDir.resolve(UUID.randomUUID() + "/" + UUID.randomUUID() + ".txt");
+    LocalOutputStream stream =
+        new LocalOutputStream(
+            targetFilePath, commonProperties, LocalStorageOpsProperties.instance());
+    stream.write("some data".getBytes(StandardCharsets.UTF_8));
+    stream.close();
+
+    String result = Files.asCharSource(targetFilePath.toFile(), StandardCharsets.UTF_8).read();
+    Assertions.assertThat(result).isEqualTo("some data");
+  }
+
+  @Test
   public void testTwoConcurrentSeal(@TempDir Path tempDir) throws IOException {
     CommonStorageOpsProperties commonProperties =
         new CommonStorageOpsProperties(

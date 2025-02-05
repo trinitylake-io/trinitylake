@@ -15,6 +15,7 @@ package io.trinitylake.tree;
 
 import com.google.common.collect.Maps;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class BasicTreeNode implements TreeNode {
@@ -23,6 +24,11 @@ public class BasicTreeNode implements TreeNode {
 
   public BasicTreeNode() {
     this.values = Maps.newHashMap();
+  }
+
+  @Override
+  public Optional<String> path() {
+    return Optional.empty();
   }
 
   @Override

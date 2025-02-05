@@ -29,8 +29,8 @@ public interface LakehouseStorage extends Closeable {
 
   StorageOps ops();
 
-  default void prepareToRead(String path) {
-    ops().prepareToRead(root().extendPath(path));
+  default void prepareToReadLocal(String path) {
+    ops().prepareToReadLocal(root().extendPath(path));
   }
 
   default SeekableInputStream startRead(String path) {

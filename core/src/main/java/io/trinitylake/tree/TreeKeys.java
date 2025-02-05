@@ -24,7 +24,7 @@ public class TreeKeys {
 
   public static String PREVIOUS_ROOT_NODE = "previous_root";
 
-  public static String VERSION = "version";
+  public static String NUMBER_OF_KEYS = "n_keys";
 
   public static String ROLLBACK_FROM_ROOT_NODE = "rollback_from_root";
 
@@ -34,7 +34,7 @@ public class TreeKeys {
       ImmutableSet.<String>builder()
           .add(LAKEHOUSE_DEFINITION)
           .add(PREVIOUS_ROOT_NODE)
-          .add(VERSION)
+          .add(NUMBER_OF_KEYS)
           .add(ROLLBACK_FROM_ROOT_NODE)
           .add(CREATED_AT_MILLIS)
           .build();
@@ -44,6 +44,8 @@ public class TreeKeys {
   private static final String TABLE_SCHEMA_ID_PART = "C===";
 
   public static String namespaceKey(String namespaceName, LakehouseDef lakehouseDef) {
+    ValidationUtil.checkNotNull(lakehouseDef, "Lakehouse definition must be provided");
+    ValidationUtil.checkNotNullOrEmptyString(namespaceName, "namespace name must be provided");
     ValidationUtil.checkArgument(
         namespaceName.length() <= lakehouseDef.getNamespaceNameMaxSizeBytes(),
         "namespace name %s must be less than or equal to %s in lakehouse definition",
@@ -60,15 +62,23 @@ public class TreeKeys {
     return sb.toString();
   }
 
-  public static String namespaceNameFromKey(String namespaceKey) {
+  public static String namespaceNameFromKey(String namespaceKey, LakehouseDef lakehouseDef) {
+    ValidationUtil.checkArgument(
+        isNamespaceKey(namespaceKey, lakehouseDef), "Invalid namespace key: %s", namespaceKey);
     return namespaceKey.substring(SCHEMA_ID_PART_SIZE).trim();
   }
 
-  public static boolean isNamespaceKey(String key) {
-    return key.startsWith(NAMESPACE_SCHEMA_ID_PART);
+  public static boolean isNamespaceKey(String key, LakehouseDef lakehouseDef) {
+    ValidationUtil.checkNotNull(lakehouseDef, "Lakehouse definition must be provided");
+    ValidationUtil.checkNotNullOrEmptyString(key, "key must be provided");
+    return key.startsWith(NAMESPACE_SCHEMA_ID_PART)
+        && key.length() == SCHEMA_ID_PART_SIZE + lakehouseDef.getNamespaceNameMaxSizeBytes();
   }
 
   public static String tableKey(String namespaceName, String tableName, LakehouseDef lakehouseDef) {
+    ValidationUtil.checkNotNull(lakehouseDef, "Lakehouse definition must be provided");
+    ValidationUtil.checkNotNullOrEmptyString(namespaceName, "namespace name must be provided");
+    ValidationUtil.checkNotNullOrEmptyString(tableName, "table name must be provided");
     ValidationUtil.checkArgument(
         namespaceName.length() <= lakehouseDef.getNamespaceNameMaxSizeBytes(),
         "namespace name %s must be less than or equal to %s in lakehouse definition",
@@ -96,11 +106,21 @@ public class TreeKeys {
     return sb.toString();
   }
 
-  public static String tableNameFromKey(String namespaceName, String tableKey) {
-    return tableKey.substring(SCHEMA_ID_PART_SIZE + namespaceName.length()).trim();
+  public static String tableNameFromKey(String tableKey, LakehouseDef lakehouseDef) {
+    ValidationUtil.checkArgument(
+        isTableKey(tableKey, lakehouseDef), "Invalid table key: %s", tableKey);
+    return tableKey
+        .substring(SCHEMA_ID_PART_SIZE + lakehouseDef.getNamespaceNameMaxSizeBytes())
+        .trim();
   }
 
-  public static boolean isTableKey(String key) {
-    return key.startsWith(TABLE_SCHEMA_ID_PART);
+  public static boolean isTableKey(String key, LakehouseDef lakehouseDef) {
+    ValidationUtil.checkNotNull(lakehouseDef, "Lakehouse definition must be provided");
+    ValidationUtil.checkNotNullOrEmptyString(key, "key must be provided");
+    return key.startsWith(TABLE_SCHEMA_ID_PART)
+        && key.length()
+            == (SCHEMA_ID_PART_SIZE
+                + lakehouseDef.getNamespaceNameMaxSizeBytes()
+                + lakehouseDef.getTableNameMaxSizeBytes());
   }
 }

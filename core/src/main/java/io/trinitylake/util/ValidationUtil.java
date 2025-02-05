@@ -28,6 +28,10 @@ public class ValidationUtil {
     checkArgument(object != null, message, args);
   }
 
+  public static void checkNotNullOrEmptyString(String str, String message, Object... args) {
+    checkArgument(str != null && !str.isEmpty(), message, args);
+  }
+
   public static void checkState(boolean expression, String message, Object... args) {
     if (!expression) {
       throw new InvalidStateException(message, args);
