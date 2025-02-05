@@ -25,17 +25,17 @@ public interface StorageOps extends Closeable, Initializable {
 
   StorageOpsProperties systemSpecificProperties();
 
-  void prepareToRead(URI uri);
+  void prepareToRead(LiteralURI uri);
 
-  SeekableInputStream startRead(URI uri);
+  SeekableInputStream startRead(LiteralURI uri);
 
-  LocalInputStream startReadLocal(URI uri);
+  LocalInputStream startReadLocal(LiteralURI uri);
 
-  AtomicOutputStream startWrite(URI uri);
+  AtomicOutputStream startWrite(LiteralURI uri);
 
-  boolean exists(URI uri);
+  boolean exists(LiteralURI uri);
 
-  void delete(List<URI> uris);
+  void delete(List<LiteralURI> uris);
 
-  List<URI> list(URI prefix);
+  List<LiteralURI> list(LiteralURI prefix);
 }

@@ -13,7 +13,6 @@
  */
 package io.trinitylake.tree;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import io.trinitylake.ObjectDefinitions;
 import io.trinitylake.exception.StorageReadFailureException;
@@ -23,6 +22,7 @@ import io.trinitylake.storage.FilePaths;
 import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.storage.local.LocalInputStream;
 import io.trinitylake.util.FileUtil;
+import io.trinitylake.util.ValidationUtil;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
@@ -165,7 +165,7 @@ public class TreeOperations {
   public static Optional<TreeNode> findRootForVersion(LakehouseStorage storage, long version) {
     TreeNode latest = findLatestRoot(storage);
     long latestVersion = findVersion(latest);
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         version <= latestVersion,
         "Version %d must not be higher than latest version %d",
         version,
@@ -186,7 +186,7 @@ public class TreeOperations {
   public static TreeNode findRootBeforeTimestamp(LakehouseStorage storage, long timestampMillis) {
     TreeNode latest = findLatestRoot(storage);
     long latestCreatedAtMillis = findCreatedAtMillis(latest);
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         timestampMillis <= latestCreatedAtMillis,
         "Timestamp %d must not be higher than latest created version %d",
         timestampMillis,

@@ -13,10 +13,9 @@
  */
 package io.trinitylake;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import io.trinitylake.exception.CommitFailureException;
-import io.trinitylake.exception.ObjectAlreadyExistException;
+import io.trinitylake.exception.ObjectAlreadyExistsException;
 import io.trinitylake.exception.ObjectNotFoundException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
@@ -27,6 +26,7 @@ import io.trinitylake.tree.BasicTreeNode;
 import io.trinitylake.tree.TreeKeys;
 import io.trinitylake.tree.TreeNode;
 import io.trinitylake.tree.TreeOperations;
+import io.trinitylake.util.ValidationUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -64,7 +64,7 @@ public class TrinityLake {
 
   public static CommittedTransaction commitTransaction(
       LakehouseStorage storage, RunningTransaction transaction) throws CommitFailureException {
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         TreeOperations.hasVersion(transaction.runningRoot()), "There is no change to be committed");
     long beginningRootVersion = TreeOperations.findVersion(transaction.beginningRoot());
     String nextVersionFilePath = FilePaths.rootNodeFilePath(beginningRootVersion + 1);
@@ -111,11 +111,11 @@ public class TrinityLake {
       RunningTransaction transaction,
       String namespaceName,
       NamespaceDef namespaceDef)
-      throws ObjectAlreadyExistException, CommitFailureException {
+      throws ObjectAlreadyExistsException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
     String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
     if (transaction.runningRoot().contains(namespaceKey)) {
-      throw new ObjectAlreadyExistException("Namespace %s already exists", namespaceName);
+      throw new ObjectAlreadyExistsException("Namespace %s already exists", namespaceName);
     }
 
     String namespaceDefFilePath = FilePaths.newNamespaceDefFilePath(namespaceName);
@@ -212,7 +212,7 @@ public class TrinityLake {
       String namespaceName,
       String tableName,
       TableDef tableDef)
-      throws ObjectAlreadyExistException, CommitFailureException {
+      throws ObjectAlreadyExistsException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
     String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
@@ -220,7 +220,7 @@ public class TrinityLake {
     }
     String tableKey = TreeKeys.tableNameFromKey(namespaceName, tableName);
     if (transaction.runningRoot().contains(tableKey)) {
-      throw new ObjectAlreadyExistException(
+      throw new ObjectAlreadyExistsException(
           "Namespace %s table %s already exists", namespaceName, tableName);
     }
 

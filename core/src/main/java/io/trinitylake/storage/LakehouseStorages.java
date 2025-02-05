@@ -13,10 +13,8 @@
  */
 package io.trinitylake.storage;
 
-import io.trinitylake.storage.local.LocalStorageOps;
-import io.trinitylake.storage.local.LocalStorageOpsProperties;
-import io.trinitylake.storage.s3.AmazonS3StorageOps;
-import io.trinitylake.storage.s3.AmazonS3StorageOpsProperties;
+import com.google.common.collect.ImmutableMap;
+import io.trinitylake.util.InitializationUtil;
 import io.trinitylake.util.PropertyUtil;
 import java.util.Map;
 
@@ -29,8 +27,14 @@ public class LakehouseStorages {
 
   public static final String STORAGE_ROT = "storage.root";
 
+  private static final Map<String, String> STORAGE_TYPE_TO_IMPL =
+      ImmutableMap.<String, String>builder()
+          .put(STORAGE_TYPE_LOCAL, "io.trinitylake.storage.local.LocalStorageOps")
+          .put(STORAGE_TYPE_S3, "io.trinitylake.storage.s3.AmazonS3StorageOps")
+          .build();
+
   public static LakehouseStorage initialize(Map<String, String> properties) {
-    URI storageRoot = new URI(properties.get(STORAGE_ROT));
+    LiteralURI storageRoot = new LiteralURI(properties.get(STORAGE_ROT));
     StorageOps storageOps = initializeStorageOps(properties);
     return new BasicLakehouseStorage(storageRoot, storageOps);
   }
@@ -38,17 +42,9 @@ public class LakehouseStorages {
   public static StorageOps initializeStorageOps(Map<String, String> properties) {
     String storageType =
         PropertyUtil.propertyAsString(properties, STORAGE_TYPE, STORAGE_TYPE_DEFAULT);
-    CommonStorageOpsProperties commonProperties = new CommonStorageOpsProperties(properties);
-    if (STORAGE_TYPE_LOCAL.equals(storageType)) {
-      LocalStorageOpsProperties localProperties = new LocalStorageOpsProperties(properties);
-      return new LocalStorageOps(commonProperties, localProperties);
-    }
 
-    if (STORAGE_TYPE_S3.equals(storageType)) {
-      AmazonS3StorageOpsProperties s3Properties = new AmazonS3StorageOpsProperties(properties);
-      return new AmazonS3StorageOps(commonProperties, s3Properties);
-    }
-
-    throw new IllegalArgumentException("Unsupported storage type: " + storageType);
+    // if not found in default mapping, just treat type as the impl
+    String storageImpl = STORAGE_TYPE_TO_IMPL.getOrDefault(storageType, storageType);
+    return InitializationUtil.loadInitializable(storageImpl, properties, StorageOps.class);
   }
 }

@@ -13,12 +13,13 @@
  */
 package io.trinitylake.spark;
 
-import com.google.common.base.Preconditions;
+import io.trinitylake.util.ValidationUtil;
 
 public class SparkToTrinityLake {
 
   public static String namespaceName(String[] sparkNamespaceName) {
-    Preconditions.checkArgument(sparkNamespaceName.length == 1, "namespace must be a single level");
+    ValidationUtil.checkArgument(
+        sparkNamespaceName.length == 1, "namespace must be a single level");
     return sparkNamespaceName[0];
   }
 }

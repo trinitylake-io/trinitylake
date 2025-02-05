@@ -26,9 +26,9 @@ import io.trinitylake.exception.StorageDeleteFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
+import io.trinitylake.storage.LiteralURI;
 import io.trinitylake.storage.SeekableInputStream;
 import io.trinitylake.storage.StorageOps;
-import io.trinitylake.storage.URI;
 import io.trinitylake.storage.local.LocalInputStream;
 import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.Pair;
@@ -71,7 +71,7 @@ public class AmazonS3StorageOps implements StorageOps {
   private AmazonS3StorageOpsProperties s3Properties;
 
   private AtomicBoolean isResourceClosed = new AtomicBoolean(false);
-  private Cache<URI, Pair<FileDownload, File>> preparedFiles;
+  private Cache<LiteralURI, Pair<FileDownload, File>> preparedFiles;
 
   public AmazonS3StorageOps() {
     this(CommonStorageOpsProperties.instance(), AmazonS3StorageOpsProperties.instance());
@@ -118,7 +118,7 @@ public class AmazonS3StorageOps implements StorageOps {
     return builder.build();
   }
 
-  private static Cache<URI, Pair<FileDownload, File>> initializePreparedFilesCache(
+  private static Cache<LiteralURI, Pair<FileDownload, File>> initializePreparedFilesCache(
       CommonStorageOpsProperties commonProperties) {
     return Caffeine.newBuilder()
         .expireAfterAccess(Duration.ofMillis(commonProperties.prepareReadCacheExpirationMillis()))
@@ -137,7 +137,7 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public void prepareToRead(URI uri) {
+  public void prepareToRead(LiteralURI uri) {
     try {
       File tempFile =
           FileUtil.createTempFile("s3-", commonProperties().prepareReadStagingDirectory());
@@ -154,7 +154,7 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public LocalInputStream startReadLocal(URI uri) {
+  public LocalInputStream startReadLocal(LiteralURI uri) {
     Pair<FileDownload, File> fileDownloadResult = preparedFiles.getIfPresent(uri);
     if (fileDownloadResult != null) {
       prepareToRead(uri);
@@ -170,7 +170,7 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public SeekableInputStream startRead(URI uri) {
+  public SeekableInputStream startRead(LiteralURI uri) {
     Pair<FileDownload, File> fileDownloadResult = preparedFiles.getIfPresent(uri);
     if (fileDownloadResult != null) {
       try {
@@ -185,7 +185,7 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public boolean exists(URI uri) {
+  public boolean exists(LiteralURI uri) {
     try {
       s3.headObject(HeadObjectRequest.builder().bucket(uri.authority()).key(uri.path()).build())
           .get();
@@ -198,17 +198,17 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public AtomicOutputStream startWrite(URI uri) {
+  public AtomicOutputStream startWrite(LiteralURI uri) {
     return new S3OutputStream(s3, uri, commonProperties, s3Properties);
   }
 
   @Override
-  public void delete(List<URI> uris) {
+  public void delete(List<LiteralURI> uris) {
     SetMultimap<String, String> bucketToObjects =
         Multimaps.newSetMultimap(Maps.newHashMap(), Sets::newHashSet);
     List<Future<List<String>>> deletionTasks = Lists.newArrayList();
 
-    for (URI uri : uris) {
+    for (LiteralURI uri : uris) {
       String bucket = uri.authority();
       String objectKey = uri.path();
       bucketToObjects.get(bucket).add(objectKey);
@@ -281,14 +281,14 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public List<URI> list(URI prefix) {
+  public List<LiteralURI> list(LiteralURI prefix) {
     ListObjectsV2Request request =
         ListObjectsV2Request.builder().bucket(prefix.authority()).prefix(prefix.path()).build();
 
-    List<URI> result = Lists.newArrayList();
+    List<LiteralURI> result = Lists.newArrayList();
     s3.listObjectsV2Paginator(request)
         .flatMapIterable(ListObjectsV2Response::contents)
-        .map(obj -> new URI(prefix.scheme(), prefix.authority(), obj.key()))
+        .map(obj -> new LiteralURI(prefix.scheme(), prefix.authority(), obj.key()))
         .subscribe(result::add);
     return result;
   }
@@ -320,15 +320,6 @@ public class AmazonS3StorageOps implements StorageOps {
       if (s3 != null) {
         s3.close();
       }
-    }
-  }
-
-  @SuppressWarnings({"checkstyle:NoFinalizer", "Finalize"})
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    if (!isResourceClosed.get()) {
-      close();
     }
   }
 }

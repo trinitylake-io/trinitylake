@@ -13,8 +13,6 @@
  */
 package io.trinitylake.storage.s3;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import dev.failsafe.Failsafe;
@@ -22,13 +20,13 @@ import dev.failsafe.FailsafeException;
 import dev.failsafe.RetryPolicy;
 import io.trinitylake.exception.StoragePathNotFoundException;
 import io.trinitylake.exception.StorageReadFailureException;
+import io.trinitylake.storage.LiteralURI;
 import io.trinitylake.storage.SeekableInputStream;
-import io.trinitylake.storage.URI;
+import io.trinitylake.util.ValidationUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.net.ssl.SSLException;
@@ -48,7 +46,7 @@ class S3InputStream extends SeekableInputStream {
 
   private final StackTraceElement[] createStack;
   private final S3AsyncClient s3;
-  private final URI uri;
+  private final LiteralURI uri;
 
   private InputStream stream;
   private long pos = 0;
@@ -73,7 +71,7 @@ class S3InputStream extends SeekableInputStream {
           .withMaxRetries(3)
           .build();
 
-  public S3InputStream(S3AsyncClient s3, URI uri) {
+  public S3InputStream(S3AsyncClient s3, LiteralURI uri) {
     this.s3 = s3;
     this.uri = uri;
 
@@ -87,8 +85,8 @@ class S3InputStream extends SeekableInputStream {
 
   @Override
   public void seek(long newPos) {
-    Preconditions.checkState(!closed, "already closed");
-    Preconditions.checkArgument(newPos >= 0, "position is negative: %s", newPos);
+    ValidationUtil.checkState(!closed, "already closed");
+    ValidationUtil.checkArgument(newPos >= 0, "position is negative: %s", newPos);
 
     // this allows a seek beyond the end of the stream but the next read will fail
     next = newPos;
@@ -96,7 +94,7 @@ class S3InputStream extends SeekableInputStream {
 
   @Override
   public int read() throws IOException {
-    Preconditions.checkState(!closed, "Cannot read: already closed");
+    ValidationUtil.checkState(!closed, "Cannot read: already closed");
     positionStream();
     try {
       int bytesRead = Failsafe.with(retryPolicy).get(() -> stream.read());
@@ -115,7 +113,7 @@ class S3InputStream extends SeekableInputStream {
 
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
-    Preconditions.checkState(!closed, "Cannot read: already closed");
+    ValidationUtil.checkState(!closed, "Cannot read: already closed");
     positionStream();
 
     try {
@@ -233,16 +231,5 @@ class S3InputStream extends SeekableInputStream {
 
   public void setSkipSize(int skipSize) {
     this.skipSize = skipSize;
-  }
-
-  @SuppressWarnings({"checkstyle:NoFinalizer", "Finalize"})
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    if (!closed) {
-      close(); // releasing resources is more important than printing the warning
-      String trace = Joiner.on("\n\t").join(Arrays.copyOfRange(createStack, 1, createStack.length));
-      LOG.warn("Unclosed input stream created by:\n\t{}", trace);
-    }
   }
 }

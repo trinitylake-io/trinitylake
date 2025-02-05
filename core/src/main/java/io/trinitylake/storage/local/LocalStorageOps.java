@@ -13,17 +13,16 @@
  */
 package io.trinitylake.storage.local;
 
-import io.trinitylake.exception.StorageListFailureException;
 import io.trinitylake.storage.*;
+import io.trinitylake.util.ValidationUtil;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LocalStorageOps implements StorageOps {
 
@@ -51,47 +50,45 @@ public class LocalStorageOps implements StorageOps {
   }
 
   @Override
-  public void prepareToRead(URI uri) {}
+  public void prepareToRead(LiteralURI uri) {}
 
   @Override
-  public SeekableInputStream startRead(URI uri) {
+  public SeekableInputStream startRead(LiteralURI uri) {
     return startReadLocal(uri);
   }
 
   @Override
-  public LocalInputStream startReadLocal(URI uri) {
+  public LocalInputStream startReadLocal(LiteralURI uri) {
     return new LocalInputStream(new File(uri.toString()));
   }
 
   @Override
-  public AtomicOutputStream startWrite(URI uri) {
-    return new LocalOutputStream(new File(uri.toString()), commonProperties, localProperties);
+  public AtomicOutputStream startWrite(LiteralURI uri) {
+    return new LocalOutputStream(Paths.get(uri.toString()), commonProperties, localProperties);
   }
 
   @Override
-  public boolean exists(URI uri) {
-    return new File(uri.toString()).exists();
+  public boolean exists(LiteralURI uri) {
+    return new File(fileSystemPath(uri)).exists();
   }
 
   @Override
-  public void delete(List<URI> uris) {
-    for (URI uri : uris) {
-      File file = new File(uri.toString());
+  public void delete(List<LiteralURI> uris) {
+    for (LiteralURI uri : uris) {
+      File file = new File(fileSystemPath(uri));
       file.delete();
     }
   }
 
   @Override
-  public List<URI> list(URI prefix) {
-    Path startingPath = Paths.get(prefix.toString());
-    try (Stream<Path> stream = Files.walk(startingPath)) {
-      return stream
-          .filter(Files::isRegularFile)
-          .map(path -> new URI(path.toString()))
-          .collect(Collectors.toList());
-    } catch (IOException e) {
-      throw new StorageListFailureException(e);
-    }
+  public List<LiteralURI> list(LiteralURI prefix) {
+    Path startingPath = Paths.get(fileSystemPath(prefix));
+    String[] result = startingPath.toFile().list();
+    ValidationUtil.checkNotNull(result, "Invalid prefix for listing: %s", prefix);
+    return Arrays.stream(result)
+        .map(name -> "file://" + startingPath.resolve(name))
+        .map(LiteralURI::new)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -101,5 +98,9 @@ public class LocalStorageOps implements StorageOps {
   public void initialize(Map<String, String> properties) {
     this.commonProperties = new CommonStorageOpsProperties(properties);
     this.localProperties = new LocalStorageOpsProperties(properties);
+  }
+
+  private static String fileSystemPath(LiteralURI uri) {
+    return "/" + uri.path();
   }
 }

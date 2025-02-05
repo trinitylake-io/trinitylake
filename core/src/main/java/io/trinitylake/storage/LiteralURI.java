@@ -13,10 +13,14 @@
  */
 package io.trinitylake.storage;
 
-import com.google.common.base.Preconditions;
+import io.trinitylake.util.ValidationUtil;
 import java.util.Objects;
 
-public class URI {
+/**
+ * A URI that should be interpreted literally. Special characters like `..` and `.` should be
+ * prohibited.
+ */
+public class LiteralURI {
   private static final String SCHEME_DELIM = "://";
   private static final String PATH_DELIM = "/";
   private static final String QUERY_DELIM = "\\?";
@@ -27,10 +31,10 @@ public class URI {
   private final String authority;
   private final String path;
 
-  public URI(String scheme, String authority, String path) {
-    Preconditions.checkNotNull(scheme, "Scheme cannot be null.");
-    Preconditions.checkNotNull(authority, "Authority cannot be null.");
-    Preconditions.checkNotNull(path, "Path cannot be null.");
+  public LiteralURI(String scheme, String authority, String path) {
+    ValidationUtil.checkNotNull(scheme, "Scheme cannot be null.");
+    ValidationUtil.checkNotNull(authority, "Authority cannot be null.");
+    ValidationUtil.checkNotNull(path, "Path cannot be null.");
 
     this.scheme = scheme;
     this.authority = authority;
@@ -38,13 +42,13 @@ public class URI {
     this.location = scheme + SCHEME_DELIM + authority + PATH_DELIM + path;
   }
 
-  public URI(String location) {
-    Preconditions.checkNotNull(location, "Location cannot be null.");
+  public LiteralURI(String location) {
+    ValidationUtil.checkNotNull(location, "Location cannot be null.");
 
     // TODO: checks
     this.location = location;
     String[] schemeSplit = location.split(SCHEME_DELIM, -1);
-    Preconditions.checkArgument(
+    ValidationUtil.checkArgument(
         schemeSplit.length == 2, "Invalid URI, cannot determine scheme: %s", location);
     this.scheme = schemeSplit[0];
 
@@ -59,9 +63,9 @@ public class URI {
     this.path = path;
   }
 
-  public URI extendPath(String newPath) {
-    Preconditions.checkNotNull(newPath, "newPath must not be null");
-    return new URI(scheme, authority, path + PATH_DELIM + newPath);
+  public LiteralURI extendPath(String newPath) {
+    ValidationUtil.checkNotNull(newPath, "newPath must not be null");
+    return new LiteralURI(scheme, authority, path + PATH_DELIM + newPath);
   }
 
   public String authority() {
@@ -81,18 +85,18 @@ public class URI {
     return location;
   }
 
-  public URI toDirectory() {
+  public LiteralURI toDirectory() {
     if (path.endsWith(PATH_DELIM)) {
       return this;
     }
-    return new URI(String.format("%s://%s/%s/", scheme, authority, path));
+    return new LiteralURI(String.format("%s://%s/%s/", scheme, authority, path));
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    URI that = (URI) o;
+    LiteralURI that = (LiteralURI) o;
     return Objects.equals(location, that.location)
         && Objects.equals(scheme, that.scheme)
         && Objects.equals(authority, that.authority)

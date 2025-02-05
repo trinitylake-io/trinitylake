@@ -13,17 +13,17 @@
  */
 package io.trinitylake.exception;
 
-public class StorageCommitConflictException extends TrinityLakeRuntimeException {
+public class CommitAttemptExhaustedException extends TrinityLakeRuntimeException {
 
-  public StorageCommitConflictException(Throwable cause) {
+  public CommitAttemptExhaustedException(Throwable cause) {
     super(cause);
   }
 
-  public StorageCommitConflictException(Throwable cause, String message, Object... args) {
+  public CommitAttemptExhaustedException(Throwable cause, String message, Object... args) {
     super(cause, message, args);
   }
 
-  public StorageCommitConflictException(String message, Object... args) {
+  public CommitAttemptExhaustedException(String message, Object... args) {
     super(message, args);
   }
 }

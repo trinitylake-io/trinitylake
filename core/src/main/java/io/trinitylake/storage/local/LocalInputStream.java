@@ -53,8 +53,8 @@ public class LocalInputStream extends SeekableInputStream {
   }
 
   @Override
-  public synchronized void mark(int readlimit) {
-    stream.mark(readlimit);
+  public synchronized void mark(int readLimit) {
+    stream.mark(readLimit);
   }
 
   @Override
@@ -63,13 +63,13 @@ public class LocalInputStream extends SeekableInputStream {
   }
 
   @Override
-  public int read(byte[] b) throws IOException {
-    return stream.read(b);
+  public int read(byte[] bytes) throws IOException {
+    return stream.read(bytes);
   }
 
   @Override
-  public int read(byte[] b, int off, int len) throws IOException {
-    return stream.read(b, off, len);
+  public int read(byte[] bytes, int off, int len) throws IOException {
+    return stream.read(bytes, off, len);
   }
 
   @Override
@@ -78,8 +78,8 @@ public class LocalInputStream extends SeekableInputStream {
   }
 
   @Override
-  public long skip(long n) throws IOException {
-    return stream.skip(n);
+  public long skip(long len) throws IOException {
+    return stream.skip(len);
   }
 
   @Override
