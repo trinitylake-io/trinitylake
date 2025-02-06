@@ -2,8 +2,8 @@
 
 ## Definition
 
-SNAPSHOT ISOLATION is an isolation level that also avoids [dirty read](./ansi-definitions#dirty-read), 
-[non-repeatable read](./ansi-definitions#non-repeatable-read) and [phantom read](./ansi-definitions#phantom-read) like SERIALIZABLE.
+SNAPSHOT ISOLATION is an isolation level that also avoids [dirty read](./ansi-definitions.md#dirty-read), 
+[non-repeatable read](./ansi-definitions.md#non-repeatable-read) and [phantom read](./ansi-definitions.md#phantom-read) like SERIALIZABLE.
 
 SNAPSHOT ISOLATION allows the transactions occurring concurrently to see the same snapshot or copy of the system 
 as it was at the beginning of the transactions, thus allowing a second transaction to make changes to the data that 

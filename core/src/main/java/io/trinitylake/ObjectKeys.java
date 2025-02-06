@@ -11,32 +11,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.tree;
+package io.trinitylake;
 
 import com.google.common.collect.ImmutableSet;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.util.ValidationUtil;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-public class TreeKeys {
+public class ObjectKeys {
 
   public static String LAKEHOUSE_DEFINITION = "lakehouse_def";
+  public static byte[] LAKEHOUSE_DEFINITION_BYTES =
+      LAKEHOUSE_DEFINITION.getBytes(StandardCharsets.UTF_8);
 
   public static String PREVIOUS_ROOT_NODE = "previous_root";
-
-  public static String NUMBER_OF_KEYS = "n_keys";
+  public static byte[] PREVIOUS_ROOT_NODE_BYTES =
+      PREVIOUS_ROOT_NODE.getBytes(StandardCharsets.UTF_8);
 
   public static String ROLLBACK_FROM_ROOT_NODE = "rollback_from_root";
+  public static byte[] ROLLBACK_FROM_ROOT_NODE_BYTES =
+      ROLLBACK_FROM_ROOT_NODE.getBytes(StandardCharsets.UTF_8);
+
+  public static String NUMBER_OF_KEYS = "n_keys";
+  public static byte[] NUMBER_OF_KEYS_BYTES = NUMBER_OF_KEYS.getBytes(StandardCharsets.UTF_8);
 
   public static String CREATED_AT_MILLIS = "created_at_millis";
+  public static byte[] CREATED_AT_MILLIS_BYTES = CREATED_AT_MILLIS.getBytes(StandardCharsets.UTF_8);
 
   public static Set<String> SYSTEM_INTERNAL_KEYS =
       ImmutableSet.<String>builder()
           .add(LAKEHOUSE_DEFINITION)
           .add(PREVIOUS_ROOT_NODE)
-          .add(NUMBER_OF_KEYS)
           .add(ROLLBACK_FROM_ROOT_NODE)
           .add(CREATED_AT_MILLIS)
+          .add(NUMBER_OF_KEYS)
           .build();
 
   private static final int SCHEMA_ID_PART_SIZE = 4;

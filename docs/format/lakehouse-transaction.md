@@ -14,8 +14,8 @@ TrinityLake supports 2 isolation levels:
 - [SNAPSHOT ISOLATION](./transaction/snapshot-isolation.md)
 - [SERIALIZABLE](./transaction/ansi-definitions.md#ansi-isolation-levels)
 
-This means out of the box, TrinityLake users do not need to worry about potential [dirty read](./transaction/ansi-definitions#dirty-read),
-[non-repeatable read](./transaction/ansi-definitions#non-repeatable-read) and [phantom read](./transaction/ansi-definitions#phantom-read)
+This means out of the box, TrinityLake users do not need to worry about potential [dirty read](./transaction/ansi-definitions.md#dirty-read),
+[non-repeatable read](./transaction/ansi-definitions.md#non-repeatable-read) and [phantom read](./transaction/ansi-definitions.md#phantom-read)
 that could exist at lower isolation levels.
 
 Depending on tolerance of serialization anomaly like [write skew](./transaction/snapshot-isolation.md#write-skew),

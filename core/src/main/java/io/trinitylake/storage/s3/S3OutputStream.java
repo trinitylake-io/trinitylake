@@ -27,6 +27,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
@@ -149,5 +150,11 @@ class S3OutputStream extends AtomicOutputStream {
     } catch (FailsafeException e) {
       LOG.warn("Failed to delete staging file: {}", stagingFile, e);
     }
+  }
+
+  @Override
+  public FileChannel channel() {
+    // TODO: pass temp file channel here
+    return null;
   }
 }
