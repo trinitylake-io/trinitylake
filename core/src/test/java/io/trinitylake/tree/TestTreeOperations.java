@@ -33,7 +33,7 @@ public class TestTreeOperations {
       treeNode.set("k" + i, "val" + i);
     }
 
-    File file = tempDir.resolve("write.ipc").toFile();
+    File file = tempDir.resolve("testWriteReadNodeFile.ipc").toFile();
     LocalStorageOps ops = new LocalStorageOps();
     AtomicOutputStream stream = ops.startWrite(new LiteralURI("file://" + file));
 
@@ -47,6 +47,33 @@ public class TestTreeOperations {
                 .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)))
         .isEqualTo(
             node.nodeKeyTable().stream()
+                .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)));
+  }
+
+  @Test
+  public void testWriteReadRootNodeFile(@TempDir Path tempDir) {
+    TreeRoot treeRoot = new BasicTreeRoot();
+    for (int i = 0; i < 10; i++) {
+      treeRoot.set("k" + i, "val" + i);
+    }
+    treeRoot.setPreviousRootNodeFilePath("some/path/to/previous/root");
+    treeRoot.setRollbackFromRootNodeFilePath("some/path/to/rollback/from/root");
+    treeRoot.setLakehouseDefFilePath("some/path/to/lakehouse/def");
+
+    File file = tempDir.resolve("testWriteReadRootNodeFile.ipc").toFile();
+    LocalStorageOps ops = new LocalStorageOps();
+    AtomicOutputStream stream = ops.startWrite(new LiteralURI("file://" + file));
+
+    TreeOperations.writeRootNodeFile(stream, treeRoot);
+    Assertions.assertThat(file.exists()).isTrue();
+
+    LocalInputStream inputStream = ops.startReadLocal(new LiteralURI("file://" + file));
+    TreeRoot root = TreeOperations.readRootNodeFile(inputStream);
+    Assertions.assertThat(
+            treeRoot.nodeKeyTable().stream()
+                .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)))
+        .isEqualTo(
+            root.nodeKeyTable().stream()
                 .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)));
   }
 }

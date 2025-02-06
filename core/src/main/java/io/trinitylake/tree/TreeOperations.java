@@ -14,9 +14,9 @@
 package io.trinitylake.tree;
 
 import com.google.common.collect.Lists;
+import io.trinitylake.FileLocations;
 import io.trinitylake.ObjectDefinitions;
 import io.trinitylake.ObjectKeys;
-import io.trinitylake.ObjectLocations;
 import io.trinitylake.exception.StorageAtomicSealFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
@@ -27,6 +27,7 @@ import io.trinitylake.storage.local.LocalInputStream;
 import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.ValidationUtil;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
@@ -40,8 +41,12 @@ import org.apache.arrow.vector.ipc.ArrowFileReader;
 import org.apache.arrow.vector.ipc.ArrowFileWriter;
 import org.apache.arrow.vector.ipc.message.ArrowBlock;
 import org.apache.arrow.vector.types.pojo.Field;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TreeOperations {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TreeOperations.class);
 
   private static final int NODE_FILE_KEY_COLUMN_INDEX = 0;
   private static final String NODE_FILE_KEY_COLUMN_NAME = "key";
@@ -55,10 +60,23 @@ public class TreeOperations {
    * @param node node to be cloned
    * @return cloned node
    */
-  public static TreeNode clone(TreeNode node) {
+  public static TreeNode cloneTreeNode(TreeNode node) {
     TreeNode clonedNode = new BasicTreeNode();
     node.nodeKeyTable().forEach(entry -> clonedNode.set(entry.key(), entry.value()));
     return clonedNode;
+  }
+
+  /**
+   * Clone a tree root, excluding persistence specific information like path and creation time.
+   *
+   * @param node root to be cloned
+   * @return cloned root
+   */
+  public static TreeRoot cloneTreeRoot(TreeRoot node) {
+    TreeRoot clonedRoot = new BasicTreeRoot();
+    node.nodeKeyTable().forEach(entry -> clonedRoot.set(entry.key(), entry.value()));
+    clonedRoot.setLakehouseDefFilePath(node.lakehouseDefFilePath());
+    return clonedRoot;
   }
 
   public static TreeNode readNodeFile(LocalInputStream stream) {
@@ -97,6 +115,48 @@ public class TreeOperations {
     return treeNode;
   }
 
+  public static TreeRoot readRootNodeFile(LocalInputStream stream) {
+    TreeRoot treeRoot = new BasicTreeRoot();
+
+    BufferAllocator allocator = new RootAllocator();
+    ArrowFileReader reader = new ArrowFileReader(stream.channel(), allocator);
+    try {
+      for (ArrowBlock arrowBlock : reader.getRecordBlocks()) {
+        reader.loadRecordBatch(arrowBlock);
+        VectorSchemaRoot root = reader.getVectorSchemaRoot();
+
+        int numKeys = 0;
+        for (int i = 0; i < root.getRowCount(); ++i) {
+          // TODO: leverage Arrow Text to be more efficient and avoid byte array copy
+          String key = root.getVector(NODE_FILE_KEY_COLUMN_INDEX).getObject(i).toString();
+          String value = root.getVector(NODE_FILE_VALUE_COLUMN_INDEX).getObject(i).toString();
+
+          if (ObjectKeys.CREATED_AT_MILLIS.equals(key)) {
+            treeRoot.setCreatedAtMillis(Long.parseLong(value));
+          } else if (ObjectKeys.LAKEHOUSE_DEFINITION.equals(key)) {
+            treeRoot.setLakehouseDefFilePath(value);
+          } else if (ObjectKeys.PREVIOUS_ROOT_NODE.equals(key)) {
+            treeRoot.setPreviousRootNodeFilePath(value);
+          } else if (ObjectKeys.ROLLBACK_FROM_ROOT_NODE.equals(key)) {
+            treeRoot.setRollbackFromRootNodeFilePath(value);
+          } else if (ObjectKeys.NUMBER_OF_KEYS.equals(key)) {
+            numKeys = Integer.parseInt(value);
+          } else {
+            treeRoot.set(key, value);
+          }
+        }
+
+        ValidationUtil.checkState(
+            numKeys == treeRoot.numKeys(),
+            "Recorded number of keys do not match the actual node key table size, the node file might be corrupted");
+      }
+    } catch (IOException e) {
+      throw new StorageReadFailureException(e);
+    }
+
+    return treeRoot;
+  }
+
   public static void writeNodeFile(AtomicOutputStream stream, TreeNode node) {
     BufferAllocator allocator = new RootAllocator();
     VarCharVector keyVector = new VarCharVector(NODE_FILE_KEY_COLUMN_NAME, allocator);
@@ -110,6 +170,28 @@ public class TreeOperations {
     index++;
     keyVector.setSafe(index, ObjectKeys.NUMBER_OF_KEYS_BYTES);
     valueVector.setSafe(index, Integer.toString(node.numKeys()).getBytes(StandardCharsets.UTF_8));
+
+    if (node instanceof TreeRoot) {
+      TreeRoot root = (TreeRoot) node;
+
+      index++;
+      keyVector.setSafe(index, ObjectKeys.LAKEHOUSE_DEFINITION_BYTES);
+      valueVector.setSafe(index, root.lakehouseDefFilePath().getBytes(StandardCharsets.UTF_8));
+
+      if (root.previousRootNodeFilePath().isPresent()) {
+        index++;
+        keyVector.setSafe(index, ObjectKeys.PREVIOUS_ROOT_NODE_BYTES);
+        valueVector.setSafe(
+            index, root.previousRootNodeFilePath().get().getBytes(StandardCharsets.UTF_8));
+      }
+
+      if (root.rollbackFromRootNodeFilePath().isPresent()) {
+        index++;
+        keyVector.setSafe(index, ObjectKeys.ROLLBACK_FROM_ROOT_NODE_BYTES);
+        valueVector.setSafe(
+            index, root.rollbackFromRootNodeFilePath().get().getBytes(StandardCharsets.UTF_8));
+      }
+    }
 
     for (NodeKeyTableRow row : node.nodeKeyTable()) {
       index++;
@@ -139,80 +221,124 @@ public class TreeOperations {
     }
   }
 
-  public static boolean hasCreatedAtMillis(TreeNode node) {
-    return node.contains(ObjectKeys.CREATED_AT_MILLIS);
-  }
+  public static void writeRootNodeFile(AtomicOutputStream stream, TreeRoot root) {
+    // TODO: currently this is mostly the same as writeNodeFile
+    //  but we need to in the next iteration make sure this preserves the last transaction messages,
+    //  and will start to diverge from writeNodeFile
+    BufferAllocator allocator = new RootAllocator();
+    VarCharVector keyVector = new VarCharVector(NODE_FILE_KEY_COLUMN_NAME, allocator);
+    VarCharVector valueVector = new VarCharVector(NODE_FILE_VALUE_COLUMN_NAME, allocator);
 
-  public static long findCreatedAtMillis(TreeNode node) {
-    return Long.parseLong(node.get(ObjectKeys.CREATED_AT_MILLIS));
-  }
+    int index = 0;
+    long createdAtMillis = System.currentTimeMillis();
+    keyVector.setSafe(index, ObjectKeys.CREATED_AT_MILLIS_BYTES);
+    valueVector.setSafe(index, Long.toString(createdAtMillis).getBytes(StandardCharsets.UTF_8));
 
-  public static boolean hasVersion(TreeNode node) {
-    return node.path().isPresent() && ObjectLocations.isRootNodeFilePath(node.path().get());
+    index++;
+    keyVector.setSafe(index, ObjectKeys.NUMBER_OF_KEYS_BYTES);
+    valueVector.setSafe(index, Integer.toString(root.numKeys()).getBytes(StandardCharsets.UTF_8));
+
+    index++;
+    keyVector.setSafe(index, ObjectKeys.LAKEHOUSE_DEFINITION_BYTES);
+    valueVector.setSafe(index, root.lakehouseDefFilePath().getBytes(StandardCharsets.UTF_8));
+
+    if (root.previousRootNodeFilePath().isPresent()) {
+      index++;
+      keyVector.setSafe(index, ObjectKeys.PREVIOUS_ROOT_NODE_BYTES);
+      valueVector.setSafe(
+          index, root.previousRootNodeFilePath().get().getBytes(StandardCharsets.UTF_8));
+    }
+
+    if (root.rollbackFromRootNodeFilePath().isPresent()) {
+      index++;
+      keyVector.setSafe(index, ObjectKeys.ROLLBACK_FROM_ROOT_NODE_BYTES);
+      valueVector.setSafe(
+          index, root.rollbackFromRootNodeFilePath().get().getBytes(StandardCharsets.UTF_8));
+    }
+
+    for (NodeKeyTableRow row : root.nodeKeyTable()) {
+      index++;
+      keyVector.setSafe(index, row.key().getBytes(StandardCharsets.UTF_8));
+      valueVector.setSafe(index, row.value().getBytes(StandardCharsets.UTF_8));
+    }
+
+    index++;
+    keyVector.setValueCount(index);
+    valueVector.setValueCount(index);
+
+    List<Field> fields = Lists.newArrayList(keyVector.getField(), valueVector.getField());
+    List<FieldVector> vectors = Lists.newArrayList(keyVector, valueVector);
+    VectorSchemaRoot schema = new VectorSchemaRoot(fields, vectors);
+    try (ArrowFileWriter writer = new ArrowFileWriter(schema, null, stream.channel())) {
+      writer.start();
+      writer.writeBatch();
+      writer.end();
+    } catch (IOException e) {
+      throw new StorageWriteFailureException(e);
+    }
+
+    try {
+      stream.close();
+    } catch (IOException e) {
+      throw new StorageAtomicSealFailureException(e);
+    }
   }
 
   public static long findVersionFromRootNode(TreeNode node) {
     ValidationUtil.checkArgument(
         node.path().isPresent(), "Cannot derive version from a node that is not persisted");
     ValidationUtil.checkArgument(
-        ObjectLocations.isRootNodeFilePath(node.path().get()),
+        FileLocations.isRootNodeFilePath(node.path().get()),
         "Cannot derive version from a non-root node");
-    return ObjectLocations.versionFromNodeFilePath(node.path().get());
+    return FileLocations.versionFromNodeFilePath(node.path().get());
   }
 
-  public static boolean hasLakehouseDef(LakehouseStorage storage, TreeNode node) {
-    return node.contains(ObjectKeys.LAKEHOUSE_DEFINITION);
+  public static LakehouseDef findLakehouseDef(LakehouseStorage storage, TreeRoot node) {
+    return ObjectDefinitions.readLakehouseDef(storage, node.lakehouseDefFilePath());
   }
 
-  public static LakehouseDef findLakehouseDef(LakehouseStorage storage, TreeNode node) {
-    return ObjectDefinitions.readLakehouseDef(storage, node.get(ObjectKeys.LAKEHOUSE_DEFINITION));
-  }
+  public static TreeRoot findLatestRoot(LakehouseStorage storage) {
+    // TODO: this should be improved by adding a minimum version file
+    //  so that versions that are too old can be deleted in storage.
+    //  Unlike the version hint file, this minimum file must exist if the minimum version is greater
+    // than zero,
+    //  and the creation of this file should require a global lock
+    long latestVersion = 0;
+    try {
+      InputStream versionHintStream =
+          storage.startRead(FileLocations.LATEST_VERSION_HINT_FILE_PATH);
+      String versionHintText = FileUtil.readToString(versionHintStream);
+      latestVersion = Long.parseLong(versionHintText);
+    } catch (StorageReadFailureException e) {
+      LOG.warn("Failed to read latest version hint file, fallback to search from version 0", e);
+    }
 
-  public static TreeNode findPreviousRootNode(LakehouseStorage storage, TreeNode node) {
-    LocalInputStream stream = storage.startReadLocal(node.get(ObjectKeys.PREVIOUS_ROOT_NODE));
-    return TreeOperations.readNodeFile(stream);
-  }
-
-  public static boolean hasPreviousRootNode(TreeNode node) {
-    return node.contains(ObjectKeys.PREVIOUS_ROOT_NODE);
-  }
-
-  public static TreeNode findRollbackFromRootNode(LakehouseStorage storage, TreeNode node) {
-    LocalInputStream stream = storage.startReadLocal(node.get(ObjectKeys.ROLLBACK_FROM_ROOT_NODE));
-    return TreeOperations.readNodeFile(stream);
-  }
-
-  public static boolean hasRollbackFromRootNode(TreeNode node) {
-    return node.contains(ObjectKeys.ROLLBACK_FROM_ROOT_NODE);
-  }
-
-  public static TreeNode findLatestRoot(LakehouseStorage storage) {
-    String latestVersionHintText =
-        FileUtil.readToString(storage.startRead(ObjectLocations.LATEST_VERSION_HINT_FILE_PATH));
-    long latestVersion = Long.parseLong(latestVersionHintText);
-    String rootNodeFilePath = ObjectLocations.rootNodeFilePath(latestVersion);
+    String rootNodeFilePath = FileLocations.rootNodeFilePath(latestVersion);
     while (storage.exists(rootNodeFilePath)) {
       latestVersion++;
-      rootNodeFilePath = ObjectLocations.rootNodeFilePath(latestVersion);
+      rootNodeFilePath = FileLocations.rootNodeFilePath(latestVersion);
     }
 
     LocalInputStream stream = storage.startReadLocal(rootNodeFilePath);
-    return TreeOperations.readNodeFile(stream);
+    return TreeOperations.readRootNodeFile(stream);
   }
 
-  public static Optional<TreeNode> findRootForVersion(LakehouseStorage storage, long version) {
-    TreeNode latest = findLatestRoot(storage);
-    long latestVersion = findVersionFromRootNode(latest);
+  public static Optional<TreeRoot> findRootForVersion(LakehouseStorage storage, long version) {
+    TreeRoot latest = findLatestRoot(storage);
+    ValidationUtil.checkArgument(
+        latest.path().isPresent(), "latest tree root must be persisted with a path in storage");
+    long latestVersion = FileLocations.versionFromNodeFilePath(latest.path().get());
     ValidationUtil.checkArgument(
         version <= latestVersion,
         "Version %d must not be higher than latest version %d",
         version,
         latestVersion);
 
-    TreeNode current = latest;
-    while (hasPreviousRootNode(current)) {
-      TreeNode previous = findPreviousRootNode(storage, current);
-      if (version == findVersionFromRootNode(previous)) {
+    TreeRoot current = latest;
+    while (current.previousRootNodeFilePath().isPresent()) {
+      LocalInputStream stream = storage.startReadLocal(current.previousRootNodeFilePath().get());
+      TreeRoot previous = TreeOperations.readRootNodeFile(stream);
+      if (version == FileLocations.versionFromNodeFilePath(previous.path().get())) {
         return Optional.of(previous);
       }
       current = previous;
@@ -221,19 +347,26 @@ public class TreeOperations {
     return Optional.empty();
   }
 
-  public static TreeNode findRootBeforeTimestamp(LakehouseStorage storage, long timestampMillis) {
-    TreeNode latest = findLatestRoot(storage);
-    long latestCreatedAtMillis = findCreatedAtMillis(latest);
+  public static TreeRoot findRootBeforeTimestamp(LakehouseStorage storage, long timestampMillis) {
+    TreeRoot latest = findLatestRoot(storage);
+    ValidationUtil.checkArgument(
+        latest.createdAtMillis().isPresent(),
+        "latest tree root must be persisted with a timestamp in storage");
+    long latestCreatedAtMillis = latest.createdAtMillis().get();
     ValidationUtil.checkArgument(
         timestampMillis <= latestCreatedAtMillis,
         "Timestamp %d must not be higher than latest created version %d",
         timestampMillis,
         latestCreatedAtMillis);
 
-    TreeNode current = latest;
-    while (hasPreviousRootNode(current)) {
-      TreeNode previous = findPreviousRootNode(storage, current);
-      if (timestampMillis > findCreatedAtMillis(previous)) {
+    TreeRoot current = latest;
+    while (current.previousRootNodeFilePath().isPresent()) {
+      LocalInputStream stream = storage.startReadLocal(current.previousRootNodeFilePath().get());
+      TreeRoot previous = TreeOperations.readRootNodeFile(stream);
+      ValidationUtil.checkArgument(
+          previous.createdAtMillis().isPresent(),
+          "Tree root must be persisted with a timestamp in storage");
+      if (timestampMillis > previous.createdAtMillis().get()) {
         return previous;
       }
       current = previous;
@@ -242,33 +375,33 @@ public class TreeOperations {
     return current;
   }
 
-  public static Iterable<TreeNode> listRoots(LakehouseStorage storage) {
+  public static Iterable<TreeRoot> listRoots(LakehouseStorage storage) {
     return new TreeRootIterable(storage, findLatestRoot(storage));
   }
 
-  private static class TreeRootIterable implements Iterable<TreeNode> {
+  private static class TreeRootIterable implements Iterable<TreeRoot> {
 
     private final LakehouseStorage storage;
-    private final TreeNode latest;
+    private final TreeRoot latest;
 
-    public TreeRootIterable(LakehouseStorage storage, TreeNode latest) {
+    public TreeRootIterable(LakehouseStorage storage, TreeRoot latest) {
       this.storage = storage;
       this.latest = latest;
     }
 
     @Override
-    public Iterator<TreeNode> iterator() {
+    public Iterator<TreeRoot> iterator() {
       return new LakehouseVersionIterator(storage, latest);
     }
   }
 
-  private static class LakehouseVersionIterator implements Iterator<TreeNode> {
+  private static class LakehouseVersionIterator implements Iterator<TreeRoot> {
 
     private final LakehouseStorage storage;
-    private final TreeNode latest;
-    private TreeNode current;
+    private final TreeRoot latest;
+    private TreeRoot current;
 
-    public LakehouseVersionIterator(LakehouseStorage storage, TreeNode latest) {
+    public LakehouseVersionIterator(LakehouseStorage storage, TreeRoot latest) {
       this.storage = storage;
       this.latest = latest;
       this.current = null;
@@ -276,15 +409,16 @@ public class TreeOperations {
 
     @Override
     public boolean hasNext() {
-      return current == null || hasPreviousRootNode(current);
+      return current == null || current.previousRootNodeFilePath().isPresent();
     }
 
     @Override
-    public TreeNode next() {
+    public TreeRoot next() {
       if (current == null) {
         this.current = latest;
       } else {
-        this.current = findPreviousRootNode(storage, current);
+        LocalInputStream stream = storage.startReadLocal(current.previousRootNodeFilePath().get());
+        this.current = TreeOperations.readRootNodeFile(stream);
       }
       return current;
     }

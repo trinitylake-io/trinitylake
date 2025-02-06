@@ -13,7 +13,7 @@
  */
 package io.trinitylake;
 
-import io.trinitylake.tree.TreeNode;
+import io.trinitylake.tree.TreeRoot;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -21,9 +21,9 @@ public interface RunningTransaction {
 
   String transactionId();
 
-  TreeNode beginningRoot();
+  TreeRoot beginningRoot();
 
-  TreeNode runningRoot();
+  TreeRoot runningRoot();
 
   long beganAtMillis();
 

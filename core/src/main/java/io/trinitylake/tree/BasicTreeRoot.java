@@ -13,6 +13,7 @@
  */
 package io.trinitylake.tree;
 
+import io.trinitylake.util.ValidationUtil;
 import java.util.Optional;
 
 public class BasicTreeRoot extends BasicTreeNode implements TreeRoot {
@@ -56,17 +57,15 @@ public class BasicTreeRoot extends BasicTreeNode implements TreeRoot {
   }
 
   @Override
-  public Optional<String> lakehouseDefFilePath() {
-    return Optional.ofNullable(lakehouseDefFilePath);
+  public String lakehouseDefFilePath() {
+    ValidationUtil.checkState(
+        lakehouseDefFilePath != null,
+        "Lakehouse definition file path should be set for a tree root");
+    return lakehouseDefFilePath;
   }
 
   @Override
   public void setLakehouseDefFilePath(String lakehouseDefFilePath) {
     this.lakehouseDefFilePath = lakehouseDefFilePath;
-  }
-
-  @Override
-  public void clearLakehouseDefFilePath() {
-    this.lakehouseDefFilePath = null;
   }
 }

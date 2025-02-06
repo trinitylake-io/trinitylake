@@ -22,10 +22,7 @@ import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
 import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.LakehouseStorage;
-import io.trinitylake.tree.BasicTreeNode;
-import io.trinitylake.tree.NodeKeyTableRow;
-import io.trinitylake.tree.TreeNode;
-import io.trinitylake.tree.TreeOperations;
+import io.trinitylake.tree.*;
 import io.trinitylake.util.ValidationUtil;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +32,13 @@ import java.util.stream.Collectors;
 public class TrinityLake {
 
   public static void createLakehouse(LakehouseStorage storage, LakehouseDef lakehouseDef) {
-    String lakehouseDefFilePath = ObjectLocations.newLakehouseDefFilePath();
+    String lakehouseDefFilePath = FileLocations.newLakehouseDefFilePath();
     ObjectDefinitions.writeLakehouseDef(storage, lakehouseDefFilePath, lakehouseDef);
 
     BasicTreeNode root = new BasicTreeNode();
     root.set(ObjectKeys.LAKEHOUSE_DEFINITION, lakehouseDefFilePath);
     root.set(ObjectKeys.NUMBER_OF_KEYS, Long.toString(0));
-    String rootNodeFilePath = ObjectLocations.rootNodeFilePath(0);
+    String rootNodeFilePath = FileLocations.rootNodeFilePath(0);
     AtomicOutputStream stream = storage.startWrite(rootNodeFilePath);
     TreeOperations.writeNodeFile(stream, root);
   }
@@ -52,7 +49,7 @@ public class TrinityLake {
 
   public static RunningTransaction beginTransaction(
       LakehouseStorage storage, Map<String, String> options) {
-    TreeNode current = TreeOperations.findLatestRoot(storage);
+    TreeRoot current = TreeOperations.findLatestRoot(storage);
     TransactionOptions transactionOptions = new TransactionOptions(options);
     return ImmutableRunningTransaction.builder()
         .beganAtMillis(System.currentTimeMillis())
@@ -66,9 +63,14 @@ public class TrinityLake {
   public static CommittedTransaction commitTransaction(
       LakehouseStorage storage, RunningTransaction transaction) throws CommitFailureException {
     ValidationUtil.checkArgument(
-        TreeOperations.hasVersion(transaction.runningRoot()), "There is no change to be committed");
-    long beginningRootVersion = TreeOperations.findVersionFromRootNode(transaction.beginningRoot());
-    String nextVersionFilePath = ObjectLocations.rootNodeFilePath(beginningRootVersion + 1);
+        transaction.runningRoot().path().isPresent(), "There is no change to be committed");
+    ValidationUtil.checkState(
+        transaction.beginningRoot().path().isPresent(),
+        "Cannot find persisted storage path for beginning root");
+
+    long beginningRootVersion =
+        FileLocations.versionFromNodeFilePath(transaction.beginningRoot().path().get());
+    String nextVersionFilePath = FileLocations.rootNodeFilePath(beginningRootVersion + 1);
     AtomicOutputStream stream = storage.startWrite(nextVersionFilePath);
     TreeOperations.writeNodeFile(stream, transaction.runningRoot());
     return ImmutableCommittedTransaction.builder()
@@ -121,9 +123,9 @@ public class TrinityLake {
       throw new ObjectAlreadyExistsException("Namespace %s already exists", namespaceName);
     }
 
-    String namespaceDefFilePath = ObjectLocations.newNamespaceDefFilePath(namespaceName);
+    String namespaceDefFilePath = FileLocations.newNamespaceDefFilePath(namespaceName);
     ObjectDefinitions.writeNamespaceDef(storage, namespaceDefFilePath, namespaceName, namespaceDef);
-    TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
+    TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     newRoot.set(namespaceKey, namespaceDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
@@ -140,9 +142,9 @@ public class TrinityLake {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
 
-    String namespaceDefFilePath = ObjectLocations.newNamespaceDefFilePath(namespaceName);
+    String namespaceDefFilePath = FileLocations.newNamespaceDefFilePath(namespaceName);
     ObjectDefinitions.writeNamespaceDef(storage, namespaceDefFilePath, namespaceName, namespaceDef);
-    TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
+    TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     newRoot.set(namespaceKey, namespaceDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
@@ -156,7 +158,7 @@ public class TrinityLake {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
 
-    TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
+    TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     newRoot.remove(namespaceKey);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
@@ -228,9 +230,9 @@ public class TrinityLake {
           "Namespace %s table %s already exists", namespaceName, tableName);
     }
 
-    String tableDefFilePath = ObjectLocations.newTableDefFilePath(namespaceName, tableName);
+    String tableDefFilePath = FileLocations.newTableDefFilePath(namespaceName, tableName);
     ObjectDefinitions.writeTableDef(storage, tableDefFilePath, namespaceName, tableName, tableDef);
-    TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
+    TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     newRoot.set(tableKey, tableDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
@@ -253,9 +255,9 @@ public class TrinityLake {
           "Namespace %s table %s does not exists", namespaceName, tableName);
     }
 
-    String tableDefFilePath = ObjectLocations.newTableDefFilePath(namespaceName, tableName);
+    String tableDefFilePath = FileLocations.newTableDefFilePath(namespaceName, tableName);
     ObjectDefinitions.writeTableDef(storage, tableDefFilePath, namespaceName, tableName, tableDef);
-    TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
+    TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     newRoot.set(tableKey, tableDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
@@ -277,7 +279,7 @@ public class TrinityLake {
           "Namespace %s table %s does not exists", namespaceName, tableName);
     }
 
-    TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
+    TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     newRoot.remove(tableKey);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
