@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public class ObjectLocations {
+public class FileLocations {
 
   public static final String LATEST_VERSION_HINT_FILE_PATH = "_latest_hint.txt";
   public static final String LAKEHOUSE_DEF_FILE_PATH_PREFIX = "_lakehouse_def_";

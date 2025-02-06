@@ -29,9 +29,7 @@ public interface TreeRoot extends TreeNode {
 
   void clearRollbackFromRootNodeFilePath();
 
-  Optional<String> lakehouseDefFilePath();
+  String lakehouseDefFilePath();
 
   void setLakehouseDefFilePath(String lakehouseDefFilePath);
-
-  void clearLakehouseDefFilePath();
 }
