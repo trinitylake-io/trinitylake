@@ -20,10 +20,10 @@ import io.trinitylake.exception.ObjectNotFoundException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
-import io.trinitylake.storage.FilePaths;
+import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.tree.BasicTreeNode;
-import io.trinitylake.tree.TreeKeys;
+import io.trinitylake.tree.NodeKeyTableRow;
 import io.trinitylake.tree.TreeNode;
 import io.trinitylake.tree.TreeOperations;
 import io.trinitylake.util.ValidationUtil;
@@ -35,14 +35,15 @@ import java.util.stream.Collectors;
 public class TrinityLake {
 
   public static void createLakehouse(LakehouseStorage storage, LakehouseDef lakehouseDef) {
-    String lakehouseDefFilePath = FilePaths.newLakehouseDefFilePath();
+    String lakehouseDefFilePath = ObjectLocations.newLakehouseDefFilePath();
     ObjectDefinitions.writeLakehouseDef(storage, lakehouseDefFilePath, lakehouseDef);
 
     BasicTreeNode root = new BasicTreeNode();
-    root.set(TreeKeys.LAKEHOUSE_DEFINITION, lakehouseDefFilePath);
-    root.set(TreeKeys.NUMBER_OF_KEYS, Long.toString(0));
-    String rootNodeFilePath = FilePaths.rootNodeFilePath(0);
-    TreeOperations.writeNodeFile(storage, rootNodeFilePath, root);
+    root.set(ObjectKeys.LAKEHOUSE_DEFINITION, lakehouseDefFilePath);
+    root.set(ObjectKeys.NUMBER_OF_KEYS, Long.toString(0));
+    String rootNodeFilePath = ObjectLocations.rootNodeFilePath(0);
+    AtomicOutputStream stream = storage.startWrite(rootNodeFilePath);
+    TreeOperations.writeNodeFile(stream, root);
   }
 
   public static RunningTransaction beginTransaction(LakehouseStorage storage) {
@@ -67,8 +68,9 @@ public class TrinityLake {
     ValidationUtil.checkArgument(
         TreeOperations.hasVersion(transaction.runningRoot()), "There is no change to be committed");
     long beginningRootVersion = TreeOperations.findVersionFromRootNode(transaction.beginningRoot());
-    String nextVersionFilePath = FilePaths.rootNodeFilePath(beginningRootVersion + 1);
-    TreeOperations.writeNodeFile(storage, nextVersionFilePath, transaction.runningRoot());
+    String nextVersionFilePath = ObjectLocations.rootNodeFilePath(beginningRootVersion + 1);
+    AtomicOutputStream stream = storage.startWrite(nextVersionFilePath);
+    TreeOperations.writeNodeFile(stream, transaction.runningRoot());
     return ImmutableCommittedTransaction.builder()
         .committedRoot(transaction.runningRoot())
         .transactionId(transaction.transactionId())
@@ -78,17 +80,17 @@ public class TrinityLake {
   public static List<String> showNamespaces(
       LakehouseStorage storage, RunningTransaction transaction) {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    return transaction.runningRoot().allKeyValues().stream()
-        .map(Map.Entry::getKey)
-        .filter(key -> TreeKeys.isNamespaceKey(key, lakehouseDef))
-        .map(key -> TreeKeys.namespaceNameFromKey(key, lakehouseDef))
+    return transaction.runningRoot().nodeKeyTable().stream()
+        .map(NodeKeyTableRow::key)
+        .filter(key -> ObjectKeys.isNamespaceKey(key, lakehouseDef))
+        .map(key -> ObjectKeys.namespaceNameFromKey(key, lakehouseDef))
         .collect(Collectors.toList());
   }
 
   public static boolean namespaceExists(
       LakehouseStorage storage, RunningTransaction transaction, String namespaceName) {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
@@ -99,7 +101,7 @@ public class TrinityLake {
       LakehouseStorage storage, RunningTransaction transaction, String namespaceName)
       throws ObjectNotFoundException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
@@ -114,12 +116,12 @@ public class TrinityLake {
       NamespaceDef namespaceDef)
       throws ObjectAlreadyExistsException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectAlreadyExistsException("Namespace %s already exists", namespaceName);
     }
 
-    String namespaceDefFilePath = FilePaths.newNamespaceDefFilePath(namespaceName);
+    String namespaceDefFilePath = ObjectLocations.newNamespaceDefFilePath(namespaceName);
     ObjectDefinitions.writeNamespaceDef(storage, namespaceDefFilePath, namespaceName, namespaceDef);
     TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
     newRoot.set(namespaceKey, namespaceDefFilePath);
@@ -133,12 +135,12 @@ public class TrinityLake {
       NamespaceDef namespaceDef)
       throws ObjectNotFoundException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
 
-    String namespaceDefFilePath = FilePaths.newNamespaceDefFilePath(namespaceName);
+    String namespaceDefFilePath = ObjectLocations.newNamespaceDefFilePath(namespaceName);
     ObjectDefinitions.writeNamespaceDef(storage, namespaceDefFilePath, namespaceName, namespaceDef);
     TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
     newRoot.set(namespaceKey, namespaceDefFilePath);
@@ -149,7 +151,7 @@ public class TrinityLake {
       LakehouseStorage storage, RunningTransaction transaction, String namespaceName)
       throws ObjectNotFoundException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
@@ -163,10 +165,10 @@ public class TrinityLake {
       LakehouseStorage storage, RunningTransaction transaction, String namespaceName)
       throws ObjectNotFoundException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    return transaction.runningRoot().allKeyValues().stream()
-        .map(Map.Entry::getKey)
-        .filter(key -> TreeKeys.isTableKey(key, lakehouseDef))
-        .map(key -> TreeKeys.tableNameFromKey(key, lakehouseDef))
+    return transaction.runningRoot().nodeKeyTable().stream()
+        .map(NodeKeyTableRow::key)
+        .filter(key -> ObjectKeys.isTableKey(key, lakehouseDef))
+        .map(key -> ObjectKeys.tableNameFromKey(key, lakehouseDef))
         .collect(Collectors.toList());
   }
 
@@ -176,11 +178,11 @@ public class TrinityLake {
       String namespaceName,
       String tableName) {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
-    String tableKey = TreeKeys.tableKey(namespaceName, tableName, lakehouseDef);
+    String tableKey = ObjectKeys.tableKey(namespaceName, tableName, lakehouseDef);
     if (!transaction.runningRoot().contains(tableKey)) {
       throw new ObjectNotFoundException(
           "Namespace %s table %s does not exist", namespaceName, tableName);
@@ -195,11 +197,11 @@ public class TrinityLake {
       String tableName)
       throws ObjectNotFoundException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
-    String tableKey = TreeKeys.tableKey(namespaceName, tableName, lakehouseDef);
+    String tableKey = ObjectKeys.tableKey(namespaceName, tableName, lakehouseDef);
     if (!transaction.runningRoot().contains(tableKey)) {
       throw new ObjectNotFoundException(
           "Namespace %s table %s does not exist", namespaceName, tableName);
@@ -216,17 +218,17 @@ public class TrinityLake {
       TableDef tableDef)
       throws ObjectAlreadyExistsException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
-    String tableKey = TreeKeys.tableKey(namespaceName, tableName, lakehouseDef);
+    String tableKey = ObjectKeys.tableKey(namespaceName, tableName, lakehouseDef);
     if (transaction.runningRoot().contains(tableKey)) {
       throw new ObjectAlreadyExistsException(
           "Namespace %s table %s already exists", namespaceName, tableName);
     }
 
-    String tableDefFilePath = FilePaths.newTableDefFilePath(namespaceName, tableName);
+    String tableDefFilePath = ObjectLocations.newTableDefFilePath(namespaceName, tableName);
     ObjectDefinitions.writeTableDef(storage, tableDefFilePath, namespaceName, tableName, tableDef);
     TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
     newRoot.set(tableKey, tableDefFilePath);
@@ -241,17 +243,17 @@ public class TrinityLake {
       TableDef tableDef)
       throws ObjectNotFoundException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
-    String tableKey = TreeKeys.tableKey(namespaceName, tableName, lakehouseDef);
+    String tableKey = ObjectKeys.tableKey(namespaceName, tableName, lakehouseDef);
     if (!transaction.runningRoot().contains(tableKey)) {
       throw new ObjectNotFoundException(
           "Namespace %s table %s does not exists", namespaceName, tableName);
     }
 
-    String tableDefFilePath = FilePaths.newTableDefFilePath(namespaceName, tableName);
+    String tableDefFilePath = ObjectLocations.newTableDefFilePath(namespaceName, tableName);
     ObjectDefinitions.writeTableDef(storage, tableDefFilePath, namespaceName, tableName, tableDef);
     TreeNode newRoot = TreeOperations.clone(transaction.runningRoot());
     newRoot.set(tableKey, tableDefFilePath);
@@ -265,11 +267,11 @@ public class TrinityLake {
       String tableName)
       throws ObjectNotFoundException, CommitFailureException {
     LakehouseDef lakehouseDef = TreeOperations.findLakehouseDef(storage, transaction.runningRoot());
-    String namespaceKey = TreeKeys.namespaceKey(namespaceName, lakehouseDef);
+    String namespaceKey = ObjectKeys.namespaceKey(namespaceName, lakehouseDef);
     if (!transaction.runningRoot().contains(namespaceKey)) {
       throw new ObjectNotFoundException("Namespace %s does not exist", namespaceName);
     }
-    String tableKey = TreeKeys.tableKey(namespaceName, tableName, lakehouseDef);
+    String tableKey = ObjectKeys.tableKey(namespaceName, tableName, lakehouseDef);
     if (!transaction.runningRoot().contains(tableKey)) {
       throw new ObjectNotFoundException(
           "Namespace %s table %s does not exists", namespaceName, tableName);

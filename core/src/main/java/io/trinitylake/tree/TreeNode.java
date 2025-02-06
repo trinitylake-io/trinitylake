@@ -13,9 +13,8 @@
  */
 package io.trinitylake.tree;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface TreeNode {
 
@@ -26,6 +25,28 @@ public interface TreeNode {
    */
   Optional<String> path();
 
+  void setPath(String path);
+
+  void clearPath();
+
+  /**
+   * Creation time of the node file, if the node is persisted in storage
+   *
+   * @return creation epoch time in millis
+   */
+  Optional<Long> createdAtMillis();
+
+  void setCreatedAtMillis(long createdAtMillis);
+
+  void clearCreatedAtMillis();
+
+  /**
+   * THe number of keys in the node key table
+   *
+   * @return number of keys
+   */
+  int numKeys();
+
   String get(String key);
 
   void set(String key, String value);
@@ -34,5 +55,5 @@ public interface TreeNode {
 
   boolean contains(String key);
 
-  Set<Map.Entry<String, String>> allKeyValues();
+  List<NodeKeyTableRow> nodeKeyTable();
 }

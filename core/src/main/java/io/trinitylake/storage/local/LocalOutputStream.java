@@ -20,6 +20,7 @@ import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.util.FileUtil;
 import java.io.*;
+import java.nio.channels.FileChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,5 +80,10 @@ public class LocalOutputStream extends AtomicOutputStream {
   @Override
   public void flush() throws IOException {
     stream.flush();
+  }
+
+  @Override
+  public FileChannel channel() {
+    return stream.getChannel();
   }
 }

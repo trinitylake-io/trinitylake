@@ -16,6 +16,7 @@ package io.trinitylake.storage;
 import io.trinitylake.exception.StorageAtomicSealFailureException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 public abstract class AtomicOutputStream extends OutputStream {
 
@@ -27,6 +28,8 @@ public abstract class AtomicOutputStream extends OutputStream {
    * @throws IOException for any other failure
    */
   public abstract void atomicallySeal() throws StorageAtomicSealFailureException, IOException;
+
+  public abstract FileChannel channel();
 
   @Override
   public void close() throws IOException {

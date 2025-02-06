@@ -13,4 +13,40 @@
  */
 package io.trinitylake.tree;
 
-public class TestTreeOperations {}
+import io.trinitylake.storage.AtomicOutputStream;
+import io.trinitylake.storage.LiteralURI;
+import io.trinitylake.storage.local.LocalInputStream;
+import io.trinitylake.storage.local.LocalStorageOps;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+public class TestTreeOperations {
+
+  @Test
+  public void testWriteReadNodeFile(@TempDir Path tempDir) {
+    TreeNode treeNode = new BasicTreeNode();
+    for (int i = 0; i < 10; i++) {
+      treeNode.set("k" + i, "val" + i);
+    }
+
+    File file = tempDir.resolve("write.ipc").toFile();
+    LocalStorageOps ops = new LocalStorageOps();
+    AtomicOutputStream stream = ops.startWrite(new LiteralURI("file://" + file));
+
+    TreeOperations.writeNodeFile(stream, treeNode);
+    Assertions.assertThat(file.exists()).isTrue();
+
+    LocalInputStream inputStream = ops.startReadLocal(new LiteralURI("file://" + file));
+    TreeNode node = TreeOperations.readNodeFile(inputStream);
+    Assertions.assertThat(
+            treeNode.nodeKeyTable().stream()
+                .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)))
+        .isEqualTo(
+            node.nodeKeyTable().stream()
+                .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)));
+  }
+}

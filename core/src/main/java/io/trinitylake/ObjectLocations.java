@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trinitylake.storage;
+package io.trinitylake;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-public class FilePaths {
+public class ObjectLocations {
 
   public static final String LATEST_VERSION_HINT_FILE_PATH = "_latest_hint.txt";
   public static final String LAKEHOUSE_DEF_FILE_PATH_PREFIX = "_lakehouse_def_";

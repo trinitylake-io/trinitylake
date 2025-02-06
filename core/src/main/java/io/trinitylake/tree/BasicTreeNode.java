@@ -14,13 +14,16 @@
 package io.trinitylake.tree;
 
 import com.google.common.collect.Maps;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BasicTreeNode implements TreeNode {
 
   private final Map<String, String> values;
+  private String path;
+  private Long createdAtMillis;
 
   public BasicTreeNode() {
     this.values = Maps.newHashMap();
@@ -28,7 +31,37 @@ public class BasicTreeNode implements TreeNode {
 
   @Override
   public Optional<String> path() {
-    return Optional.empty();
+    return Optional.ofNullable(path);
+  }
+
+  @Override
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  @Override
+  public void clearPath() {
+    this.path = null;
+  }
+
+  @Override
+  public Optional<Long> createdAtMillis() {
+    return Optional.ofNullable(createdAtMillis);
+  }
+
+  @Override
+  public void setCreatedAtMillis(long createdAtMillis) {
+    this.createdAtMillis = createdAtMillis;
+  }
+
+  @Override
+  public void clearCreatedAtMillis() {
+    this.createdAtMillis = null;
+  }
+
+  @Override
+  public int numKeys() {
+    return values.size();
   }
 
   @Override
@@ -52,7 +85,9 @@ public class BasicTreeNode implements TreeNode {
   }
 
   @Override
-  public Set<Map.Entry<String, String>> allKeyValues() {
-    return values.entrySet();
+  public List<NodeKeyTableRow> nodeKeyTable() {
+    return values.entrySet().stream()
+        .map(e -> ImmutableNodeKeyTableRow.builder().key(e.getKey()).value(e.getValue()).build())
+        .collect(Collectors.toList());
   }
 }
