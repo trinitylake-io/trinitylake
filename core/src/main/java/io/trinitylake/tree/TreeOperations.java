@@ -18,6 +18,7 @@ import io.trinitylake.FileLocations;
 import io.trinitylake.ObjectDefinitions;
 import io.trinitylake.ObjectKeys;
 import io.trinitylake.exception.StorageAtomicSealFailureException;
+import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.models.LakehouseDef;
@@ -55,18 +56,6 @@ public class TreeOperations {
   private static final String NODE_FILE_VALUE_COLUMN_NAME = "value";
 
   /**
-   * Clone a tree node, excluding persistence specific information like path and creation time.
-   *
-   * @param node node to be cloned
-   * @return cloned node
-   */
-  public static TreeNode cloneTreeNode(TreeNode node) {
-    TreeNode clonedNode = new BasicTreeNode();
-    node.nodeKeyTable().forEach(entry -> clonedNode.set(entry.key(), entry.value()));
-    return clonedNode;
-  }
-
-  /**
    * Clone a tree root, excluding persistence specific information like path and creation time.
    *
    * @param node root to be cloned
@@ -79,43 +68,17 @@ public class TreeOperations {
     return clonedRoot;
   }
 
-  public static TreeNode readNodeFile(LocalInputStream stream) {
-    TreeNode treeNode = new BasicTreeNode();
-
-    BufferAllocator allocator = new RootAllocator();
-    ArrowFileReader reader = new ArrowFileReader(stream.channel(), allocator);
-    try {
-      for (ArrowBlock arrowBlock : reader.getRecordBlocks()) {
-        reader.loadRecordBatch(arrowBlock);
-        VectorSchemaRoot root = reader.getVectorSchemaRoot();
-
-        int numKeys = 0;
-        for (int i = 0; i < root.getRowCount(); ++i) {
-          // TODO: leverage Arrow Text to be more efficient and avoid byte array copy
-          String key = root.getVector(NODE_FILE_KEY_COLUMN_INDEX).getObject(i).toString();
-          String value = root.getVector(NODE_FILE_VALUE_COLUMN_INDEX).getObject(i).toString();
-
-          if (ObjectKeys.CREATED_AT_MILLIS.equals(key)) {
-            treeNode.setCreatedAtMillis(Long.parseLong(value));
-          } else if (ObjectKeys.NUMBER_OF_KEYS.equals(key)) {
-            numKeys = Integer.parseInt(value);
-          } else {
-            treeNode.set(key, value);
-          }
-        }
-
-        ValidationUtil.checkState(
-            numKeys == treeNode.numKeys(),
-            "Recorded number of keys do not match the actual node key table size, the node file might be corrupted");
-      }
+  public static TreeRoot readRootNodeFile(LakehouseStorage storage, String path) {
+    try (LocalInputStream stream = storage.startReadLocal(path)) {
+      TreeRoot root = readRootNodeFile(stream);
+      root.setPath(path);
+      return root;
     } catch (IOException e) {
       throw new StorageReadFailureException(e);
     }
-
-    return treeNode;
   }
 
-  public static TreeRoot readRootNodeFile(LocalInputStream stream) {
+  private static TreeRoot readRootNodeFile(LocalInputStream stream) {
     TreeRoot treeRoot = new BasicTreeRoot();
 
     BufferAllocator allocator = new RootAllocator();
@@ -157,74 +120,15 @@ public class TreeOperations {
     return treeRoot;
   }
 
-  public static void writeNodeFile(AtomicOutputStream stream, TreeNode node) {
-    BufferAllocator allocator = new RootAllocator();
-    VarCharVector keyVector = new VarCharVector(NODE_FILE_KEY_COLUMN_NAME, allocator);
-    VarCharVector valueVector = new VarCharVector(NODE_FILE_VALUE_COLUMN_NAME, allocator);
-
-    int index = 0;
-    long createdAtMillis = System.currentTimeMillis();
-    keyVector.setSafe(index, ObjectKeys.CREATED_AT_MILLIS_BYTES);
-    valueVector.setSafe(index, Long.toString(createdAtMillis).getBytes(StandardCharsets.UTF_8));
-
-    index++;
-    keyVector.setSafe(index, ObjectKeys.NUMBER_OF_KEYS_BYTES);
-    valueVector.setSafe(index, Integer.toString(node.numKeys()).getBytes(StandardCharsets.UTF_8));
-
-    if (node instanceof TreeRoot) {
-      TreeRoot root = (TreeRoot) node;
-
-      index++;
-      keyVector.setSafe(index, ObjectKeys.LAKEHOUSE_DEFINITION_BYTES);
-      valueVector.setSafe(index, root.lakehouseDefFilePath().getBytes(StandardCharsets.UTF_8));
-
-      if (root.previousRootNodeFilePath().isPresent()) {
-        index++;
-        keyVector.setSafe(index, ObjectKeys.PREVIOUS_ROOT_NODE_BYTES);
-        valueVector.setSafe(
-            index, root.previousRootNodeFilePath().get().getBytes(StandardCharsets.UTF_8));
-      }
-
-      if (root.rollbackFromRootNodeFilePath().isPresent()) {
-        index++;
-        keyVector.setSafe(index, ObjectKeys.ROLLBACK_FROM_ROOT_NODE_BYTES);
-        valueVector.setSafe(
-            index, root.rollbackFromRootNodeFilePath().get().getBytes(StandardCharsets.UTF_8));
-      }
-    }
-
-    for (NodeKeyTableRow row : node.nodeKeyTable()) {
-      index++;
-      keyVector.setSafe(index, row.key().getBytes(StandardCharsets.UTF_8));
-      valueVector.setSafe(index, row.value().getBytes(StandardCharsets.UTF_8));
-    }
-
-    index++;
-    keyVector.setValueCount(index);
-    valueVector.setValueCount(index);
-
-    List<Field> fields = Lists.newArrayList(keyVector.getField(), valueVector.getField());
-    List<FieldVector> vectors = Lists.newArrayList(keyVector, valueVector);
-    VectorSchemaRoot schema = new VectorSchemaRoot(fields, vectors);
-    try (ArrowFileWriter writer = new ArrowFileWriter(schema, null, stream.channel())) {
-      writer.start();
-      writer.writeBatch();
-      writer.end();
-    } catch (IOException e) {
-      throw new StorageWriteFailureException(e);
-    }
-
-    try {
-      stream.close();
+  public static void writeRootNodeFile(LakehouseStorage storage, String path, TreeRoot root) {
+    try (AtomicOutputStream stream = storage.startWrite(path)) {
+      writeRootNodeFile(stream, root);
     } catch (IOException e) {
       throw new StorageAtomicSealFailureException(e);
     }
   }
 
-  public static void writeRootNodeFile(AtomicOutputStream stream, TreeRoot root) {
-    // TODO: currently this is mostly the same as writeNodeFile
-    //  but we need to in the next iteration make sure this preserves the last transaction messages,
-    //  and will start to diverge from writeNodeFile
+  private static void writeRootNodeFile(AtomicOutputStream stream, TreeRoot root) {
     BufferAllocator allocator = new RootAllocator();
     VarCharVector keyVector = new VarCharVector(NODE_FILE_KEY_COLUMN_NAME, allocator);
     VarCharVector valueVector = new VarCharVector(NODE_FILE_VALUE_COLUMN_NAME, allocator);
@@ -276,12 +180,6 @@ public class TreeOperations {
     } catch (IOException e) {
       throw new StorageWriteFailureException(e);
     }
-
-    try {
-      stream.close();
-    } catch (IOException e) {
-      throw new StorageAtomicSealFailureException(e);
-    }
   }
 
   public static long findVersionFromRootNode(TreeNode node) {
@@ -304,23 +202,29 @@ public class TreeOperations {
     // than zero,
     //  and the creation of this file should require a global lock
     long latestVersion = 0;
-    try {
-      InputStream versionHintStream =
-          storage.startRead(FileLocations.LATEST_VERSION_HINT_FILE_PATH);
+    try (InputStream versionHintStream =
+        storage.startRead(FileLocations.LATEST_VERSION_HINT_FILE_PATH)) {
       String versionHintText = FileUtil.readToString(versionHintStream);
       latestVersion = Long.parseLong(versionHintText);
-    } catch (StorageReadFailureException e) {
+    } catch (StorageFileOpenFailureException | StorageReadFailureException | IOException e) {
       LOG.warn("Failed to read latest version hint file, fallback to search from version 0", e);
     }
 
     String rootNodeFilePath = FileLocations.rootNodeFilePath(latestVersion);
-    while (storage.exists(rootNodeFilePath)) {
-      latestVersion++;
-      rootNodeFilePath = FileLocations.rootNodeFilePath(latestVersion);
+
+    while (true) {
+      long nextVersion = latestVersion + 1;
+      String nextRootNodeFilePath = FileLocations.rootNodeFilePath(latestVersion);
+      if (!storage.exists(nextRootNodeFilePath)) {
+        break;
+      }
+      rootNodeFilePath = nextRootNodeFilePath;
+      latestVersion = nextVersion;
     }
 
-    LocalInputStream stream = storage.startReadLocal(rootNodeFilePath);
-    return TreeOperations.readRootNodeFile(stream);
+    TreeRoot root = TreeOperations.readRootNodeFile(storage, rootNodeFilePath);
+    root.setPath(rootNodeFilePath);
+    return root;
   }
 
   public static Optional<TreeRoot> findRootForVersion(LakehouseStorage storage, long version) {
@@ -336,8 +240,8 @@ public class TreeOperations {
 
     TreeRoot current = latest;
     while (current.previousRootNodeFilePath().isPresent()) {
-      LocalInputStream stream = storage.startReadLocal(current.previousRootNodeFilePath().get());
-      TreeRoot previous = TreeOperations.readRootNodeFile(stream);
+      TreeRoot previous =
+          TreeOperations.readRootNodeFile(storage, current.previousRootNodeFilePath().get());
       if (version == FileLocations.versionFromNodeFilePath(previous.path().get())) {
         return Optional.of(previous);
       }
@@ -361,8 +265,8 @@ public class TreeOperations {
 
     TreeRoot current = latest;
     while (current.previousRootNodeFilePath().isPresent()) {
-      LocalInputStream stream = storage.startReadLocal(current.previousRootNodeFilePath().get());
-      TreeRoot previous = TreeOperations.readRootNodeFile(stream);
+      TreeRoot previous =
+          TreeOperations.readRootNodeFile(storage, current.previousRootNodeFilePath().get());
       ValidationUtil.checkArgument(
           previous.createdAtMillis().isPresent(),
           "Tree root must be persisted with a timestamp in storage");
@@ -417,8 +321,8 @@ public class TreeOperations {
       if (current == null) {
         this.current = latest;
       } else {
-        LocalInputStream stream = storage.startReadLocal(current.previousRootNodeFilePath().get());
-        this.current = TreeOperations.readRootNodeFile(stream);
+        this.current =
+            TreeOperations.readRootNodeFile(storage, current.previousRootNodeFilePath().get());
       }
       return current;
     }
