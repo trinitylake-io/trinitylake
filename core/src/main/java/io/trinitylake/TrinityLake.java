@@ -20,7 +20,6 @@ import io.trinitylake.exception.ObjectNotFoundException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
-import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.tree.*;
 import io.trinitylake.util.ValidationUtil;
@@ -35,12 +34,10 @@ public class TrinityLake {
     String lakehouseDefFilePath = FileLocations.newLakehouseDefFilePath();
     ObjectDefinitions.writeLakehouseDef(storage, lakehouseDefFilePath, lakehouseDef);
 
-    BasicTreeNode root = new BasicTreeNode();
-    root.set(ObjectKeys.LAKEHOUSE_DEFINITION, lakehouseDefFilePath);
-    root.set(ObjectKeys.NUMBER_OF_KEYS, Long.toString(0));
+    BasicTreeRoot root = new BasicTreeRoot();
+    root.setLakehouseDefFilePath(lakehouseDefFilePath);
     String rootNodeFilePath = FileLocations.rootNodeFilePath(0);
-    AtomicOutputStream stream = storage.startWrite(rootNodeFilePath);
-    TreeOperations.writeNodeFile(stream, root);
+    TreeOperations.writeRootNodeFile(storage, rootNodeFilePath, root);
   }
 
   public static RunningTransaction beginTransaction(LakehouseStorage storage) {
@@ -68,11 +65,13 @@ public class TrinityLake {
         transaction.beginningRoot().path().isPresent(),
         "Cannot find persisted storage path for beginning root");
 
-    long beginningRootVersion =
-        FileLocations.versionFromNodeFilePath(transaction.beginningRoot().path().get());
+    String beginningRootNodeFilePath = transaction.beginningRoot().path().get();
+    long beginningRootVersion = FileLocations.versionFromNodeFilePath(beginningRootNodeFilePath);
     String nextVersionFilePath = FileLocations.rootNodeFilePath(beginningRootVersion + 1);
-    AtomicOutputStream stream = storage.startWrite(nextVersionFilePath);
-    TreeOperations.writeNodeFile(stream, transaction.runningRoot());
+    transaction.runningRoot().setPreviousRootNodeFilePath(beginningRootNodeFilePath);
+
+    TreeOperations.writeRootNodeFile(storage, nextVersionFilePath, transaction.runningRoot());
+    transaction.runningRoot().setPath(nextVersionFilePath);
     return ImmutableCommittedTransaction.builder()
         .committedRoot(transaction.runningRoot())
         .transactionId(transaction.transactionId())
