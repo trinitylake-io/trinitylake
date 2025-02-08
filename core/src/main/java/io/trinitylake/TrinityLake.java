@@ -38,6 +38,7 @@ public class TrinityLake {
     root.setLakehouseDefFilePath(lakehouseDefFilePath);
     String rootNodeFilePath = FileLocations.rootNodeFilePath(0);
     TreeOperations.writeRootNodeFile(storage, rootNodeFilePath, root);
+    TreeOperations.tryWriteRootNodeVersionHintFile(storage, 0);
   }
 
   public static RunningTransaction beginTransaction(LakehouseStorage storage) {
@@ -67,10 +68,12 @@ public class TrinityLake {
 
     String beginningRootNodeFilePath = transaction.beginningRoot().path().get();
     long beginningRootVersion = FileLocations.versionFromNodeFilePath(beginningRootNodeFilePath);
-    String nextVersionFilePath = FileLocations.rootNodeFilePath(beginningRootVersion + 1);
+    long nextRootVersion = beginningRootVersion + 1;
+    String nextVersionFilePath = FileLocations.rootNodeFilePath(nextRootVersion);
     transaction.runningRoot().setPreviousRootNodeFilePath(beginningRootNodeFilePath);
 
     TreeOperations.writeRootNodeFile(storage, nextVersionFilePath, transaction.runningRoot());
+    TreeOperations.tryWriteRootNodeVersionHintFile(storage, nextRootVersion);
     transaction.runningRoot().setPath(nextVersionFilePath);
     return ImmutableCommittedTransaction.builder()
         .committedRoot(transaction.runningRoot())
