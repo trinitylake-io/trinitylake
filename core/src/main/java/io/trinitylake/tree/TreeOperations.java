@@ -182,6 +182,15 @@ public class TreeOperations {
     }
   }
 
+  public static void tryWriteRootNodeVersionHintFile(LakehouseStorage storage, long rootVersion) {
+    try (AtomicOutputStream stream =
+        storage.startWrite(FileLocations.LATEST_VERSION_HINT_FILE_PATH)) {
+      stream.write(Long.toString(rootVersion).getBytes(StandardCharsets.UTF_8));
+    } catch (StorageAtomicSealFailureException | StorageWriteFailureException | IOException e) {
+      LOG.error("Failed to write root node version hint file", e);
+    }
+  }
+
   public static long findVersionFromRootNode(TreeNode node) {
     ValidationUtil.checkArgument(
         node.path().isPresent(), "Cannot derive version from a node that is not persisted");
@@ -223,7 +232,6 @@ public class TreeOperations {
     }
 
     TreeRoot root = TreeOperations.readRootNodeFile(storage, rootNodeFilePath);
-    root.setPath(rootNodeFilePath);
     return root;
   }
 
