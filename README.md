@@ -19,6 +19,8 @@ please visit [trinitylake.io](https://trinitylake.io).
 
 ## Building
 
+TrinityLake is built using Gradle with Java 11, 17, 21, or 23.
+
 * Build and run tests: `./gradlew build`
 * Build without running tests: `./gradlew build -x test -x integrationTest`
 * Fix code style and formatting: `./gradlew spotlessApply`
