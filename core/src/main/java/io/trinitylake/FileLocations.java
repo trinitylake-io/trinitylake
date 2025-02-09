@@ -27,9 +27,9 @@ public class FileLocations {
   public static final String LAKEHOUSE_DEF_FILE_PATH_PREFIX = "_lakehouse_def_";
   public static final String PROTOBUF_BINARY_FILE_SUFFIX = ".binpb";
 
-  // underscore + 64 binary bits + .ipc suffix
+  // underscore + 64 binary bits + .arrow suffix
   private static final int ROOT_NODE_FILE_PATH_LENGTH = 69;
-  private static final Pattern ROOT_NODE_FILE_PATH_PATTERN = Pattern.compile("^_[01]{64}\\.ipc$");
+  private static final Pattern ROOT_NODE_FILE_PATH_PATTERN = Pattern.compile("^_[01]{64}\\.arrow$");
 
   private static final HashFunction HASH_FUNC = Hashing.murmur3_32_fixed();
   // Length of entropy generated in the file path

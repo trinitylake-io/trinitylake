@@ -22,7 +22,7 @@ PROTO_BINARY_FILE_SUFFIX = ".binpb"
 
 LAKEHOUSE_DEF_FILE_PREFIX = "_lakehouse_def_"
 
-IPC_FILE_SUFFIX = ".ipc"
+IPC_FILE_SUFFIX = ".arrow"
 
 SCHEMA_ID_PART_SIZE = 4
 
