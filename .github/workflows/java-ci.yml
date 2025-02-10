@@ -19,7 +19,7 @@ on:
       - 'main'
   pull_request:
     paths-ignore:
-      - '.github/**',
+      - '.github/**'
       - '.gitignore'
       - 'docs/**'
       - 'python/**'
