@@ -47,13 +47,11 @@ public interface TreeNode {
    */
   int numKeys();
 
-  String get(String key);
+  NodeSearchResult search(String key);
 
   void set(String key, String value);
 
   void remove(String key);
-
-  boolean contains(String key);
 
   List<NodeKeyTableRow> nodeKeyTable();
 }

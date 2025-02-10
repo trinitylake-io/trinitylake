@@ -65,18 +65,13 @@ public class BasicTreeNode implements TreeNode {
   }
 
   @Override
-  public String get(String key) {
-    return values.get(key);
+  public NodeSearchResult search(String key) {
+    return ImmutableNodeSearchResult.builder().value(Optional.ofNullable(values.get(key))).build();
   }
 
   @Override
   public void set(String key, String value) {
     values.put(key, value);
-  }
-
-  @Override
-  public boolean contains(String key) {
-    return values.containsKey(key);
   }
 
   @Override

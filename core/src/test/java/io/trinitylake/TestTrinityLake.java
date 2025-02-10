@@ -25,6 +25,7 @@ import io.trinitylake.storage.local.LocalStorageOpsProperties;
 import io.trinitylake.tree.TreeOperations;
 import io.trinitylake.tree.TreeRoot;
 import java.io.File;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,8 +76,10 @@ public class TestTrinityLake {
     Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
     Assertions.assertThat(root.previousRootNodeFilePath().get())
         .isEqualTo(FileLocations.rootNodeFilePath(0));
-    String ns1Path = root.get(ObjectKeys.namespaceKey("ns1", lakehouseDef));
-    NamespaceDef readDef = ObjectDefinitions.readNamespaceDef(storage, ns1Path);
+    String ns1Key = ObjectKeys.namespaceKey("ns1", lakehouseDef);
+    Optional<String> ns1Path = TreeOperations.searchValue(storage, root, ns1Key);
+    Assertions.assertThat(ns1Path.isPresent()).isTrue();
+    NamespaceDef readDef = ObjectDefinitions.readNamespaceDef(storage, ns1Path.get());
     Assertions.assertThat(readDef).isEqualTo(ns1Def);
   }
 }
