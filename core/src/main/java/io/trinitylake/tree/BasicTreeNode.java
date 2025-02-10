@@ -13,7 +13,7 @@
  */
 package io.trinitylake.tree;
 
-import com.google.common.collect.Maps;
+import io.trinitylake.relocated.com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

@@ -13,9 +13,9 @@
  */
 package io.trinitylake.util;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import io.trinitylake.Initializable;
+import io.trinitylake.relocated.com.google.common.base.Throwables;
+import io.trinitylake.relocated.com.google.common.collect.Maps;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -13,7 +13,7 @@
  */
 package io.trinitylake.storage.local;
 
-import com.google.common.io.CharStreams;
+import io.trinitylake.relocated.com.google.common.io.CharStreams;
 import io.trinitylake.storage.LiteralURI;
 import java.io.IOException;
 import java.io.InputStream;

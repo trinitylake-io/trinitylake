@@ -13,7 +13,6 @@
  */
 package io.trinitylake.tree;
 
-import com.google.common.collect.Lists;
 import io.trinitylake.FileLocations;
 import io.trinitylake.ObjectDefinitions;
 import io.trinitylake.ObjectKeys;
@@ -22,6 +21,7 @@ import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.models.LakehouseDef;
+import io.trinitylake.relocated.com.google.common.collect.Lists;
 import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.storage.local.LocalInputStream;

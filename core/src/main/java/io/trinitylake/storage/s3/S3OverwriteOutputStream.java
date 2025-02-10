@@ -13,12 +13,12 @@
  */
 package io.trinitylake.storage.s3;
 
-import com.google.common.io.CountingOutputStream;
 import dev.failsafe.Failsafe;
 import dev.failsafe.FailsafeException;
 import dev.failsafe.RetryPolicy;
 import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageWriteFailureException;
+import io.trinitylake.relocated.com.google.common.io.CountingOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.storage.LiteralURI;
 import java.io.BufferedOutputStream;

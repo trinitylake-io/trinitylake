@@ -13,8 +13,8 @@
  */
 package io.trinitylake.storage;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableSet;
 import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.PropertyUtil;
 import java.io.File;

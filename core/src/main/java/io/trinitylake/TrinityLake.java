@@ -13,13 +13,13 @@
  */
 package io.trinitylake;
 
-import com.google.common.collect.ImmutableMap;
 import io.trinitylake.exception.CommitFailureException;
 import io.trinitylake.exception.ObjectAlreadyExistsException;
 import io.trinitylake.exception.ObjectNotFoundException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.tree.*;
 import io.trinitylake.util.ValidationUtil;

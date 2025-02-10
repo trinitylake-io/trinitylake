@@ -13,9 +13,9 @@
  */
 package io.trinitylake;
 
-import com.google.common.collect.ImmutableMap;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.BasicLakehouseStorage;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.storage.LakehouseStorage;
