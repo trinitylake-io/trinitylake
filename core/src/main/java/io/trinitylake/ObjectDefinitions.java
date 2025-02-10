@@ -28,7 +28,7 @@ public class ObjectDefinitions {
   public static void writeLakehouseDef(
       LakehouseStorage storage, String path, LakehouseDef lakehouseDef) {
 
-    try (OutputStream stream = storage.startWrite(path)) {
+    try (OutputStream stream = storage.startCommit(path)) {
       lakehouseDef.writeTo(stream);
     } catch (IOException e) {
       throw new StorageWriteFailureException(
@@ -50,7 +50,7 @@ public class ObjectDefinitions {
 
   public static void writeNamespaceDef(
       LakehouseStorage storage, String path, String namespaceName, NamespaceDef namespaceDef) {
-    try (OutputStream stream = storage.startWrite(path)) {
+    try (OutputStream stream = storage.startCommit(path)) {
       namespaceDef.writeTo(stream);
     } catch (IOException e) {
       throw new StorageWriteFailureException(
@@ -80,7 +80,7 @@ public class ObjectDefinitions {
       String namespaceName,
       String tableName,
       TableDef tableDef) {
-    try (OutputStream stream = storage.startWrite(path)) {
+    try (OutputStream stream = storage.startCommit(path)) {
       tableDef.writeTo(stream);
     } catch (IOException e) {
       throw new StorageWriteFailureException(

@@ -33,6 +33,7 @@ import io.trinitylake.storage.local.LocalInputStream;
 import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.Pair;
 import java.io.File;
+import java.io.OutputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -198,8 +199,13 @@ public class AmazonS3StorageOps implements StorageOps {
   }
 
   @Override
-  public AtomicOutputStream startWrite(LiteralURI uri) {
-    return new S3OutputStream(s3, uri, commonProperties, s3Properties);
+  public AtomicOutputStream startCommit(LiteralURI uri) {
+    return new S3AtomicOutputStream(s3, uri, commonProperties, s3Properties);
+  }
+
+  @Override
+  public OutputStream startOverwrite(LiteralURI uri) {
+    return new S3OverwriteOutputStream(s3, uri, commonProperties, s3Properties);
   }
 
   @Override

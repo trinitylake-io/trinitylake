@@ -15,6 +15,7 @@ package io.trinitylake;
 
 import com.google.common.collect.ImmutableMap;
 import io.trinitylake.models.LakehouseDef;
+import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.storage.BasicLakehouseStorage;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.storage.LakehouseStorage;
@@ -56,5 +57,26 @@ public class TestTrinityLake {
     TreeRoot root = TreeOperations.findLatestRoot(storage);
     Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isFalse();
     Assertions.assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(0));
+  }
+
+  @Test
+  public void testCreateNamespace() {
+    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
+    TrinityLake.createLakehouse(storage, lakehouseDef);
+    RunningTransaction transaction = TrinityLake.beginTransaction(storage);
+
+    NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
+    transaction = TrinityLake.createNamespace(storage, transaction, "ns1", ns1Def);
+    TrinityLake.commitTransaction(storage, transaction);
+
+    TreeRoot root = TreeOperations.findLatestRoot(storage);
+    Assertions.assertThat(root.path().isPresent()).isTrue();
+    Assertions.assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(1));
+    Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
+    Assertions.assertThat(root.previousRootNodeFilePath().get())
+        .isEqualTo(FileLocations.rootNodeFilePath(0));
+    String ns1Path = root.get(ObjectKeys.namespaceKey("ns1", lakehouseDef));
+    NamespaceDef readDef = ObjectDefinitions.readNamespaceDef(storage, ns1Path);
+    Assertions.assertThat(readDef).isEqualTo(ns1Def);
   }
 }

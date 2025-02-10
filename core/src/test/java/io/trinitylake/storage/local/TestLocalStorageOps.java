@@ -108,7 +108,7 @@ public class TestLocalStorageOps {
   public void testWriteFile(@TempDir Path tempDir) throws IOException {
     Path file = tempDir.resolve("write.txt");
     LocalStorageOps ops = new LocalStorageOps();
-    OutputStream stream = ops.startWrite(new LiteralURI("file://" + file));
+    OutputStream stream = ops.startCommit(new LiteralURI("file://" + file));
     stream.write("data".getBytes());
     stream.close();
 

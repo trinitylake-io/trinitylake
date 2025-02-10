@@ -16,6 +16,7 @@ package io.trinitylake.storage;
 import io.trinitylake.storage.local.LocalInputStream;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,8 +46,12 @@ public interface LakehouseStorage extends Closeable {
     return ops().exists(root().extendPath(path));
   }
 
-  default AtomicOutputStream startWrite(String path) {
-    return ops().startWrite(root().extendPath(path));
+  default AtomicOutputStream startCommit(String path) {
+    return ops().startCommit(root().extendPath(path));
+  }
+
+  default OutputStream startOverwrite(String path) {
+    return ops().startOverwrite(root().extendPath(path));
   }
 
   default void delete(List<String> paths) {

@@ -61,7 +61,7 @@ public class TrinityLake {
   public static CommittedTransaction commitTransaction(
       LakehouseStorage storage, RunningTransaction transaction) throws CommitFailureException {
     ValidationUtil.checkArgument(
-        transaction.runningRoot().path().isPresent(), "There is no change to be committed");
+        !transaction.runningRoot().path().isPresent(), "There is no change to be committed");
     ValidationUtil.checkState(
         transaction.beginningRoot().path().isPresent(),
         "Cannot find persisted storage path for beginning root");
