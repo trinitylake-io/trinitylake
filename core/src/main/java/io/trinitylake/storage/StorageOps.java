@@ -16,6 +16,7 @@ package io.trinitylake.storage;
 import io.trinitylake.Initializable;
 import io.trinitylake.storage.local.LocalInputStream;
 import java.io.Closeable;
+import java.io.OutputStream;
 import java.util.List;
 
 /** Common operations that should be supported by a TrinityLake storage */
@@ -31,7 +32,9 @@ public interface StorageOps extends Closeable, Initializable {
 
   LocalInputStream startReadLocal(LiteralURI uri);
 
-  AtomicOutputStream startWrite(LiteralURI uri);
+  AtomicOutputStream startCommit(LiteralURI uri);
+
+  OutputStream startOverwrite(LiteralURI uri);
 
   boolean exists(LiteralURI uri);
 

@@ -36,8 +36,8 @@ import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-class S3OutputStream extends AtomicOutputStream {
-  private static final Logger LOG = LoggerFactory.getLogger(S3OutputStream.class);
+class S3AtomicOutputStream extends AtomicOutputStream {
+  private static final Logger LOG = LoggerFactory.getLogger(S3AtomicOutputStream.class);
 
   private final S3AsyncClient s3;
   private final LiteralURI uri;
@@ -63,7 +63,7 @@ class S3OutputStream extends AtomicOutputStream {
           .withMaxRetries(3)
           .build();
 
-  public S3OutputStream(
+  public S3AtomicOutputStream(
       S3AsyncClient s3,
       LiteralURI uri,
       CommonStorageOpsProperties commonProperties,

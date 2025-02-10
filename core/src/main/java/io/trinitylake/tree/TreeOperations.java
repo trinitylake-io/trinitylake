@@ -29,6 +29,7 @@ import io.trinitylake.util.FileUtil;
 import io.trinitylake.util.ValidationUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
@@ -121,7 +122,7 @@ public class TreeOperations {
   }
 
   public static void writeRootNodeFile(LakehouseStorage storage, String path, TreeRoot root) {
-    try (AtomicOutputStream stream = storage.startWrite(path)) {
+    try (AtomicOutputStream stream = storage.startCommit(path)) {
       writeRootNodeFile(stream, root);
     } catch (IOException e) {
       throw new StorageAtomicSealFailureException(e);
@@ -183,10 +184,10 @@ public class TreeOperations {
   }
 
   public static void tryWriteRootNodeVersionHintFile(LakehouseStorage storage, long rootVersion) {
-    try (AtomicOutputStream stream =
-        storage.startWrite(FileLocations.LATEST_VERSION_HINT_FILE_PATH)) {
+    try (OutputStream stream =
+        storage.startOverwrite(FileLocations.LATEST_VERSION_HINT_FILE_PATH)) {
       stream.write(Long.toString(rootVersion).getBytes(StandardCharsets.UTF_8));
-    } catch (StorageAtomicSealFailureException | StorageWriteFailureException | IOException e) {
+    } catch (StorageWriteFailureException | IOException e) {
       LOG.error("Failed to write root node version hint file", e);
     }
   }

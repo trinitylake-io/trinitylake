@@ -17,6 +17,7 @@ import io.trinitylake.storage.*;
 import io.trinitylake.util.ValidationUtil;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -63,8 +64,15 @@ public class LocalStorageOps implements StorageOps {
   }
 
   @Override
-  public AtomicOutputStream startWrite(LiteralURI uri) {
-    return new LocalOutputStream(Paths.get(fileSystemPath(uri)), commonProperties, localProperties);
+  public AtomicOutputStream startCommit(LiteralURI uri) {
+    return new LocalAtomicOutputStream(
+        Paths.get(fileSystemPath(uri)), commonProperties, localProperties);
+  }
+
+  @Override
+  public OutputStream startOverwrite(LiteralURI uri) {
+    return new LocalOverwriteOutputStream(
+        Paths.get(fileSystemPath(uri)), commonProperties, localProperties);
   }
 
   @Override
