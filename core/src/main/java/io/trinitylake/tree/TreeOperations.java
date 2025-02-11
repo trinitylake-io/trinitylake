@@ -336,4 +336,21 @@ public class TreeOperations {
       return current;
     }
   }
+
+  public static Optional<String> searchValue(
+      LakehouseStorage storage, TreeNode startNode, String key) {
+    TreeNode currentNode = startNode;
+    while (true) {
+      NodeSearchResult searchResult = currentNode.search(key);
+      if (searchResult.value().isPresent()) {
+        return Optional.of(searchResult.value().get());
+      }
+
+      if (!searchResult.nodePointer().isPresent()) {
+        return Optional.empty();
+      }
+
+      currentNode = readRootNodeFile(storage, searchResult.nodePointer().get());
+    }
+  }
 }
