@@ -13,7 +13,7 @@
  */
 package io.trinitylake;
 
-import com.google.common.collect.ImmutableSet;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableSet;
 import io.trinitylake.util.PropertyUtil;
 import java.util.Locale;
 import java.util.Map;

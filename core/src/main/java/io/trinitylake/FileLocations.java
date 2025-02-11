@@ -13,9 +13,9 @@
  */
 package io.trinitylake;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
+import io.trinitylake.relocated.com.google.common.hash.HashCode;
+import io.trinitylake.relocated.com.google.common.hash.HashFunction;
+import io.trinitylake.relocated.com.google.common.hash.Hashing;
 import io.trinitylake.util.ValidationUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;

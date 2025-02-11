@@ -13,8 +13,8 @@
  */
 package io.trinitylake;
 
-import com.google.common.collect.ImmutableSet;
 import io.trinitylake.models.LakehouseDef;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableSet;
 import io.trinitylake.util.ValidationUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;

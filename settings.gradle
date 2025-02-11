@@ -16,9 +16,11 @@ rootProject.name = 'trinitylake'
 
 include 'core'
 include 'spark'
+include 'bundled-guava'
 
 project(':core').name = 'trinitylake-core'
 project(':spark').name = 'trinitylake-spark'
+project(':bundled-guava').name = 'trinitylake-bundled-guava'
 
 if (System.getProperty("allModules") != null) {
     System.setProperty("sparkVersions", System.getProperty("knownSparkVersions"))

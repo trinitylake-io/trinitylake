@@ -13,13 +13,13 @@
  */
 package io.trinitylake.storage.s3;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteStreams;
 import dev.failsafe.Failsafe;
 import dev.failsafe.FailsafeException;
 import dev.failsafe.RetryPolicy;
 import io.trinitylake.exception.StoragePathNotFoundException;
 import io.trinitylake.exception.StorageReadFailureException;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableList;
+import io.trinitylake.relocated.com.google.common.io.ByteStreams;
 import io.trinitylake.storage.LiteralURI;
 import io.trinitylake.storage.SeekableInputStream;
 import io.trinitylake.util.ValidationUtil;
