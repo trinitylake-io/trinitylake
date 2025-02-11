@@ -13,9 +13,9 @@
  */
 package io.trinitylake.storage.local;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
 import io.trinitylake.exception.StorageAtomicSealFailureException;
+import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
+import io.trinitylake.relocated.com.google.common.io.Files;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

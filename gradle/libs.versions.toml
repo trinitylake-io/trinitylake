@@ -12,10 +12,12 @@
 
 [versions]
 antlr = "4.9.3"
+guava = "33.3.1-jre"
 junit = "5.11.3"
 scala-collection-compat = "2.12.0"
 spark-hive35 = "3.5.2"
 
 [libraries]
 antlr-antlr4 = { module = "org.antlr:antlr4", version.ref = "antlr" }
+guava-guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }

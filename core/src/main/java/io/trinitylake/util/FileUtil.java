@@ -13,9 +13,9 @@
  */
 package io.trinitylake.util;
 
-import com.google.common.io.CharStreams;
 import io.trinitylake.exception.StorageFileOpenFailureException;
 import io.trinitylake.exception.StorageReadFailureException;
+import io.trinitylake.relocated.com.google.common.io.CharStreams;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
