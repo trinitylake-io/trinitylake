@@ -13,41 +13,16 @@
  */
 package io.trinitylake;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Streams;
+import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import com.google.common.io.CountingOutputStream;
 import com.google.common.io.Files;
-import com.google.common.io.Resources;
-import com.google.common.primitives.Bytes;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 // inspired in part by
 // https://github.com/apache/avro/blob/release-1.8.2/lang/java/guava/src/main/java/org/apache/avro/GuavaClasses.java
@@ -58,41 +33,15 @@ public class GuavaClasses {
    * Referencing Guava classes here includes them in the minimized and relocated Guava jar
    */
   static {
-    VisibleForTesting.class.getName();
-    Joiner.class.getName();
-    MoreObjects.class.getName();
-    Objects.class.getName();
-    Preconditions.class.getName();
-    Splitter.class.getName();
     Throwables.class.getName();
-    BiMap.class.getName();
-    FluentIterable.class.getName();
-    ImmutableBiMap.class.getName();
-    ImmutableList.class.getName();
-    ImmutableMap.class.getName();
-    ImmutableSet.class.getName();
-    Iterables.class.getName();
-    Iterators.class.getName();
-    ListMultimap.class.getName();
-    Lists.class.getName();
-    MapMaker.class.getName();
-    Maps.class.getName();
-    Multimap.class.getName();
-    Multimaps.class.getName();
-    Ordering.class.getName();
-    Sets.class.getName();
-    Streams.class.getName();
-    Hasher.class.getName();
+    HashCode.class.getName();
     HashFunction.class.getName();
     Hashing.class.getName();
-    Files.class.getName();
-    Bytes.class.getName();
-    Resources.class.getName();
-    MoreExecutors.class.getName();
-    ThreadFactoryBuilder.class.getName();
-    Iterables.class.getName();
+    Maps.class.getName();
+    CharStreams.class.getName();
     CountingOutputStream.class.getName();
-    Suppliers.class.getName();
-    Stopwatch.class.getName();
+    ByteStreams.class.getName();
+    MoreExecutors.class.getName();
+    Files.class.getName();
   }
 }
