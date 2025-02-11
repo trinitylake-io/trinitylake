@@ -82,4 +82,67 @@ public class TestTrinityLake {
     NamespaceDef readDef = ObjectDefinitions.readNamespaceDef(storage, ns1Path.get());
     Assertions.assertThat(readDef).isEqualTo(ns1Def);
   }
+
+  @Test
+  public void testCreateDescribeNamespace() {
+    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
+    TrinityLake.createLakehouse(storage, lakehouseDef);
+    RunningTransaction transaction = TrinityLake.beginTransaction(storage);
+
+    NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
+    transaction = TrinityLake.createNamespace(storage, transaction, "ns1", ns1Def);
+    TrinityLake.commitTransaction(storage, transaction);
+
+    transaction = TrinityLake.beginTransaction(storage);
+    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    NamespaceDef ns1DefDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
+    Assertions.assertThat(ns1DefDescribe).isEqualTo(ns1Def);
+  }
+
+  @Test
+  public void testCreateDescribeAlterDescribeNamespace() {
+    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
+    TrinityLake.createLakehouse(storage, lakehouseDef);
+    RunningTransaction transaction = TrinityLake.beginTransaction(storage);
+
+    NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
+    transaction = TrinityLake.createNamespace(storage, transaction, "ns1", ns1Def);
+    TrinityLake.commitTransaction(storage, transaction);
+
+    transaction = TrinityLake.beginTransaction(storage);
+    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    NamespaceDef ns1DefDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
+    Assertions.assertThat(ns1DefDescribe).isEqualTo(ns1Def);
+
+    NamespaceDef ns1DefAlter = NamespaceDef.newBuilder().putProperties("k1", "v2").build();
+    transaction = TrinityLake.alterNamespace(storage, transaction, "ns1", ns1DefAlter);
+    TrinityLake.commitTransaction(storage, transaction);
+
+    transaction = TrinityLake.beginTransaction(storage);
+    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    NamespaceDef ns1DefAlterDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
+    Assertions.assertThat(ns1DefAlterDescribe).isEqualTo(ns1DefAlter);
+  }
+
+  @Test
+  public void testCreateDescribeDropDescribeNamespace() {
+    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
+    TrinityLake.createLakehouse(storage, lakehouseDef);
+    RunningTransaction transaction = TrinityLake.beginTransaction(storage);
+
+    NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
+    transaction = TrinityLake.createNamespace(storage, transaction, "ns1", ns1Def);
+    TrinityLake.commitTransaction(storage, transaction);
+
+    transaction = TrinityLake.beginTransaction(storage);
+    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    NamespaceDef ns1DefDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
+    Assertions.assertThat(ns1DefDescribe).isEqualTo(ns1Def);
+
+    transaction = TrinityLake.dropNamespace(storage, transaction, "ns1");
+    TrinityLake.commitTransaction(storage, transaction);
+
+    transaction = TrinityLake.beginTransaction(storage);
+    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isFalse();
+  }
 }
