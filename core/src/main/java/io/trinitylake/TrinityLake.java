@@ -127,7 +127,7 @@ public class TrinityLake {
     String namespaceDefFilePath = FileLocations.newNamespaceDefFilePath(namespaceName);
     ObjectDefinitions.writeNamespaceDef(storage, namespaceDefFilePath, namespaceName, namespaceDef);
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
-    newRoot.set(namespaceKey, namespaceDefFilePath);
+    TreeOperations.setValue(storage, newRoot, namespaceKey, namespaceDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
 
@@ -146,7 +146,7 @@ public class TrinityLake {
     String namespaceDefFilePath = FileLocations.newNamespaceDefFilePath(namespaceName);
     ObjectDefinitions.writeNamespaceDef(storage, namespaceDefFilePath, namespaceName, namespaceDef);
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
-    newRoot.set(namespaceKey, namespaceDefFilePath);
+    TreeOperations.setValue(storage, newRoot, namespaceKey, namespaceDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
 
@@ -160,7 +160,7 @@ public class TrinityLake {
     }
 
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
-    newRoot.remove(namespaceKey);
+    TreeOperations.removeKey(storage, newRoot, namespaceKey);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
 
@@ -223,7 +223,7 @@ public class TrinityLake {
     String tableDefFilePath = FileLocations.newTableDefFilePath(namespaceName, tableName);
     ObjectDefinitions.writeTableDef(storage, tableDefFilePath, namespaceName, tableName, tableDef);
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
-    newRoot.set(tableKey, tableDefFilePath);
+    TreeOperations.setValue(storage, newRoot, tableKey, tableDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
 
@@ -248,7 +248,7 @@ public class TrinityLake {
     String tableDefFilePath = FileLocations.newTableDefFilePath(namespaceName, tableName);
     ObjectDefinitions.writeTableDef(storage, tableDefFilePath, namespaceName, tableName, tableDef);
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
-    newRoot.set(tableKey, tableDefFilePath);
+    TreeOperations.setValue(storage, newRoot, tableKey, tableDefFilePath);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
 
@@ -266,7 +266,7 @@ public class TrinityLake {
     }
 
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
-    newRoot.remove(tableKey);
+    TreeOperations.removeKey(storage, newRoot, tableKey);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
   }
 }
