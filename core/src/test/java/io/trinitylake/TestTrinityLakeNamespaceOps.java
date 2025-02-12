@@ -31,7 +31,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-public class TestTrinityLake {
+public class TestTrinityLakeNamespaceOps {
+
+  private static final LakehouseDef LAKEHOUSE_DEF =
+      LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
 
   @TempDir private File tempDir;
 
@@ -49,21 +52,12 @@ public class TestTrinityLake {
         new BasicLakehouseStorage(
             new LiteralURI("file://" + tempDir),
             new LocalStorageOps(props, LocalStorageOpsProperties.instance()));
-  }
 
-  @Test
-  public void testCreateLakehouse() {
-    TrinityLake.createLakehouse(storage, LakehouseDef.newBuilder().build());
-    Assertions.assertThat(storage.exists(FileLocations.LATEST_VERSION_HINT_FILE_PATH)).isTrue();
-    TreeRoot root = TreeOperations.findLatestRoot(storage);
-    Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isFalse();
-    Assertions.assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(0));
+    TrinityLake.createLakehouse(storage, LAKEHOUSE_DEF);
   }
 
   @Test
   public void testCreateNamespace() {
-    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    TrinityLake.createLakehouse(storage, lakehouseDef);
     RunningTransaction transaction = TrinityLake.beginTransaction(storage);
 
     NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
@@ -76,7 +70,7 @@ public class TestTrinityLake {
     Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
     Assertions.assertThat(root.previousRootNodeFilePath().get())
         .isEqualTo(FileLocations.rootNodeFilePath(0));
-    String ns1Key = ObjectKeys.namespaceKey("ns1", lakehouseDef);
+    String ns1Key = ObjectKeys.namespaceKey("ns1", LAKEHOUSE_DEF);
     Optional<String> ns1Path = TreeOperations.searchValue(storage, root, ns1Key);
     Assertions.assertThat(ns1Path.isPresent()).isTrue();
     NamespaceDef readDef = ObjectDefinitions.readNamespaceDef(storage, ns1Path.get());
@@ -85,8 +79,6 @@ public class TestTrinityLake {
 
   @Test
   public void testCreateDescribeNamespace() {
-    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    TrinityLake.createLakehouse(storage, lakehouseDef);
     RunningTransaction transaction = TrinityLake.beginTransaction(storage);
 
     NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
@@ -101,8 +93,6 @@ public class TestTrinityLake {
 
   @Test
   public void testCreateDescribeAlterDescribeNamespace() {
-    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    TrinityLake.createLakehouse(storage, lakehouseDef);
     RunningTransaction transaction = TrinityLake.beginTransaction(storage);
 
     NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
@@ -126,8 +116,6 @@ public class TestTrinityLake {
 
   @Test
   public void testCreateDescribeDropDescribeNamespace() {
-    LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    TrinityLake.createLakehouse(storage, lakehouseDef);
     RunningTransaction transaction = TrinityLake.beginTransaction(storage);
 
     NamespaceDef ns1Def = NamespaceDef.newBuilder().putProperties("k1", "v1").build();
