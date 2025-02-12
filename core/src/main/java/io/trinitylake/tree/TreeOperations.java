@@ -353,4 +353,14 @@ public class TreeOperations {
       currentNode = readRootNodeFile(storage, searchResult.nodePointer().get());
     }
   }
+
+  public static void setValue(LakehouseStorage storage, TreeRoot root, String key, String value) {
+    // TODO: implement actual algorithm
+    root.set(key, value);
+  }
+
+  public static void removeKey(LakehouseStorage storage, TreeRoot root, String key) {
+    // TODO: implement actual algorithm
+    root.remove(key);
+  }
 }
