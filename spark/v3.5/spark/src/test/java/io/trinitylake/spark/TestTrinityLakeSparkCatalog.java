@@ -15,7 +15,7 @@ package io.trinitylake.spark;
 
 import org.junit.jupiter.api.Test;
 
-public class TestTrinityLakeCatalog {
+public class TestTrinityLakeSparkCatalog {
 
   @Test
   public void test() {}
