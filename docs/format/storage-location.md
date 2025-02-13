@@ -67,9 +67,9 @@ For example, an original file path `my/path/my-table-definition.binpb` will be t
 
 ### Non-Root Node File Path
 
-Non-root node file paths are in the form of prefix `node-` plus a version 4 UUID with suffix `.ipc`.
+Non-root node file paths are in the form of prefix `node-` plus a version 4 UUID with suffix `.arrow`.
 For example, if a UUID `6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8` is generated for the node file,
-the original file name of the node file will be `node-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc`,
+the original file name of the node file will be `node-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.arrow`,
 and that further goes through the [file name optimization](./storage-location#optimized-file-name)
 to produce the final node file path.
 
@@ -91,9 +91,9 @@ With CoW, the root node file name is important because every change to the tree 
 and the root node file name can be used essentially as the version of the tree.
 
 TrinityLake defines that each root node has a numeric version number,
-and the root node is stored in a file name `_<version_number_binary_reversed>.ipc`.
+and the root node is stored in a file name `_<version_number_binary_reversed>.arrow`.
 The file name is persisted in storage as is without [optimization](./storage-location#optimized-file-name).
-For example, the 100th version of the root node file would be stored with name `_00100110000000000000000000000000.ipc`.
+For example, the 100th version of the root node file would be stored with name `_00100110000000000000000000000000.arrow`.
 
 ### Root Node Latest Version Hint File Path
 

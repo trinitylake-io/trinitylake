@@ -40,7 +40,7 @@ class Storage:
 
     def serialize_protobuf(self, proto_msg, file_name=None) -> str:
         if not file_name:
-            file_name = f"{str(uuid.uuid4())}.ipc"
+            file_name = f"{str(uuid.uuid4())}.arrow"
         serialized_data = proto_msg.SerializeToString()
         file_path = self._full_path(file_name)
         with open(file_path, "wb") as f:
@@ -76,7 +76,7 @@ class Storage:
             if i < len(node.children):
                 child = node.children[i]
                 if child:
-                    child_file_path = f"{str(uuid.uuid4())}.ipc"
+                    child_file_path = f"{str(uuid.uuid4())}.arrow"
                     self.serialize_tree(child, child_file_path)
                     pnodes.append(child_file_path)
                 else:

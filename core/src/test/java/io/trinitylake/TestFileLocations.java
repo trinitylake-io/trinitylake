@@ -22,13 +22,13 @@ public class TestFileLocations {
   @Test
   public void testVersionToRootNodeFilePath() {
     Assertions.assertThat(FileLocations.rootNodeFilePath(1))
-        .isEqualTo("_1000000000000000000000000000000000000000000000000000000000000000.ipc");
+        .isEqualTo("_1000000000000000000000000000000000000000000000000000000000000000.arrow");
 
     Assertions.assertThat(FileLocations.rootNodeFilePath(12345678))
-        .isEqualTo("_0111001010000110001111010000000000000000000000000000000000000000.ipc");
+        .isEqualTo("_0111001010000110001111010000000000000000000000000000000000000000.arrow");
 
     Assertions.assertThat(FileLocations.rootNodeFilePath(9223372036854775802L))
-        .isEqualTo("_0101111111111111111111111111111111111111111111111111111111111110.ipc");
+        .isEqualTo("_0101111111111111111111111111111111111111111111111111111111111110.arrow");
 
     Assertions.assertThatThrownBy(() -> FileLocations.rootNodeFilePath(-1))
         .isInstanceOf(InvalidArgumentException.class)
@@ -39,17 +39,17 @@ public class TestFileLocations {
   public void testRootNodeFilePathToVersion() {
     Assertions.assertThat(
             FileLocations.versionFromNodeFilePath(
-                "_1000000000000000000000000000000000000000000000000000000000000000.ipc"))
+                "_1000000000000000000000000000000000000000000000000000000000000000.arrow"))
         .isEqualTo(1);
 
     Assertions.assertThat(
             FileLocations.versionFromNodeFilePath(
-                "_0111001010000110001111010000000000000000000000000000000000000000.ipc"))
+                "_0111001010000110001111010000000000000000000000000000000000000000.arrow"))
         .isEqualTo(12345678);
 
     Assertions.assertThat(
             FileLocations.versionFromNodeFilePath(
-                "_0101111111111111111111111111111111111111111111111111111111111110.ipc"))
+                "_0101111111111111111111111111111111111111111111111111111111111110.arrow"))
         .isEqualTo(9223372036854775802L);
 
     Assertions.assertThat(FileLocations.isRootNodeFilePath("invalid.txt")).isFalse();
@@ -59,12 +59,12 @@ public class TestFileLocations {
 
     Assertions.assertThat(
             FileLocations.isRootNodeFilePath(
-                "_2000000000000000000000000000000000000000000000000000000000000000.ipc"))
+                "_2000000000000000000000000000000000000000000000000000000000000000.arrow"))
         .isFalse();
     Assertions.assertThatThrownBy(
             () ->
                 FileLocations.versionFromNodeFilePath(
-                    "_2000000000000000000000000000000000000000000000000000000000000000.ipc"))
+                    "_2000000000000000000000000000000000000000000000000000000000000000.arrow"))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("Root node file path must match pattern");
   }
