@@ -1,0 +1,1397 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://trinitylake.io/format/storage-location/">
+      
+      
+        <link rel="prev" href="../storage-layout/">
+      
+      
+        <link rel="next" href="../storage-transaction/">
+      
+      
+      <link rel="icon" href="../../logo/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+    
+    
+      
+        <title>Storage Location - TrinityLake</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#storage-location" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="TrinityLake" class="md-header__button md-logo" aria-label="TrinityLake" data-md-component="logo">
+      
+  <img src="../../logo/blue.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TrinityLake
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Storage Location
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/trinitylake-io/trinitylake" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    trinitylake-io/trinitylake
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="TrinityLake" class="md-nav__button md-logo" aria-label="TrinityLake" data-md-component="logo">
+      
+  <img src="../../logo/blue.png" alt="logo">
+
+    </a>
+    TrinityLake
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/trinitylake-io/trinitylake" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    trinitylake-io/trinitylake
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Format
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Format
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../versioning/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Versioning
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage-layout/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Storage Layout
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Storage Location
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Storage Location
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#terminologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminologies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminologies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-vs-prefix-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory vs Prefix Notation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types-of-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Types of Locations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root URI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standard-file-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      Standard File Paths
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Standard File Paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-path-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Path Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#non-root-node-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-Root Node File Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-definition-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object Definition File Path
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-standard-file-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-Standard File Paths
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Non-Standard File Paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#root-node-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root Node File Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-node-latest-version-hint-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root Node Latest Version Hint File Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lakehouse-definition-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lakehouse Definition File Path
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage-transaction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Storage Transaction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lakehouse-transaction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lakehouse Transaction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../key-encoding/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lakehouse Object Key Encoding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Lakehouse Object Definitions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            Lakehouse Object Definitions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/lakehouse/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lakehouse
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/namespace/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Namespace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8_4" id="__nav_2_8_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Table
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Table
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/table/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/table/table-schema/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/table/table-type/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Table Type
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/table/format-iceberg/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apache Iceberg Table Format
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tree Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tree Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tree/search-tree/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Search Tree
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tree/search-tree-map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Search Tree Map
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tree/b-tree/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    B-Tree
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tree/b-epsilon-tree/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    B-Epsilon Tree
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Transaction concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            Transaction concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transaction/ansi-definitions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ANSI Definitions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transaction/snapshot-isolation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Snapshot Isolation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../join-us/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Join Us
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#terminologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminologies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminologies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-vs-prefix-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory vs Prefix Notation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types-of-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Types of Locations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root URI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standard-file-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      Standard File Paths
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Standard File Paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-path-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Path Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#non-root-node-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-Root Node File Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-definition-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object Definition File Path
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-standard-file-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-Standard File Paths
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Non-Standard File Paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#root-node-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root Node File Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-node-latest-version-hint-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Root Node Latest Version Hint File Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lakehouse-definition-file-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lakehouse Definition File Path
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="storage-location">Storage Location</h1>
+<p>In the <a href="../storage-layout/">Storage Layout</a> document, we have described how a TrinityLake tree is persisted in a storage.
+This document describes the specification for the location of persisted files.</p>
+<h2 id="terminologies">Terminologies</h2>
+<h3 id="directory-vs-prefix-notation">Directory vs Prefix Notation</h3>
+<p>In general, TrinityLake is designed against object storage systems, and only have a prefix concept.
+There is no operation at TrinityLake interface level to create or manage directories in any storage systems that supports directory.</p>
+<p>However, we retain the conventional directory concept and syntax, and users can say a prefix, or a part of a prefix, 
+is a directory if the purpose of that prefix is to store more files, with <code>/</code> being the separator for different levels of directories.</p>
+<h3 id="types-of-locations">Types of Locations</h3>
+<p>We in general use 3 terminologies when describing the storage locations in TrinityLake:</p>
+<ul>
+<li><strong>URI</strong>: a URI in TrinityLake follows the <a href="https://datatracker.ietf.org/doc/html/rfc3986">RFC-3986</a> specification,
+  but in addition obeys the object storage semantics, where special characters like <code>.</code>, <code>..</code>, etc. should be interpreted literally,
+  rather than having semantic file system meanings. To check if a URI is qualified to be used in TrinityLake, evaluate the URI in a
+  POSIX file system, and the resulting URI should be identical to the original URI. For example, <code>s3://my-bucket/../file</code> is evaluated
+  to <code>s3://my-file</code>, and is thus not qualified and must not be used in TrinityLake.</li>
+<li><strong>Path</strong>: when used in TrinityLake, a path refers to a sequence of directories, optionally with a final file name. 
+  Therefore, a path must be relative to a prefix, and not start with <code>/</code>.</li>
+<li><strong>Location</strong>: when used in TrinityLake, a location can be either a path, or a fully qualified URI</li>
+</ul>
+<h2 id="root-uri">Root URI</h2>
+<p>A Trinity Lakehouse always starts at a storage <strong>Root</strong> URI, for example <code>s3://my-trinity-lakehouse/</code>.
+We call a storage system with a root URI a <strong>Trinity Lakehouse Storage</strong>, as all the internal information of this lakehouse
+must be using paths within this root URI.</p>
+<p>The root URI is always a directory, thus to avoid user confusion, we will always treat it as 
+ending with a <code>/</code> even when the user input does not.
+For example, if the user defines the root URI as <code>s3://my-bucket/my-lakehouse</code>,
+it is treated as <code>s3://my-bucket/my-lakehouse/</code> when used.</p>
+<p>The Lakehouse root URI is not stored within the TrinityLake format itself.
+It is expected that a user would specify the root location at runtime.
+This ensures the whole lakehouse is portable for use cases like cross-region replication.</p>
+<h2 id="standard-file-paths">Standard File Paths</h2>
+<h3 id="file-path-optimization">File Path Optimization</h3>
+<p>A file path in the TrinityLake format is designed for optimized performance in storage, with a focus on object storage.
+Given an <strong>Original File Path</strong>, the <strong>Optimized File Path</strong> in storage can be calculated as the following:</p>
+<ol>
+<li>Calculate the MurMur3 hash of the file path in bytes.</li>
+<li>Get the first 20 bytes and convert it to binary string representation and use it as the prefix. 
+   This maximizes the throughput in object storages like S3.</li>
+<li>For the first, second and third group of 4 characters in the prefix, further separated with <code>/</code>. 
+   This maximizes the throughput in file systems when a directory listing at root location is necessary.</li>
+<li>Replace the <code>/</code> character in original file path by <code>-</code></li>
+<li>Concatenate the prefix before the file path produced in step 4 using the <code>-</code> character.</li>
+</ol>
+<p>For example, an original file path <code>my/path/my-table-definition.binpb</code> will be transformed to 
+<code>0101/0101/0101/10101100-my-path-my-table-definition.binpb</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>File name optimization is a write side feature, and should not be used by readers to reverse-engineer
+the original file name.</p>
+</div>
+<h3 id="non-root-node-file-path">Non-Root Node File Path</h3>
+<p>Non-root node file paths are in the form of prefix <code>node-</code> plus a version 4 UUID with suffix <code>.ipc</code>.
+For example, if a UUID <code>6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8</code> is generated for the node file,
+the original file name of the node file will be <code>node-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.ipc</code>,
+and that further goes through the <a href="./storage-location#optimized-file-name">file name optimization</a>
+to produce the final node file path.</p>
+<h3 id="object-definition-file-path">Object Definition File Path</h3>
+<p>Object definition file paths excluding the <a href="#lakehouse-definition-file-path">Lakehouse definition file path</a>
+are in the form of prefix <code>{object-type}-{object-identifier}-</code> plus a version 4 UUID
+with suffix <code>.binpb</code>.
+For example, a table <code>t1</code> in namespace <code>ns1</code> and UUID <code>6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8</code> would give a path
+<code>table-t1-ns1-6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.binpb</code>,
+and that further goes through the <a href="./storage-location#optimized-file-name">file name optimization</a>
+to produce the final object definition file path.</p>
+<h2 id="non-standard-file-paths">Non-Standard File Paths</h2>
+<h3 id="root-node-file-path">Root Node File Path</h3>
+<p>With CoW, the root node file name is important because every change to the tree would create a new root node file,
+and the root node file name can be used essentially as the version of the tree.</p>
+<p>TrinityLake defines that each root node has a numeric version number,
+and the root node is stored in a file name <code>_&lt;version_number_binary_reversed&gt;.ipc</code>.
+The file name is persisted in storage as is without <a href="./storage-location#optimized-file-name">optimization</a>.
+For example, the 100th version of the root node file would be stored with name <code>_00100110000000000000000000000000.ipc</code>.</p>
+<h3 id="root-node-latest-version-hint-file-path">Root Node Latest Version Hint File Path</h3>
+<p>A file with name <code>_latest_hint.txt</code> is stored and marks the hint to the latest version of the TrinityLake tree root node file.
+The file name is persisted in storage as is without <a href="./storage-location#optimized-file-name">optimization</a>
+The file contains a number that marks the presumably latest version of the tree root node, such as <code>100</code>.</p>
+<h3 id="lakehouse-definition-file-path">Lakehouse Definition File Path</h3>
+<p>Lakehouse definition file path are in the form of <code>_lakehouse_def_</code> plus a version 4 UUID with suffix <code>.binpb</code>.
+For example, a UUID <code>6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8</code> would give a path
+<code>_lakehouse_def_6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8.binpb</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      
+    
+  </body>
+</html>
