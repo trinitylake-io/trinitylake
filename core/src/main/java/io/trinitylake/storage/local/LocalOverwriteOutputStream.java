@@ -13,70 +13,24 @@
  */
 package io.trinitylake.storage.local;
 
-import io.trinitylake.exception.StorageAtomicSealFailureException;
-import io.trinitylake.exception.StoragePathNotFoundException;
 import io.trinitylake.storage.CommonStorageOpsProperties;
-import io.trinitylake.util.FileUtil;
-import java.io.*;
-import java.nio.file.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
-/** TODO: refactor with LocalAtomicOutputStream */
-public class LocalOverwriteOutputStream extends OutputStream {
-
-  private static final Logger LOG = LoggerFactory.getLogger(LocalOverwriteOutputStream.class);
-
-  private final Path file;
-  private final File tempFile;
-  private final FileOutputStream stream;
+public class LocalOverwriteOutputStream extends LocalStagingOutputStream {
 
   public LocalOverwriteOutputStream(
       Path file,
       CommonStorageOpsProperties commonProperties,
       LocalStorageOpsProperties localProperties) {
-    this.file = file;
-    this.tempFile = FileUtil.createTempFile("local-", commonProperties.writeStagingDirectory());
-    try {
-      this.stream = new FileOutputStream(tempFile);
-    } catch (FileNotFoundException e) {
-      throw new StoragePathNotFoundException(e);
-    }
+    super(file, commonProperties, localProperties);
   }
 
   @Override
-  public void write(byte[] bytes) throws IOException {
-    stream.write(bytes);
-  }
-
-  @Override
-  public void write(int b) throws IOException {
-    stream.write(b);
-  }
-
-  @Override
-  public void write(byte[] bytes, int off, int len) throws IOException {
-    stream.write(bytes, off, len);
-  }
-
-  @Override
-  public void flush() throws IOException {
-    stream.flush();
-  }
-
-  @Override
-  public void close() throws IOException {
-    try {
-      // this would result in potential orphan directories,
-      // but there is not a better way at this moment
-      // plus with the file path optimization strategy,
-      // it is okay to create these folders since they would be used eventually
-      Files.createDirectories(file.getParent());
-      Files.move(tempFile.toPath(), file, StandardCopyOption.REPLACE_EXISTING);
-    } catch (FileAlreadyExistsException e) {
-      throw new StorageAtomicSealFailureException(e);
-    }
-
-    stream.close();
+  public void commit() throws IOException {
+    createParentDirectories();
+    Files.move(tempFile.toPath(), file, StandardCopyOption.REPLACE_EXISTING);
   }
 }
