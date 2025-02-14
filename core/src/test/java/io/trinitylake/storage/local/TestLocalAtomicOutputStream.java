@@ -16,6 +16,7 @@ package io.trinitylake.storage.local;
 import io.trinitylake.exception.StorageAtomicSealFailureException;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.relocated.com.google.common.io.Files;
+import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,8 +40,8 @@ public class TestLocalAtomicOutputStream {
                 CommonStorageOpsProperties.WRITE_STAGING_DIRECTORY, tempDir.toString()));
 
     Path targetFilePath = tempDir.resolve("target-" + UUID.randomUUID() + ".txt");
-    LocalAtomicOutputStream stream =
-        new LocalAtomicOutputStream(
+    AtomicOutputStream stream =
+        new LocalAtomicStagingOutputStream(
             targetFilePath, commonProperties, LocalStorageOpsProperties.instance());
     stream.write("some data".getBytes(StandardCharsets.UTF_8));
     stream.close();
@@ -57,8 +58,8 @@ public class TestLocalAtomicOutputStream {
                 CommonStorageOpsProperties.WRITE_STAGING_DIRECTORY, tempDir.toString()));
 
     Path targetFilePath = tempDir.resolve(UUID.randomUUID() + "/" + UUID.randomUUID() + ".txt");
-    LocalAtomicOutputStream stream =
-        new LocalAtomicOutputStream(
+    AtomicOutputStream stream =
+        new LocalAtomicStagingOutputStream(
             targetFilePath, commonProperties, LocalStorageOpsProperties.instance());
     stream.write("some data".getBytes(StandardCharsets.UTF_8));
     stream.close();
@@ -76,13 +77,13 @@ public class TestLocalAtomicOutputStream {
 
     Path targetFilePath = tempDir.resolve("target-" + UUID.randomUUID() + ".txt");
 
-    LocalAtomicOutputStream stream1 =
-        new LocalAtomicOutputStream(
+    AtomicOutputStream stream1 =
+        new LocalAtomicStagingOutputStream(
             targetFilePath, commonProperties, LocalStorageOpsProperties.instance());
     stream1.write("some data 1".getBytes(StandardCharsets.UTF_8));
 
-    LocalAtomicOutputStream stream2 =
-        new LocalAtomicOutputStream(
+    AtomicOutputStream stream2 =
+        new LocalAtomicStagingOutputStream(
             targetFilePath, commonProperties, LocalStorageOpsProperties.instance());
     stream2.write("some data 2".getBytes(StandardCharsets.UTF_8));
 
@@ -103,13 +104,13 @@ public class TestLocalAtomicOutputStream {
 
     Path targetFilePath = tempDir.resolve("target-" + UUID.randomUUID() + ".txt");
     AtomicInteger failedWrites = new AtomicInteger(0);
-    List<LocalAtomicOutputStream> streams =
+    List<AtomicOutputStream> streams =
         IntStream.range(0, 128)
             .mapToObj(
                 i -> {
                   try {
-                    LocalAtomicOutputStream stream =
-                        new LocalAtomicOutputStream(
+                    AtomicOutputStream stream =
+                        new LocalAtomicStagingOutputStream(
                             targetFilePath, commonProperties, LocalStorageOpsProperties.instance());
                     stream.write("some data".getBytes(StandardCharsets.UTF_8));
                     return stream;
