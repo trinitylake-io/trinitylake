@@ -65,7 +65,7 @@ public class LocalStorageOps implements StorageOps {
 
   @Override
   public AtomicOutputStream startCommit(LiteralURI uri) {
-    return new LocalAtomicOutputStream(
+    return new LocalAtomicStagingOutputStream(
         Paths.get(fileSystemPath(uri)), commonProperties, localProperties);
   }
 

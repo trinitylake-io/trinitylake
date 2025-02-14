@@ -13,29 +13,23 @@
  */
 package io.trinitylake.storage.local;
 
-import io.trinitylake.exception.CommitFailureException;
-import io.trinitylake.exception.StorageAtomicSealFailureException;
 import io.trinitylake.exception.StoragePathNotFoundException;
-import io.trinitylake.storage.AtomicOutputStream;
 import io.trinitylake.storage.CommonStorageOpsProperties;
 import io.trinitylake.util.FileUtil;
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocalAtomicOutputStream extends AtomicOutputStream {
+public abstract class LocalStagingOutputStream extends OutputStream {
+  private static final Logger LOG = LoggerFactory.getLogger(LocalStagingOutputStream.class);
 
-  private static final Logger LOG = LoggerFactory.getLogger(LocalAtomicOutputStream.class);
+  protected final Path file;
+  protected final File tempFile;
+  protected final FileOutputStream stream;
 
-  private final Path file;
-  private final File tempFile;
-  private final FileOutputStream stream;
-
-  public LocalAtomicOutputStream(
+  protected LocalStagingOutputStream(
       Path file,
       CommonStorageOpsProperties commonProperties,
       LocalStorageOpsProperties localProperties) {
@@ -46,20 +40,6 @@ public class LocalAtomicOutputStream extends AtomicOutputStream {
       this.stream = new FileOutputStream(tempFile);
     } catch (FileNotFoundException e) {
       throw new StoragePathNotFoundException(e);
-    }
-  }
-
-  @Override
-  public void atomicallySeal() throws CommitFailureException, IOException {
-    try {
-      // this would result in potential orphan directories,
-      // but there is not a better way at this moment
-      // plus with the file path optimization strategy,
-      // it is okay to create these folders since they would be used eventually
-      Files.createDirectories(file.getParent());
-      Files.move(tempFile.toPath(), file);
-    } catch (FileAlreadyExistsException e) {
-      throw new StorageAtomicSealFailureException(e);
     }
   }
 
@@ -83,8 +63,22 @@ public class LocalAtomicOutputStream extends AtomicOutputStream {
     stream.flush();
   }
 
-  @Override
-  public FileChannel channel() {
+  protected FileChannel getChannel() {
     return stream.getChannel();
+  }
+
+  protected void createParentDirectories() throws IOException {
+    Files.createDirectories(file.getParent());
+  }
+
+  protected abstract void commit() throws IOException;
+
+  @Override
+  public void close() throws IOException {
+    try {
+      commit();
+    } finally {
+      stream.close();
+    }
   }
 }
