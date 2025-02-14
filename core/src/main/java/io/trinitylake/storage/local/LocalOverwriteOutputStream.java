@@ -22,10 +22,10 @@ import java.nio.file.StandardCopyOption;
 public class LocalOverwriteOutputStream extends LocalStagingOutputStream {
 
   public LocalOverwriteOutputStream(
-      Path tempFile,
+      Path file,
       CommonStorageOpsProperties commonProperties,
       LocalStorageOpsProperties localProperties) {
-    super(tempFile, commonProperties, localProperties);
+    super(file, commonProperties, localProperties);
   }
 
   @Override
