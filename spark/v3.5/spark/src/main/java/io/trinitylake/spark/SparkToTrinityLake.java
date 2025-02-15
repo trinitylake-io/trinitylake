@@ -17,6 +17,8 @@ import io.trinitylake.util.ValidationUtil;
 
 public class SparkToTrinityLake {
 
+  private SparkToTrinityLake() {}
+
   public static String namespaceName(String[] sparkNamespaceName) {
     ValidationUtil.checkArgument(
         sparkNamespaceName.length == 1, "namespace must be a single level");

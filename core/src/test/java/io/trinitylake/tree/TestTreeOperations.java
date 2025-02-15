@@ -13,6 +13,8 @@
  */
 package io.trinitylake.tree;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.trinitylake.FileLocations;
 import io.trinitylake.storage.BasicLakehouseStorage;
 import io.trinitylake.storage.LakehouseStorage;
@@ -22,7 +24,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.stream.Collectors;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -44,10 +45,10 @@ public class TestTreeOperations {
     File file = tempDir.resolve("testWriteReadRootNodeFile.ipc").toFile();
 
     TreeOperations.writeRootNodeFile(storage, "testWriteReadRootNodeFile.ipc", treeRoot);
-    Assertions.assertThat(file.exists()).isTrue();
+    assertThat(file.exists()).isTrue();
 
     TreeRoot root = TreeOperations.readRootNodeFile(storage, "testWriteReadRootNodeFile.ipc");
-    Assertions.assertThat(
+    assertThat(
             treeRoot.nodeKeyTable().stream()
                 .collect(Collectors.toMap(NodeKeyTableRow::key, NodeKeyTableRow::value)))
         .isEqualTo(
@@ -78,7 +79,7 @@ public class TestTreeOperations {
     TreeOperations.writeRootNodeFile(storage, v2Path, treeRootV2);
 
     TreeRoot root = TreeOperations.findLatestRoot(storage);
-    Assertions.assertThat(root.path().get()).isEqualTo(v2Path);
+    assertThat(root.path().get()).isEqualTo(v2Path);
   }
 
   @Test
@@ -105,21 +106,21 @@ public class TestTreeOperations {
 
     Iterator<TreeRoot> roots = TreeOperations.listRoots(storage).iterator();
 
-    Assertions.assertThat(roots.hasNext()).isTrue();
+    assertThat(roots.hasNext()).isTrue();
     TreeRoot root = roots.next();
-    Assertions.assertThat(root.path().get()).isEqualTo(v2Path);
-    Assertions.assertThat(root.previousRootNodeFilePath().get()).isEqualTo(v1Path);
+    assertThat(root.path().get()).isEqualTo(v2Path);
+    assertThat(root.previousRootNodeFilePath().get()).isEqualTo(v1Path);
 
-    Assertions.assertThat(roots.hasNext()).isTrue();
+    assertThat(roots.hasNext()).isTrue();
     root = roots.next();
-    Assertions.assertThat(root.path().get()).isEqualTo(v1Path);
-    Assertions.assertThat(root.previousRootNodeFilePath().get()).isEqualTo(v0Path);
+    assertThat(root.path().get()).isEqualTo(v1Path);
+    assertThat(root.previousRootNodeFilePath().get()).isEqualTo(v0Path);
 
-    Assertions.assertThat(roots.hasNext()).isTrue();
+    assertThat(roots.hasNext()).isTrue();
     root = roots.next();
-    Assertions.assertThat(root.path().get()).isEqualTo(v0Path);
-    Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isFalse();
+    assertThat(root.path().get()).isEqualTo(v0Path);
+    assertThat(root.previousRootNodeFilePath().isPresent()).isFalse();
 
-    Assertions.assertThat(roots.hasNext()).isFalse();
+    assertThat(roots.hasNext()).isFalse();
   }
 }

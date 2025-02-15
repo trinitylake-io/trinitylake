@@ -13,9 +13,11 @@
  */
 package io.trinitylake;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.trinitylake.exception.InvalidArgumentException;
 import io.trinitylake.models.LakehouseDef;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TestObjectKeys {
@@ -23,11 +25,11 @@ public class TestObjectKeys {
   @Test
   public void testNamespaceKey() {
     LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    Assertions.assertThat(ObjectKeys.namespaceKey("ns1", lakehouseDef)).isEqualTo("B===ns1     ");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.namespaceKey("", lakehouseDef))
+    assertThat(ObjectKeys.namespaceKey("ns1", lakehouseDef)).isEqualTo("B===ns1     ");
+    assertThatThrownBy(() -> ObjectKeys.namespaceKey("", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("must be provided");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.namespaceKey("aaaaaaaaa", lakehouseDef))
+    assertThatThrownBy(() -> ObjectKeys.namespaceKey("aaaaaaaaa", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("must be less than or equal to 8");
   }
@@ -35,17 +37,16 @@ public class TestObjectKeys {
   @Test
   public void testIsNamespaceKey() {
     LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    Assertions.assertThat(ObjectKeys.isNamespaceKey("B===ns1     ", lakehouseDef)).isTrue();
-    Assertions.assertThat(ObjectKeys.isNamespaceKey("B===ns1  ", lakehouseDef)).isFalse();
-    Assertions.assertThat(ObjectKeys.isNamespaceKey("b===ns1", lakehouseDef)).isFalse();
+    assertThat(ObjectKeys.isNamespaceKey("B===ns1     ", lakehouseDef)).isTrue();
+    assertThat(ObjectKeys.isNamespaceKey("B===ns1  ", lakehouseDef)).isFalse();
+    assertThat(ObjectKeys.isNamespaceKey("b===ns1", lakehouseDef)).isFalse();
   }
 
   @Test
   public void testNamespaceNameFromKey() {
     LakehouseDef lakehouseDef = LakehouseDef.newBuilder().setNamespaceNameMaxSizeBytes(8).build();
-    Assertions.assertThat(ObjectKeys.namespaceNameFromKey("B===ns1     ", lakehouseDef))
-        .isEqualTo("ns1");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.namespaceNameFromKey("B===ns1  ", lakehouseDef))
+    assertThat(ObjectKeys.namespaceNameFromKey("B===ns1     ", lakehouseDef)).isEqualTo("ns1");
+    assertThatThrownBy(() -> ObjectKeys.namespaceNameFromKey("B===ns1  ", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("Invalid namespace key");
   }
@@ -57,18 +58,17 @@ public class TestObjectKeys {
             .setNamespaceNameMaxSizeBytes(8)
             .setTableNameMaxSizeBytes(8)
             .build();
-    Assertions.assertThat(ObjectKeys.tableKey("ns1", "t1", lakehouseDef))
-        .isEqualTo("C===ns1     t1      ");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.tableKey("", "t1", lakehouseDef))
+    assertThat(ObjectKeys.tableKey("ns1", "t1", lakehouseDef)).isEqualTo("C===ns1     t1      ");
+    assertThatThrownBy(() -> ObjectKeys.tableKey("", "t1", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("must be provided");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.tableKey("ns1", "", lakehouseDef))
+    assertThatThrownBy(() -> ObjectKeys.tableKey("ns1", "", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("must be provided");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.tableKey("aaaaaaaaa", "t1", lakehouseDef))
+    assertThatThrownBy(() -> ObjectKeys.tableKey("aaaaaaaaa", "t1", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("must be less than or equal to 8");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.tableKey("ns1", "aaaaaaaaa", lakehouseDef))
+    assertThatThrownBy(() -> ObjectKeys.tableKey("ns1", "aaaaaaaaa", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("must be less than or equal to 8");
   }
@@ -80,9 +80,9 @@ public class TestObjectKeys {
             .setNamespaceNameMaxSizeBytes(8)
             .setTableNameMaxSizeBytes(8)
             .build();
-    Assertions.assertThat(ObjectKeys.isTableKey("C===ns1     t1      ", lakehouseDef)).isTrue();
-    Assertions.assertThat(ObjectKeys.isTableKey("C===ns1  t1   ", lakehouseDef)).isFalse();
-    Assertions.assertThat(ObjectKeys.isTableKey("c===ns1     t1      ", lakehouseDef)).isFalse();
+    assertThat(ObjectKeys.isTableKey("C===ns1     t1      ", lakehouseDef)).isTrue();
+    assertThat(ObjectKeys.isTableKey("C===ns1  t1   ", lakehouseDef)).isFalse();
+    assertThat(ObjectKeys.isTableKey("c===ns1     t1      ", lakehouseDef)).isFalse();
   }
 
   @Test
@@ -92,9 +92,8 @@ public class TestObjectKeys {
             .setNamespaceNameMaxSizeBytes(8)
             .setTableNameMaxSizeBytes(8)
             .build();
-    Assertions.assertThat(ObjectKeys.tableNameFromKey("C===ns1     t1      ", lakehouseDef))
-        .isEqualTo("t1");
-    Assertions.assertThatThrownBy(() -> ObjectKeys.tableNameFromKey("B===ns1  ", lakehouseDef))
+    assertThat(ObjectKeys.tableNameFromKey("C===ns1     t1      ", lakehouseDef)).isEqualTo("t1");
+    assertThatThrownBy(() -> ObjectKeys.tableNameFromKey("B===ns1  ", lakehouseDef))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("Invalid table key");
   }

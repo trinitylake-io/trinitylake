@@ -13,6 +13,9 @@
  */
 package io.trinitylake.storage.local;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.trinitylake.exception.StorageAtomicSealFailureException;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.relocated.com.google.common.io.Files;
@@ -25,7 +28,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -46,7 +48,7 @@ public class TestLocalAtomicOutputStream {
     stream.close();
 
     String result = Files.asCharSource(targetFilePath.toFile(), StandardCharsets.UTF_8).read();
-    Assertions.assertThat(result).isEqualTo("some data");
+    assertThat(result).isEqualTo("some data");
   }
 
   @Test
@@ -64,7 +66,7 @@ public class TestLocalAtomicOutputStream {
     stream.close();
 
     String result = Files.asCharSource(targetFilePath.toFile(), StandardCharsets.UTF_8).read();
-    Assertions.assertThat(result).isEqualTo("some data");
+    assertThat(result).isEqualTo("some data");
   }
 
   @Test
@@ -87,11 +89,10 @@ public class TestLocalAtomicOutputStream {
     stream2.write("some data 2".getBytes(StandardCharsets.UTF_8));
 
     stream1.close();
-    Assertions.assertThatThrownBy(() -> stream2.close())
-        .isInstanceOf(StorageAtomicSealFailureException.class);
+    assertThatThrownBy(() -> stream2.close()).isInstanceOf(StorageAtomicSealFailureException.class);
 
     String result = Files.asCharSource(targetFilePath.toFile(), StandardCharsets.UTF_8).read();
-    Assertions.assertThat(result).isEqualTo("some data 1");
+    assertThat(result).isEqualTo("some data 1");
   }
 
   @Test
@@ -120,7 +121,7 @@ public class TestLocalAtomicOutputStream {
                 })
             .collect(Collectors.toList());
 
-    Assertions.assertThat(failedWrites.get()).isEqualTo(0);
+    assertThat(failedWrites.get()).isEqualTo(0);
 
     AtomicInteger failedClose = new AtomicInteger(0);
     streams.parallelStream()
@@ -129,7 +130,7 @@ public class TestLocalAtomicOutputStream {
               try {
                 s.close();
               } catch (RuntimeException e) {
-                Assertions.assertThat(e).isInstanceOf(StorageAtomicSealFailureException.class);
+                assertThat(e).isInstanceOf(StorageAtomicSealFailureException.class);
                 failedClose.incrementAndGet();
               } catch (IOException e) {
                 // this should not happen
@@ -138,6 +139,6 @@ public class TestLocalAtomicOutputStream {
             });
 
     String result = Files.asCharSource(targetFilePath.toFile(), StandardCharsets.UTF_8).read();
-    Assertions.assertThat(result).isEqualTo("some data");
+    assertThat(result).isEqualTo("some data");
   }
 }

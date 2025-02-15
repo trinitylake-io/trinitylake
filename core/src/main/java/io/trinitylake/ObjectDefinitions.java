@@ -25,6 +25,8 @@ import java.io.OutputStream;
 
 public class ObjectDefinitions {
 
+  private ObjectDefinitions() {}
+
   public static void writeLakehouseDef(
       LakehouseStorage storage, String path, LakehouseDef lakehouseDef) {
 

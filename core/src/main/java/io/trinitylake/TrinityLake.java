@@ -21,7 +21,10 @@ import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.LakehouseStorage;
-import io.trinitylake.tree.*;
+import io.trinitylake.tree.BasicTreeRoot;
+import io.trinitylake.tree.NodeKeyTableRow;
+import io.trinitylake.tree.TreeOperations;
+import io.trinitylake.tree.TreeRoot;
 import io.trinitylake.util.ValidationUtil;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TrinityLake {
+
+  private TrinityLake() {}
 
   public static void createLakehouse(LakehouseStorage storage, LakehouseDef lakehouseDef) {
     String lakehouseDefFilePath = FileLocations.newLakehouseDefFilePath();

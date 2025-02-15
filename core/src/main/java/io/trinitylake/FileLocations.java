@@ -39,6 +39,8 @@ public class FileLocations {
   // Entropy generated will be divided into this number of directories
   private static final int ENTROPY_DIR_DEPTH = 3;
 
+  private FileLocations() {}
+
   public static boolean isRootNodeFilePath(String path) {
     return ROOT_NODE_FILE_PATH_PATTERN.matcher(path).matches();
   }

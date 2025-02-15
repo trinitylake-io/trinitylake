@@ -13,6 +13,8 @@
  */
 package io.trinitylake.storage.local;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.trinitylake.relocated.com.google.common.io.CharStreams;
 import io.trinitylake.storage.LiteralURI;
 import java.io.IOException;
@@ -25,7 +27,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -35,7 +36,7 @@ public class TestLocalStorageOps {
   public void testListing(@TempDir Path tempDir) throws IOException {
     Path dir = tempDir.resolve("testListing");
     boolean created = dir.toFile().mkdirs();
-    Assertions.assertThat(created).isTrue();
+    assertThat(created).isTrue();
 
     for (int i = 0; i < 10; i++) {
       Path file = dir.resolve("f" + i + ".txt");
@@ -44,7 +45,7 @@ public class TestLocalStorageOps {
 
     LocalStorageOps ops = new LocalStorageOps();
     List<LiteralURI> results = ops.list(new LiteralURI("file://" + dir));
-    Assertions.assertThat(results.size()).isEqualTo(10);
+    assertThat(results.size()).isEqualTo(10);
   }
 
   @Test
@@ -53,9 +54,8 @@ public class TestLocalStorageOps {
     Files.write(file, "data".getBytes());
 
     LocalStorageOps ops = new LocalStorageOps();
-    Assertions.assertThat(ops.exists(new LiteralURI("file://" + file))).isTrue();
-    Assertions.assertThat(ops.exists(new LiteralURI("file://" + tempDir.resolve("not-exist.txt"))))
-        .isFalse();
+    assertThat(ops.exists(new LiteralURI("file://" + file))).isTrue();
+    assertThat(ops.exists(new LiteralURI("file://" + tempDir.resolve("not-exist.txt")))).isFalse();
   }
 
   @Test
@@ -74,12 +74,12 @@ public class TestLocalStorageOps {
                   }
                 })
             .collect(Collectors.toList());
-    files.stream().forEach(f -> Assertions.assertThat(f.toFile().exists()).isTrue());
+    files.stream().forEach(f -> assertThat(f.toFile().exists()).isTrue());
 
     LocalStorageOps ops = new LocalStorageOps();
     ops.delete(files.stream().map(f -> new LiteralURI("file://" + f)).collect(Collectors.toList()));
 
-    files.stream().forEach(f -> Assertions.assertThat(f.toFile().exists()).isFalse());
+    files.stream().forEach(f -> assertThat(f.toFile().exists()).isFalse());
   }
 
   @Test
@@ -88,8 +88,7 @@ public class TestLocalStorageOps {
     Files.write(file, "data".getBytes());
     LocalStorageOps ops = new LocalStorageOps();
     InputStream stream = ops.startRead(new LiteralURI("file://" + file));
-    Assertions.assertThat(
-            CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8)))
+    assertThat(CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8)))
         .isEqualTo("data");
   }
 
@@ -99,8 +98,7 @@ public class TestLocalStorageOps {
     Files.write(file, "data".getBytes());
     LocalStorageOps ops = new LocalStorageOps();
     InputStream stream = ops.startReadLocal(new LiteralURI("file://" + file));
-    Assertions.assertThat(
-            CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8)))
+    assertThat(CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8)))
         .isEqualTo("data");
   }
 
@@ -112,7 +110,6 @@ public class TestLocalStorageOps {
     stream.write("data".getBytes());
     stream.close();
 
-    Assertions.assertThat(new String(Files.readAllBytes(file), StandardCharsets.UTF_8))
-        .isEqualTo("data");
+    assertThat(new String(Files.readAllBytes(file), StandardCharsets.UTF_8)).isEqualTo("data");
   }
 }

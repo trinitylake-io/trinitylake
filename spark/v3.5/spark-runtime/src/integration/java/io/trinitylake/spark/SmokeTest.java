@@ -23,7 +23,7 @@ public class SmokeTest {
   private static SparkSession spark;
 
   @BeforeAll
-  public static void setup() {
+  public static void beforeAll() {
     spark =
         SparkSession.builder()
             .master("local[2]")

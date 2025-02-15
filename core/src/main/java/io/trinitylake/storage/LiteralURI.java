@@ -57,10 +57,10 @@ public class LiteralURI {
     this.authority = authoritySplit[0];
 
     // Strip query and fragment if they exist
-    String path = authoritySplit.length > 1 ? authoritySplit[1] : "";
-    path = path.split(QUERY_DELIM, -1)[0];
-    path = path.split(FRAGMENT_DELIM, -1)[0];
-    this.path = path;
+    String parsedPath = authoritySplit.length > 1 ? authoritySplit[1] : "";
+    parsedPath = parsedPath.split(QUERY_DELIM, -1)[0];
+    parsedPath = parsedPath.split(FRAGMENT_DELIM, -1)[0];
+    this.path = parsedPath;
   }
 
   public LiteralURI extendPath(String newPath) {
@@ -94,8 +94,12 @@ public class LiteralURI {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     LiteralURI that = (LiteralURI) o;
     return Objects.equals(location, that.location)
         && Objects.equals(scheme, that.scheme)

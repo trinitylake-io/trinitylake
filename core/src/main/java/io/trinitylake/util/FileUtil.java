@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 
 public class FileUtil {
 
+  private FileUtil() {}
+
   private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
   public static File createTempFile(String filePrefix, File stagingDirectory) {

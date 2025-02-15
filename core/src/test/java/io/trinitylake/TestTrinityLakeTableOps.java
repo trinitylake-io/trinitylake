@@ -13,7 +13,14 @@
  */
 package io.trinitylake;
 
-import io.trinitylake.models.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.trinitylake.models.Column;
+import io.trinitylake.models.DataType;
+import io.trinitylake.models.LakehouseDef;
+import io.trinitylake.models.NamespaceDef;
+import io.trinitylake.models.Schema;
+import io.trinitylake.models.TableDef;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.BasicLakehouseStorage;
 import io.trinitylake.storage.CommonStorageOpsProperties;
@@ -25,7 +32,6 @@ import io.trinitylake.tree.TreeOperations;
 import io.trinitylake.tree.TreeRoot;
 import java.io.File;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -77,16 +83,15 @@ public class TestTrinityLakeTableOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     TreeRoot root = TreeOperations.findLatestRoot(storage);
-    Assertions.assertThat(root.path().isPresent()).isTrue();
-    Assertions.assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(2));
-    Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
-    Assertions.assertThat(root.previousRootNodeFilePath().get())
-        .isEqualTo(FileLocations.rootNodeFilePath(1));
+    assertThat(root.path().isPresent()).isTrue();
+    assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(2));
+    assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
+    assertThat(root.previousRootNodeFilePath().get()).isEqualTo(FileLocations.rootNodeFilePath(1));
     String t1Key = ObjectKeys.tableKey("ns1", "t1", LAKEHOUSE_DEF);
     Optional<String> t1Path = TreeOperations.searchValue(storage, root, t1Key);
-    Assertions.assertThat(t1Path.isPresent()).isTrue();
+    assertThat(t1Path.isPresent()).isTrue();
     TableDef readDef = ObjectDefinitions.readTableDef(storage, t1Path.get());
-    Assertions.assertThat(readDef).isEqualTo(tableDef);
+    assertThat(readDef).isEqualTo(tableDef);
   }
 
   @Test
@@ -105,9 +110,9 @@ public class TestTrinityLakeTableOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
+    assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
     TableDef t1DefDescribe = TrinityLake.describeTable(storage, transaction, "ns1", "t1");
-    Assertions.assertThat(t1DefDescribe).isEqualTo(tableDef);
+    assertThat(t1DefDescribe).isEqualTo(tableDef);
   }
 
   @Test
@@ -126,9 +131,9 @@ public class TestTrinityLakeTableOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
+    assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
     TableDef t1DefDescribe = TrinityLake.describeTable(storage, transaction, "ns1", "t1");
-    Assertions.assertThat(t1DefDescribe).isEqualTo(tableDef);
+    assertThat(t1DefDescribe).isEqualTo(tableDef);
 
     TableDef t1DefAlter =
         TableDef.newBuilder()
@@ -143,9 +148,9 @@ public class TestTrinityLakeTableOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
+    assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
     TableDef t1DefAlterDescribe = TrinityLake.describeTable(storage, transaction, "ns1", "t1");
-    Assertions.assertThat(t1DefAlterDescribe).isEqualTo(t1DefAlter);
+    assertThat(t1DefAlterDescribe).isEqualTo(t1DefAlter);
   }
 
   @Test
@@ -164,14 +169,14 @@ public class TestTrinityLakeTableOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
+    assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isTrue();
     TableDef t1DefDescribe = TrinityLake.describeTable(storage, transaction, "ns1", "t1");
-    Assertions.assertThat(t1DefDescribe).isEqualTo(tableDef);
+    assertThat(t1DefDescribe).isEqualTo(tableDef);
 
     transaction = TrinityLake.dropTable(storage, transaction, "ns1", "t1");
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isFalse();
+    assertThat(TrinityLake.tableExists(storage, transaction, "ns1", "t1")).isFalse();
   }
 }

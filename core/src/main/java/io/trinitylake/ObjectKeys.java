@@ -21,25 +21,26 @@ import java.util.Set;
 
 public class ObjectKeys {
 
-  public static String LAKEHOUSE_DEFINITION = "lakehouse_def";
-  public static byte[] LAKEHOUSE_DEFINITION_BYTES =
+  public static final String LAKEHOUSE_DEFINITION = "lakehouse_def";
+  public static final byte[] LAKEHOUSE_DEFINITION_BYTES =
       LAKEHOUSE_DEFINITION.getBytes(StandardCharsets.UTF_8);
 
-  public static String PREVIOUS_ROOT_NODE = "previous_root";
-  public static byte[] PREVIOUS_ROOT_NODE_BYTES =
+  public static final String PREVIOUS_ROOT_NODE = "previous_root";
+  public static final byte[] PREVIOUS_ROOT_NODE_BYTES =
       PREVIOUS_ROOT_NODE.getBytes(StandardCharsets.UTF_8);
 
-  public static String ROLLBACK_FROM_ROOT_NODE = "rollback_from_root";
-  public static byte[] ROLLBACK_FROM_ROOT_NODE_BYTES =
+  public static final String ROLLBACK_FROM_ROOT_NODE = "rollback_from_root";
+  public static final byte[] ROLLBACK_FROM_ROOT_NODE_BYTES =
       ROLLBACK_FROM_ROOT_NODE.getBytes(StandardCharsets.UTF_8);
 
-  public static String NUMBER_OF_KEYS = "n_keys";
-  public static byte[] NUMBER_OF_KEYS_BYTES = NUMBER_OF_KEYS.getBytes(StandardCharsets.UTF_8);
+  public static final String NUMBER_OF_KEYS = "n_keys";
+  public static final byte[] NUMBER_OF_KEYS_BYTES = NUMBER_OF_KEYS.getBytes(StandardCharsets.UTF_8);
 
-  public static String CREATED_AT_MILLIS = "created_at_millis";
-  public static byte[] CREATED_AT_MILLIS_BYTES = CREATED_AT_MILLIS.getBytes(StandardCharsets.UTF_8);
+  public static final String CREATED_AT_MILLIS = "created_at_millis";
+  public static final byte[] CREATED_AT_MILLIS_BYTES =
+      CREATED_AT_MILLIS.getBytes(StandardCharsets.UTF_8);
 
-  public static Set<String> SYSTEM_INTERNAL_KEYS =
+  public static final Set<String> SYSTEM_INTERNAL_KEYS =
       ImmutableSet.<String>builder()
           .add(LAKEHOUSE_DEFINITION)
           .add(PREVIOUS_ROOT_NODE)
@@ -51,6 +52,8 @@ public class ObjectKeys {
   private static final int SCHEMA_ID_PART_SIZE = 4;
   private static final String NAMESPACE_SCHEMA_ID_PART = "B===";
   private static final String TABLE_SCHEMA_ID_PART = "C===";
+
+  private ObjectKeys() {}
 
   public static String namespaceKey(String namespaceName, LakehouseDef lakehouseDef) {
     ValidationUtil.checkNotNull(lakehouseDef, "Lakehouse definition must be provided");
