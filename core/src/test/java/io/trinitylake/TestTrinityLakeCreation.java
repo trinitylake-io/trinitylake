@@ -13,6 +13,8 @@
  */
 package io.trinitylake;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.BasicLakehouseStorage;
@@ -24,7 +26,6 @@ import io.trinitylake.storage.local.LocalStorageOpsProperties;
 import io.trinitylake.tree.TreeOperations;
 import io.trinitylake.tree.TreeRoot;
 import java.io.File;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,9 +53,9 @@ public class TestTrinityLakeCreation {
   @Test
   public void testCreateLakehouse() {
     TrinityLake.createLakehouse(storage, LakehouseDef.newBuilder().build());
-    Assertions.assertThat(storage.exists(FileLocations.LATEST_VERSION_HINT_FILE_PATH)).isTrue();
+    assertThat(storage.exists(FileLocations.LATEST_VERSION_HINT_FILE_PATH)).isTrue();
     TreeRoot root = TreeOperations.findLatestRoot(storage);
-    Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isFalse();
-    Assertions.assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(0));
+    assertThat(root.previousRootNodeFilePath().isPresent()).isFalse();
+    assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(0));
   }
 }

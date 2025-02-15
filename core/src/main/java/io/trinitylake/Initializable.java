@@ -18,5 +18,5 @@ import java.util.Map;
 /** Interface for objects that can be initialized through reflection */
 public interface Initializable {
 
-  public void initialize(Map<String, String> properties);
+  void initialize(Map<String, String> properties);
 }

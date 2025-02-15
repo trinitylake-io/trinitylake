@@ -13,6 +13,8 @@
  */
 package io.trinitylake;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
@@ -26,7 +28,6 @@ import io.trinitylake.tree.TreeOperations;
 import io.trinitylake.tree.TreeRoot;
 import java.io.File;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -65,16 +66,15 @@ public class TestTrinityLakeNamespaceOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     TreeRoot root = TreeOperations.findLatestRoot(storage);
-    Assertions.assertThat(root.path().isPresent()).isTrue();
-    Assertions.assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(1));
-    Assertions.assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
-    Assertions.assertThat(root.previousRootNodeFilePath().get())
-        .isEqualTo(FileLocations.rootNodeFilePath(0));
+    assertThat(root.path().isPresent()).isTrue();
+    assertThat(root.path().get()).isEqualTo(FileLocations.rootNodeFilePath(1));
+    assertThat(root.previousRootNodeFilePath().isPresent()).isTrue();
+    assertThat(root.previousRootNodeFilePath().get()).isEqualTo(FileLocations.rootNodeFilePath(0));
     String ns1Key = ObjectKeys.namespaceKey("ns1", LAKEHOUSE_DEF);
     Optional<String> ns1Path = TreeOperations.searchValue(storage, root, ns1Key);
-    Assertions.assertThat(ns1Path.isPresent()).isTrue();
+    assertThat(ns1Path.isPresent()).isTrue();
     NamespaceDef readDef = ObjectDefinitions.readNamespaceDef(storage, ns1Path.get());
-    Assertions.assertThat(readDef).isEqualTo(ns1Def);
+    assertThat(readDef).isEqualTo(ns1Def);
   }
 
   @Test
@@ -86,9 +86,9 @@ public class TestTrinityLakeNamespaceOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
     NamespaceDef ns1DefDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
-    Assertions.assertThat(ns1DefDescribe).isEqualTo(ns1Def);
+    assertThat(ns1DefDescribe).isEqualTo(ns1Def);
   }
 
   @Test
@@ -100,18 +100,18 @@ public class TestTrinityLakeNamespaceOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
     NamespaceDef ns1DefDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
-    Assertions.assertThat(ns1DefDescribe).isEqualTo(ns1Def);
+    assertThat(ns1DefDescribe).isEqualTo(ns1Def);
 
     NamespaceDef ns1DefAlter = NamespaceDef.newBuilder().putProperties("k1", "v2").build();
     transaction = TrinityLake.alterNamespace(storage, transaction, "ns1", ns1DefAlter);
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
     NamespaceDef ns1DefAlterDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
-    Assertions.assertThat(ns1DefAlterDescribe).isEqualTo(ns1DefAlter);
+    assertThat(ns1DefAlterDescribe).isEqualTo(ns1DefAlter);
   }
 
   @Test
@@ -123,14 +123,14 @@ public class TestTrinityLakeNamespaceOps {
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
+    assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isTrue();
     NamespaceDef ns1DefDescribe = TrinityLake.describeNamespace(storage, transaction, "ns1");
-    Assertions.assertThat(ns1DefDescribe).isEqualTo(ns1Def);
+    assertThat(ns1DefDescribe).isEqualTo(ns1Def);
 
     transaction = TrinityLake.dropNamespace(storage, transaction, "ns1");
     TrinityLake.commitTransaction(storage, transaction);
 
     transaction = TrinityLake.beginTransaction(storage);
-    Assertions.assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isFalse();
+    assertThat(TrinityLake.namespaceExists(storage, transaction, "ns1")).isFalse();
   }
 }

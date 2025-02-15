@@ -26,6 +26,8 @@ import java.util.Map;
 
 public class InitializationUtil {
 
+  private InitializationUtil() {}
+
   public static <T extends Initializable> T loadInitializable(
       String impl, Map<String, String> properties, Class<T> clazz) {
     ValidationUtil.checkNotNull(

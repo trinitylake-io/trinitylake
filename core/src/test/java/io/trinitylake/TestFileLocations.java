@@ -13,55 +13,57 @@
  */
 package io.trinitylake;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.trinitylake.exception.InvalidArgumentException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TestFileLocations {
 
   @Test
   public void testVersionToRootNodeFilePath() {
-    Assertions.assertThat(FileLocations.rootNodeFilePath(1))
+    assertThat(FileLocations.rootNodeFilePath(1))
         .isEqualTo("_1000000000000000000000000000000000000000000000000000000000000000.ipc");
 
-    Assertions.assertThat(FileLocations.rootNodeFilePath(12345678))
+    assertThat(FileLocations.rootNodeFilePath(12345678))
         .isEqualTo("_0111001010000110001111010000000000000000000000000000000000000000.ipc");
 
-    Assertions.assertThat(FileLocations.rootNodeFilePath(9223372036854775802L))
+    assertThat(FileLocations.rootNodeFilePath(9223372036854775802L))
         .isEqualTo("_0101111111111111111111111111111111111111111111111111111111111110.ipc");
 
-    Assertions.assertThatThrownBy(() -> FileLocations.rootNodeFilePath(-1))
+    assertThatThrownBy(() -> FileLocations.rootNodeFilePath(-1))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("version must be non-negative");
   }
 
   @Test
   public void testRootNodeFilePathToVersion() {
-    Assertions.assertThat(
+    assertThat(
             FileLocations.versionFromNodeFilePath(
                 "_1000000000000000000000000000000000000000000000000000000000000000.ipc"))
         .isEqualTo(1);
 
-    Assertions.assertThat(
+    assertThat(
             FileLocations.versionFromNodeFilePath(
                 "_0111001010000110001111010000000000000000000000000000000000000000.ipc"))
         .isEqualTo(12345678);
 
-    Assertions.assertThat(
+    assertThat(
             FileLocations.versionFromNodeFilePath(
                 "_0101111111111111111111111111111111111111111111111111111111111110.ipc"))
         .isEqualTo(9223372036854775802L);
 
-    Assertions.assertThat(FileLocations.isRootNodeFilePath("invalid.txt")).isFalse();
-    Assertions.assertThatThrownBy(() -> FileLocations.versionFromNodeFilePath("invalid.txt"))
+    assertThat(FileLocations.isRootNodeFilePath("invalid.txt")).isFalse();
+    assertThatThrownBy(() -> FileLocations.versionFromNodeFilePath("invalid.txt"))
         .isInstanceOf(InvalidArgumentException.class)
         .hasMessageContaining("Root node file path must match pattern");
 
-    Assertions.assertThat(
+    assertThat(
             FileLocations.isRootNodeFilePath(
                 "_2000000000000000000000000000000000000000000000000000000000000000.ipc"))
         .isFalse();
-    Assertions.assertThatThrownBy(
+    assertThatThrownBy(
             () ->
                 FileLocations.versionFromNodeFilePath(
                     "_2000000000000000000000000000000000000000000000000000000000000000.ipc"))
@@ -71,14 +73,14 @@ public class TestFileLocations {
 
   @Test
   public void testLakehouseDefFilePath() {
-    Assertions.assertThat(FileLocations.newLakehouseDefFilePath())
+    assertThat(FileLocations.newLakehouseDefFilePath())
         .startsWith(FileLocations.LAKEHOUSE_DEF_FILE_PATH_PREFIX)
         .endsWith(FileLocations.PROTOBUF_BINARY_FILE_SUFFIX);
   }
 
   @Test
   public void testNamespaceDefFilePath() {
-    Assertions.assertThat(FileLocations.newNamespaceDefFilePath("ns1"))
+    assertThat(FileLocations.newNamespaceDefFilePath("ns1"))
         .contains("ns1")
         .endsWith(FileLocations.PROTOBUF_BINARY_FILE_SUFFIX)
         .hasSize(23 + "-ns1-".length() + 36 + FileLocations.PROTOBUF_BINARY_FILE_SUFFIX.length());
@@ -86,7 +88,7 @@ public class TestFileLocations {
 
   @Test
   public void testTableDefFilePath() {
-    Assertions.assertThat(FileLocations.newTableDefFilePath("ns1", "t1"))
+    assertThat(FileLocations.newTableDefFilePath("ns1", "t1"))
         .contains("ns1")
         .contains("t1")
         .endsWith(FileLocations.PROTOBUF_BINARY_FILE_SUFFIX)

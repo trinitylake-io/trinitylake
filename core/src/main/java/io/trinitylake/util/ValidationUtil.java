@@ -18,6 +18,8 @@ import io.trinitylake.exception.InvalidStateException;
 
 public class ValidationUtil {
 
+  private ValidationUtil() {}
+
   public static void checkArgument(boolean expression, String message, Object... args) {
     if (!expression) {
       throw new InvalidArgumentException(message, args);

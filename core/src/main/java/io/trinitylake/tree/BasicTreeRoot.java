@@ -22,9 +22,7 @@ public class BasicTreeRoot extends BasicTreeNode implements TreeRoot {
   private String rollbackFromRootNodeFilePath;
   private String lakehouseDefFilePath;
 
-  public BasicTreeRoot() {
-    super();
-  }
+  public BasicTreeRoot() {}
 
   @Override
   public Optional<String> previousRootNodeFilePath() {

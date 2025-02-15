@@ -71,7 +71,7 @@ class S3InputStream extends SeekableInputStream {
           .withMaxRetries(3)
           .build();
 
-  public S3InputStream(S3AsyncClient s3, LiteralURI uri) {
+  S3InputStream(S3AsyncClient s3, LiteralURI uri) {
     this.s3 = s3;
     this.uri = uri;
 

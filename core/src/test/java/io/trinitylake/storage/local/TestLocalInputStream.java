@@ -13,6 +13,9 @@
  */
 package io.trinitylake.storage.local;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.trinitylake.exception.StorageFileOpenFailureException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,7 +23,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -28,7 +30,7 @@ public class TestLocalInputStream {
 
   @Test
   public void testReadFileNotExist() {
-    Assertions.assertThatThrownBy(() -> new LocalInputStream(new File("not-exist.txt")))
+    assertThatThrownBy(() -> new LocalInputStream(new File("not-exist.txt")))
         .isInstanceOf(StorageFileOpenFailureException.class)
         .hasCauseInstanceOf(FileNotFoundException.class);
   }
@@ -44,20 +46,20 @@ public class TestLocalInputStream {
 
     byte[] buffer = new byte[10];
     int len = stream.read(buffer);
-    Assertions.assertThat(len).isEqualTo(10);
-    Assertions.assertThat(new String(buffer, StandardCharsets.UTF_8)).isEqualTo("Lorem ipsu");
+    assertThat(len).isEqualTo(10);
+    assertThat(new String(buffer, StandardCharsets.UTF_8)).isEqualTo("Lorem ipsu");
 
     // seek beyond
     stream.seek(20);
     len = stream.read(buffer);
-    Assertions.assertThat(len).isEqualTo(10);
-    Assertions.assertThat(new String(buffer, StandardCharsets.UTF_8)).isEqualTo("t amet, co");
+    assertThat(len).isEqualTo(10);
+    assertThat(new String(buffer, StandardCharsets.UTF_8)).isEqualTo("t amet, co");
 
     // seek back
     stream.seek(10);
     len = stream.read(buffer);
-    Assertions.assertThat(len).isEqualTo(10);
-    Assertions.assertThat(new String(buffer, StandardCharsets.UTF_8)).isEqualTo("m dolor si");
+    assertThat(len).isEqualTo(10);
+    assertThat(new String(buffer, StandardCharsets.UTF_8)).isEqualTo("m dolor si");
   }
 
   @Test
@@ -70,6 +72,6 @@ public class TestLocalInputStream {
     stream.seek(10);
     byte[] buffer = new byte[10];
     int len = stream.read(buffer);
-    Assertions.assertThat(len).isEqualTo(-1);
+    assertThat(len).isEqualTo(-1);
   }
 }

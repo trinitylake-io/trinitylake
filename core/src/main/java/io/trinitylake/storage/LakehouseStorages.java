@@ -33,6 +33,8 @@ public class LakehouseStorages {
           .put(STORAGE_TYPE_S3, "io.trinitylake.storage.s3.AmazonS3StorageOps")
           .build();
 
+  private LakehouseStorages() {}
+
   public static LakehouseStorage initialize(Map<String, String> properties) {
     LiteralURI storageRoot = new LiteralURI(properties.get(STORAGE_ROT));
     StorageOps storageOps = initializeStorageOps(properties);

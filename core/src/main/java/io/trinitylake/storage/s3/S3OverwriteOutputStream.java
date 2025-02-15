@@ -61,7 +61,7 @@ class S3OverwriteOutputStream extends OutputStream {
           .withMaxRetries(3)
           .build();
 
-  public S3OverwriteOutputStream(
+  S3OverwriteOutputStream(
       S3AsyncClient s3,
       LiteralURI uri,
       CommonStorageOpsProperties commonProperties,

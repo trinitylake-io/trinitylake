@@ -63,7 +63,7 @@ class S3AtomicOutputStream extends AtomicOutputStream {
           .withMaxRetries(3)
           .build();
 
-  public S3AtomicOutputStream(
+  S3AtomicOutputStream(
       S3AsyncClient s3,
       LiteralURI uri,
       CommonStorageOpsProperties commonProperties,

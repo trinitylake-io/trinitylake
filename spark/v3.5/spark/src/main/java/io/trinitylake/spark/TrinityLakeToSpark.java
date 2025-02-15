@@ -15,6 +15,8 @@ package io.trinitylake.spark;
 
 public class TrinityLakeToSpark {
 
+  private TrinityLakeToSpark() {}
+
   public static String[] namespaceName(String trinityLakeNamespaceName) {
     return new String[] {trinityLakeNamespaceName};
   }

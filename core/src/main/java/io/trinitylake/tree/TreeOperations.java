@@ -56,6 +56,8 @@ public class TreeOperations {
   private static final int NODE_FILE_VALUE_COLUMN_INDEX = 1;
   private static final String NODE_FILE_VALUE_COLUMN_NAME = "value";
 
+  private TreeOperations() {}
+
   /**
    * Clone a tree root, excluding persistence specific information like path and creation time.
    *
@@ -297,7 +299,7 @@ public class TreeOperations {
     private final LakehouseStorage storage;
     private final TreeRoot latest;
 
-    public TreeRootIterable(LakehouseStorage storage, TreeRoot latest) {
+    TreeRootIterable(LakehouseStorage storage, TreeRoot latest) {
       this.storage = storage;
       this.latest = latest;
     }
@@ -314,7 +316,7 @@ public class TreeOperations {
     private final TreeRoot latest;
     private TreeRoot current;
 
-    public LakehouseVersionIterator(LakehouseStorage storage, TreeRoot latest) {
+    LakehouseVersionIterator(LakehouseStorage storage, TreeRoot latest) {
       this.storage = storage;
       this.latest = latest;
       this.current = null;
