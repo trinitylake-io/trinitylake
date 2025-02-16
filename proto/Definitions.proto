@@ -37,7 +37,7 @@ message TableDef {
 message ViewDef {
   Schema schema = 2;
   ViewRepresentation representation = 3;
-  optional view_type = 4
+  optional string view_type = 4;
   string view_format = 5;
   map<string, string> format_properties = 6;
   map<string, string> properties = 7;
