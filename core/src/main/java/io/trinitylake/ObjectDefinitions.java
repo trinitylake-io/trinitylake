@@ -18,6 +18,7 @@ import io.trinitylake.exception.StorageWriteFailureException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
+import io.trinitylake.models.ViewDef;
 import io.trinitylake.storage.LakehouseStorage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,5 +103,16 @@ public class ObjectDefinitions {
       throw new StorageReadFailureException(
           e, "Failed to read table definition from storage path %s at %s", path, storage.root());
     }
+  }
+
+  public static void writeViewDef(
+      LakehouseStorage storage,
+      String path,
+      String namespaceName,
+      String viewName,
+      TableDef viewDef) {}
+
+  public static ViewDef readViewDef(LakehouseStorage storage, String path) {
+    return null;
   }
 }

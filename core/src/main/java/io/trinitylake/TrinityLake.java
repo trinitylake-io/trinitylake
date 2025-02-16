@@ -19,6 +19,7 @@ import io.trinitylake.exception.ObjectNotFoundException;
 import io.trinitylake.models.LakehouseDef;
 import io.trinitylake.models.NamespaceDef;
 import io.trinitylake.models.TableDef;
+import io.trinitylake.models.ViewDef;
 import io.trinitylake.relocated.com.google.common.collect.ImmutableMap;
 import io.trinitylake.storage.LakehouseStorage;
 import io.trinitylake.tree.BasicTreeRoot;
@@ -273,5 +274,61 @@ public class TrinityLake {
     TreeRoot newRoot = TreeOperations.cloneTreeRoot(transaction.runningRoot());
     TreeOperations.removeKey(storage, newRoot, tableKey);
     return ImmutableRunningTransaction.builder().from(transaction).runningRoot(newRoot).build();
+  }
+
+  public static List<String> showViews(
+      LakehouseStorage storage, RunningTransaction transaction, String namespaceName) {
+    return null;
+  }
+
+  public static boolean viewExists(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String viewName) {
+    return false;
+  }
+
+  public static ViewDef describeView(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String viewName) {
+    return null;
+  }
+
+  public static RunningTransaction createView(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String viewName,
+      TableDef viewDef) {
+    return null;
+  }
+
+  public static RunningTransaction replaceView(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String viewName,
+      TableDef viewDef) {
+    return null;
+  }
+
+  public static RunningTransaction alterView(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String viewName,
+      TableDef viewDef) {
+    return null;
+  }
+
+  public static RunningTransaction dropView(
+      LakehouseStorage storage,
+      RunningTransaction transaction,
+      String namespaceName,
+      String viewName) {
+    return null;
   }
 }
