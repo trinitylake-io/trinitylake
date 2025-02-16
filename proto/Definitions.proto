@@ -34,6 +34,21 @@ message TableDef {
   map<string, string> properties = 11;
 }
 
+message ViewDef {
+  Schema schema = 2;
+  ViewRepresentation representation = 3;
+  optional string view_type = 4;
+  string view_format = 5;
+  map<string, string> format_properties = 6;
+  map<string, string> properties = 7;
+}
+
+message ViewRepresentation {
+  string type = 1;
+  string sql = 2;
+  string dialect = 3;
+}
+
 message Schema {
   repeated Column columns = 1;
 }
