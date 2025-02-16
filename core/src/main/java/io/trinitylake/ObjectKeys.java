@@ -52,6 +52,7 @@ public class ObjectKeys {
   private static final int SCHEMA_ID_PART_SIZE = 4;
   private static final String NAMESPACE_SCHEMA_ID_PART = "B===";
   private static final String TABLE_SCHEMA_ID_PART = "C===";
+  private static final String VIEW_SCHEMA_ID_PART = "D===";
 
   private ObjectKeys() {}
 
@@ -134,5 +135,17 @@ public class ObjectKeys {
             == (SCHEMA_ID_PART_SIZE
                 + lakehouseDef.getNamespaceNameMaxSizeBytes()
                 + lakehouseDef.getTableNameMaxSizeBytes());
+  }
+
+  public static String viewKey(String namespaceName, String viewName, LakehouseDef lakehouseDef) {
+    return null;
+  }
+
+  public static String viewNameFromKey(String viewName, LakehouseDef lakehouseDef) {
+    return null;
+  }
+
+  public static boolean isViewKey(String key, LakehouseDef lakehouseDef) {
+    return false;
   }
 }
